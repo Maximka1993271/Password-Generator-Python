@@ -43,14 +43,6 @@
 3. Программа работает как **Portable** (установка не требуется).
 
 ### 💻 Для разработчиков
-1. Убедитесь, что у вас установлен **Python 3.x**.
-2. Склонируйте репозиторий:
-   ```bash
-   git clone [https://github.com/Maximka1993271/Password-Generator-Python.git](https://github.com/Maximka1993271/Password-Generator-Python.git)
-
-   Запустите основной файл:
+1. Убедитесь, что у вас установлен **Python 3.14.4**.
+2. Запустите основной файл 
    python Secure_Pass_Pro.pyw
-
-   Разработчик: Maxim Melnikov
-
-Лицензия: Open Source
