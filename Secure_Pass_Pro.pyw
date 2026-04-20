@@ -7,7 +7,7 @@ import os
 import threading
 import time
 
-# 1. Функция для определения системной темы Windows
+# 1. Функция для определения системной темы
 def get_system_theme():
     try:
         import winreg
@@ -17,7 +17,7 @@ def get_system_theme():
     except:
         return 'light'
 
-# Глобальные переменные
+# Глобальная переменная для пути
 current_file_path = None
 
 # 2. Функция смены темы
@@ -37,6 +37,7 @@ def change_theme(mode):
     root.configure(bg=bg)
     result_entry.config(readonlybackground=res_bg, fg=res_fg, bg=res_bg)
     frame_checks.config(bg=bg)
+    strength_canvas.config(bg=bg, highlightthickness=0)
     
     root.current_theme_colors = {'btn': btn, 'btn_h': btn_h}
 
@@ -61,70 +62,60 @@ def setup_hover(widget):
     widget.bind("<Enter>", lambda e: widget.config(bg=root.current_theme_colors['btn_h']))
     widget.bind("<Leave>", lambda e: widget.config(bg=root.current_theme_colors['btn']))
 
-# 3. Безопасность и Валидация
+# 3. Логика сложности
+def update_strength_meter(score):
+    strength_canvas.delete("all")
+    colors = ["#e74c3c", "#e67e22", "#f1c40f", "#2ecc71", "#27ae60", "#1abc9c"]
+    labels = ["Очень слабый", "Слабый", "Средний", "Неплохой", "Сильный", "Очень сильный"]
+    
+    width = (score + 1) * 40 
+    strength_canvas.create_rectangle(0, 0, 240, 8, fill="#333333", outline="")
+    strength_canvas.create_rectangle(0, 0, width, 8, fill=colors[score], outline="")
+    strength_var.set(f"Сложность: {labels[score]}")
+
 def validate_digit_input(P):
-    """Разрешает ввод только цифр и ограничивает длину 2 символами"""
     if P == "" or (P.isdigit() and len(P) <= 2):
         return True
     return False
 
-def toggle_password_visibility():
-    result_entry.config(show="*" if hide_var.get() else "")
-
-def secure_clear_clipboard(content_to_clear):
-    time.sleep(60)
-    try:
-        if root.clipboard_get() == content_to_clear:
-            root.clipboard_clear()
-    except: pass
-
-# 4. Логика генерации
+# 4. Основные функции
 def generate_password():
     try:
         val = length_var.get()
-        if not val: 
-            messagebox.showwarning("Внимание", "Укажите длину пароля")
+        if not val or int(val) < 4:
+            messagebox.showwarning("Внимание", "Минимальная длина — 4")
             return
             
         length = int(val)
-        if not (4 <= length <= 64):
-            messagebox.showwarning("Внимание", "Длина должна быть от 4 до 64")
-            return
-
         chars = ''
         if upper_var.get(): chars += string.ascii_uppercase
         if lower_var.get(): chars += string.ascii_lowercase
         if digits_var.get(): chars += string.digits
         if symbols_var.get(): chars += string.punctuation
         
-        # Исключение похожих символов
         if exclude_similar_var.get():
-            similar = "Il1O0"
-            for s in similar:
-                chars = chars.replace(s, "")
+            for s in "Il1O0": chars = chars.replace(s, "")
 
         if not chars:
-            messagebox.showerror("Ошибка", "Выберите хотя бы один набор символов")
+            messagebox.showerror("Ошибка", "Выберите наборы символов")
             return
         
         pwd = ''.join(secrets.choice(chars) for _ in range(length))
         result_var.set(pwd)
         
-        # Расчет сложности
         score = sum([len(pwd) >= 12, any(c.isupper() for c in pwd), any(c.islower() for c in pwd), 
                      any(c.isdigit() for c in pwd), any(c in string.punctuation for c in pwd)])
-        txt = ["Очень слабый", "Слабый", "Средний", "Неплохой", "Сильный", "Очень сильный"]
-        strength_var.set(f"Сложность: {txt[score]}")
-    except ValueError:
-        messagebox.showerror("Ошибка", "Некорректная длина")
+        update_strength_meter(score)
+    except:
+        messagebox.showerror("Ошибка", "Проверьте ввод")
 
 def copy_to_clipboard():
     pwd = result_var.get()
     if pwd:
         root.clipboard_clear()
         root.clipboard_append(pwd)
-        show_custom_info("Буфер", "Успешно!", "Скопировано. Очистка через 60 сек.")
-        threading.Thread(target=secure_clear_clipboard, args=(pwd,), daemon=True).start()
+        threading.Thread(target=lambda: (time.sleep(60), root.clipboard_clear()), daemon=True).start()
+        show_custom_info("Буфер", "Успешно!", "Пароль скопирован. Очистка через 60 сек.")
 
 def show_custom_info(title, label_text, main_text):
     info_win = tk.Toplevel(root)
@@ -136,24 +127,29 @@ def show_custom_info(title, label_text, main_text):
     
     current_bg = root.cget("bg")
     current_fg = "#FFFFFF" if current_bg == "#252526" else "#000000"
+    btn_color = "#3E3E42" if current_bg == "#252526" else "#E1E1E1"
     info_win.configure(bg=current_bg)
     
     tk.Label(info_win, text=label_text, font=("Arial", 10), bg=current_bg, fg=current_fg).pack(pady=(25, 5))
     tk.Label(info_win, text=main_text, font=("Arial", 11, "bold"), bg=current_bg, fg=current_fg, wraplength=280).pack(pady=5)
-    tk.Button(info_win, text="OK", command=info_win.destroy, width=12, relief='flat').pack(pady=15)
+    tk.Button(info_win, text="OK", command=info_win.destroy, width=12, bg=btn_color, fg=current_fg, relief='flat').pack(pady=15)
 
+# Функции сохранения
 def save_quick():
+    global current_file_path
     if not result_var.get(): return
     if current_file_path and os.path.exists(current_file_path):
         with open(current_file_path, "w", encoding="utf-8") as f:
             f.write(result_var.get())
         show_custom_info("Сохранение", "Файл обновлен:", os.path.basename(current_file_path))
-    else: save_as()
+    else:
+        save_as()
 
 def save_as():
     global current_file_path
     if result_var.get():
-        path = filedialog.asksaveasfilename(defaultextension=".txt", filetypes=[("Текстовые файлы", "*.txt")])
+        path = filedialog.asksaveasfilename(defaultextension=".txt", 
+                                            filetypes=[("Текстовые файлы", "*.txt"), ("Все файлы", "*.*")])
         if path:
             current_file_path = path
             with open(path, "w", encoding="utf-8") as f:
@@ -163,29 +159,26 @@ def save_as():
 def open_github():
     webbrowser.open("https://github.com/Maximka1993271/Password-Generator-Python")
 
-# 5. Главное окно
+# 5. Интерфейс
 root = tk.Tk()
-root.title("Secure Pass Pro v1.8.2")
-root.geometry("400x620")
+root.title("Secure Pass Pro v1.8.3")
+root.geometry("400x670")
 root.resizable(False, False)
 root.current_theme_colors = {}
 
-# Подключение иконки (файл должен быть в папке с .py)
 if os.path.exists("icon.ico"):
     root.iconbitmap("icon.ico")
-
-# Валидация ввода
-vcmd = (root.register(validate_digit_input), '%P')
 
 length_var = tk.StringVar(value="12")
 upper_var, lower_var = tk.BooleanVar(value=True), tk.BooleanVar(value=True)
 digits_var, symbols_var = tk.BooleanVar(value=True), tk.BooleanVar(value=True)
-exclude_similar_var = tk.BooleanVar(value=False)
-hide_var = tk.BooleanVar(value=False)
-result_var, strength_var = tk.StringVar(), tk.StringVar()
+exclude_similar_var, hide_var = tk.BooleanVar(value=False), tk.BooleanVar(value=False)
+result_var, strength_var = tk.StringVar(), tk.StringVar(value="Сложность: -")
 
 # --- МЕНЮ ---
 menubar = tk.Menu(root)
+
+# МЕНЮ ФАЙЛ (ВОЗВРАЩЕНО)
 file_menu = tk.Menu(menubar, tearoff=0)
 file_menu.add_command(label="Сохранить", command=save_quick)
 file_menu.add_command(label="Сохранить как...", command=save_as)
@@ -203,34 +196,42 @@ menubar.add_cascade(label="Настройки", menu=settings_menu)
 
 about_menu = tk.Menu(menubar, tearoff=0)
 about_menu.add_command(label="Автор программы", command=lambda: show_custom_info("Автор", "Программу разработал:", "Maxim Melnikov"))
-about_menu.add_command(label="Версия программы", command=lambda: show_custom_info("Версия", "Текущая сборка:", "v1.8.2 Stable"))
+about_menu.add_command(label="Версия программы", command=lambda: show_custom_info("Версия", "Текущая сборка:", "v1.8.3 Stable"))
 about_menu.add_command(label="Сайт проекта (GitHub)", command=open_github)
 menubar.add_cascade(label="О программе", menu=about_menu)
+
 root.config(menu=menubar)
 
-# --- ИНТЕРФЕЙС ---
+# --- ГЛАВНЫЙ ЭКРАН ---
 tk.Label(root, text="Настройки генерации", font=("Arial", 12, "bold")).pack(pady=15)
 tk.Label(root, text="Длина пароля (4-64):").pack()
-tk.Entry(root, textvariable=length_var, width=8, justify='center', font=("Arial", 11), validate='key', validatecommand=vcmd).pack(pady=5)
+tk.Entry(root, textvariable=length_var, width=8, justify='center', font=("Arial", 11), 
+         validate='key', validatecommand=(root.register(validate_digit_input), '%P')).pack(pady=5)
 
 frame_checks = tk.Frame(root)
 frame_checks.pack(pady=5)
-tk.Checkbutton(frame_checks, text="Заглавные буквы", variable=upper_var).pack(anchor='w')
-tk.Checkbutton(frame_checks, text="Строчные буквы", variable=lower_var).pack(anchor='w')
-tk.Checkbutton(frame_checks, text="Цифры", variable=digits_var).pack(anchor='w')
-tk.Checkbutton(frame_checks, text="Спецсимволы", variable=symbols_var).pack(anchor='w')
-tk.Checkbutton(frame_checks, text="Исключить похожие (i, l, 1, L, o, 0)", variable=exclude_similar_var).pack(anchor='w', pady=(5,0))
-tk.Checkbutton(frame_checks, text="Скрывать символы", variable=hide_var, command=toggle_password_visibility).pack(anchor='w', pady=(5,0))
+for text, var in [("Заглавные буквы", upper_var), ("Строчные буквы", lower_var), 
+                  ("Цифры", digits_var), ("Спецсимволы", symbols_var), 
+                  ("Исключить похожие (i, l, 1, L, o, 0)", exclude_similar_var)]:
+    tk.Checkbutton(frame_checks, text=text, variable=var).pack(anchor='w')
+
+tk.Checkbutton(frame_checks, text="Скрывать символы", variable=hide_var, 
+               command=lambda: result_entry.config(show="*" if hide_var.get() else "")).pack(anchor='w', pady=(5,0))
 
 btn_gen = tk.Button(root, text="СГЕНЕРИРОВАТЬ", command=generate_password, width=25, height=2, font=("Arial", 10, "bold"), relief='flat', bd=0)
 btn_gen.pack(pady=15)
 setup_hover(btn_gen)
 
-result_entry = tk.Entry(root, textvariable=result_var, font=("Consolas", 14), width=25, state='readonly', justify='center')
-result_entry.pack(pady=5)
+# Поле вывода пароля (Шрифт Consolas + Отступы)
+result_entry = tk.Entry(root, textvariable=result_var, font=("Consolas", 14), width=25, 
+                        state='readonly', justify='center')
+result_entry.pack(pady=5, padx=20)
 
+# Индикатор сложности
+strength_canvas = tk.Canvas(root, width=240, height=8)
+strength_canvas.pack(pady=(10, 0))
 strength_label = tk.Label(root, textvariable=strength_var, font=("Arial", 10, "italic"))
-strength_label.pack()
+strength_label.pack(pady=(0, 10))
 
 btn_copy = tk.Button(root, text="КОПИРОВАТЬ ПАРОЛЬ", command=copy_to_clipboard, width=25, height=1, relief='flat', bd=0)
 btn_copy.pack(pady=10)
