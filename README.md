@@ -1,7 +1,8 @@
 📸 Скриншоты
+## 📺 Скриншот интерфейса
+
 <p align="center">
-<img src="Снимок экрана 2026-04-20 225846.png" width="350" title="Главное окно">
-<img src="Снимок экрана 2026-04-20 225751.jpg" width="350" title="Валидация и темы">
+  <img src="Secure_Pass_MainWindow.png" width="350" title="Главное окно Secure Pass Pro">
 </p>
 
 🚀 Что нового в версии v1.8.3
