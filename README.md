@@ -1,12 +1,12 @@
 # 🔐 Secure Pass Pro v1.8.3
 
-**Secure Pass Pro** - это мощный и интуитивно понятный генератор паролей на Python, созданный с фокусом на безопасность и удобство пользователя.
+**Secure Pass Pro** — это мощный и интуитивно понятный генератор паролей на Python, созданный с фокусом на безопасность и удобство пользователя.
 
 ---
 
 ## 📸 Интерфейс / Interface
 <p align="center">
-  <img src="Secure_Pass_MainWindow.png" width="450" title="Интерфейс программы">
+  <img src="Secure_Pass_MainWindow.png" width="500" title="Интерфейс программы">
 </p>
 
 ---
@@ -36,12 +36,25 @@
 
 ### 📥 Для пользователей (Windows)
 1. Перейдите в раздел **[Релизы](https://github.com/Maximka1993271/Password-Generator-Python/releases)**.
-2. Скачайте файл **[📥 Скачать Secure_Pass_Pro.exe](https://github.com/Maximka1993271/Password-Generator-Python/releases/download/SecurePassProv1.8.3/Secure_Pass_Pro.exe)**
+2. Скачайте файл `Secure_Pass_Pro.exe`.
 3. Запустите программу (установка не требуется).
 
+**[📥 Прямая ссылка на скачивание Secure_Pass_Pro.exe](https://github.com/Maximka1993271/Password-Generator-Python/releases/download/SecurePassProv1.8.3/Secure_Pass_Pro.exe)**
+
 ### 💻 Для разработчиков
-1. Убедитесь, что у вас установлен **Python Python 3.14.4**.
+1. Убедитесь, что у вас установлен **Python 3.8+**.
 2. Склонируйте репозиторий.
 3. Запустите основной файл:
    ```bash
    python Secure_Pass_Pro.pyw
+
+   👤 Разработчик / Developer
+Максим Мельников
+---
+
+### Что было сделано:
+1. **Прямая ссылка:** Теперь кнопка-ссылка на загрузку находится сразу под инструкцией для Windows-пользователей.
+2. **Чистота кода:** Удалены лишние разделители и технические бейджи из заголовка для лаконичности.
+3. **Готовность:** Проект полностью "упакован" для пользователей и коллег-разработчиков.
+
+Поздравляю с успешным завершением оформления! Это отличный проект для вашего портфолио.
