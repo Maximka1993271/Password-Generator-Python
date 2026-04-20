@@ -2,9 +2,10 @@
 ## 📺 Скриншот интерфейса
 
 ## 📸 Интерфейс / Interface
+
 <p align="center">
-  <img src="Снимок экрана 2026-04-20 233109.png" width="350" title="Русский интерфейс">
-  <img src="Снимок экрана 2026-04-20 231542.png" width="350" title="English Interface">
+  <img src="Secure_Pass_MainWindow.png" width="380" title="Русский интерфейс (Темная тема)">
+  <img src="Secure_Pass_MainWindow2.png" width="380" title="English Interface (Dark Theme)">
 </p>
 
 > **Примечание:** Программа поддерживает мгновенное переключение между RU, EN и UA языками через меню «Настройки» / «Settings».
