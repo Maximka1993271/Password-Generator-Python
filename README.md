@@ -36,10 +36,8 @@
 
 ### 📥 Для пользователей (Windows)
 1. Перейдите в раздел **[Релизы](https://github.com/Maximka1993271/Password-Generator-Python/releases)**.
-2. Скачайте файл `Secure_Pass_Pro.exe`.
+2. **[📥 Скачайте файл](https://github.com/Maximka1993271/Password-Generator-Python/releases/download/SecurePassProv1.8.3/Secure_Pass_Pro.exe)
 3. Запустите программу (установка не требуется).
-
-**[📥 Прямая ссылка на скачивание Secure_Pass_Pro.exe](https://github.com/Maximka1993271/Password-Generator-Python/releases/download/SecurePassProv1.8.3/Secure_Pass_Pro.exe)**
 
 ### 💻 Для разработчиков
 1. Убедитесь, что у вас установлен **Python 3.8+**.
