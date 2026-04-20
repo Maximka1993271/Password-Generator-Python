@@ -42,7 +42,7 @@
 **[📥 Скачать Secure_Pass_Pro.exe](https://github.com/Maximka1993271/Password-Generator-Python/releases/download/SecurePassProv1.8.3/Secure_Pass_Pro.exe)**
 
 ### 💻 Для разработчиков
-1. Убедитесь, что у вас установлен **Python 3.8+**.
+1. Убедитесь, что у вас установлен **Python Python 3.14.4**.
 2. Склонируйте репозиторий.
 3. Запустите основной файл:
    ```bash
