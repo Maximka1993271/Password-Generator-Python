@@ -1,6 +1,6 @@
 import tkinter as tk
 from tkinter import messagebox, filedialog
-import random
+import secrets  # Заменили random на secrets для безопасности
 import string
 
 # Функция для изменения темы (темная/светлая)
@@ -28,7 +28,6 @@ def change_theme(mode):
         label_color = '#333333'
         strength_label_color = '#3333cc'
 
-    # Обновляем элементы интерфейса с учетом новой темы
     for widget in root.winfo_children():
         if isinstance(widget, tk.Label):
             widget.config(fg=text_color, bg=root.cget('bg'), font=("Arial", 12))
@@ -41,18 +40,13 @@ def change_theme(mode):
             widget.bind("<Enter>", lambda event, btn=widget: on_hover(btn, button_hover_color))
             widget.bind("<Leave>", lambda event, btn=widget: on_leave(btn, button_color))
 
-    # Изменяем цвет текста на кнопке, которая активирует темный/светлый режим
     theme_button.config(bg=button_color, fg=text_color)
-
-    # Изменяем цвет лейбла с силой пароля
     strength_label.config(fg=strength_label_color)
 
 def on_hover(btn, hover_color):
-    """Эффект при наведении на кнопку"""
     btn.config(bg=hover_color)
 
 def on_leave(btn, normal_color):
-    """Восстановление цвета кнопки при убирании курсора"""
     btn.config(bg=normal_color)
 
 def generate_password():
@@ -79,7 +73,8 @@ def generate_password():
         if not characters:
             raise Exception("Выберите хотя бы один тип символов.")
 
-        password = ''.join(random.choice(characters) for _ in range(length))
+        # Используем secrets.choice для криптографической стойкости
+        password = ''.join(secrets.choice(characters) for _ in range(length))
         result_var.set(password)
         evaluate_strength(password)
     except ValueError:
@@ -129,11 +124,9 @@ def evaluate_strength(password):
     }
     strength_var.set("Сложность: " + strength.get(score, "Неизвестно"))
 
-# Создание окна
 root = tk.Tk()
-root.title("Генератор паролей")
+root.title("Генератор паролей (Secure Edition)")
 
-# Переменные
 length_var = tk.StringVar(value="12")
 upper_var = tk.BooleanVar(value=True)
 lower_var = tk.BooleanVar(value=True)
@@ -142,7 +135,6 @@ symbols_var = tk.BooleanVar(value=True)
 result_var = tk.StringVar()
 strength_var = tk.StringVar()
 
-# Центрировать окно на экране
 def center_window(win):
     win.update_idletasks()
     width = win.winfo_width()
@@ -151,9 +143,6 @@ def center_window(win):
     y = (win.winfo_screenheight() // 2) - (height // 2)
     win.geometry(f"{width}x{height}+{x}+{y}")
 
-center_window(root)
-
-# Интерфейс
 tk.Label(root, text="Длина пароля (1-64):").grid(row=0, column=0, columnspan=2, sticky="w", padx=10, pady=5)
 tk.Entry(root, textvariable=length_var, width=5).grid(row=0, column=1, sticky="w", padx=10, pady=5)
 
@@ -171,37 +160,29 @@ strength_label.grid(row=7, column=0, columnspan=2, pady=5, padx=10)
 tk.Button(root, text="Скопировать", command=copy_to_clipboard).grid(row=8, column=0, pady=5, padx=10)
 tk.Button(root, text="Сохранить", command=save_to_file).grid(row=8, column=1, pady=5, padx=10)
 
-# Кнопки для изменения темы
 def switch_to_dark():
     change_theme('dark')
 
 def switch_to_light():
     change_theme('light')
 
-# Кнопки для переключения темы
 theme_button = tk.Button(root, text="Темный режим", command=switch_to_dark)
 theme_button.grid(row=9, column=0, pady=5, padx=10)
 light_button = tk.Button(root, text="Светлый режим", command=switch_to_light)
 light_button.grid(row=9, column=1, pady=5, padx=10)
 
-# Имя автора (ссылка на GitHub)
 def open_github(event=None):
     import webbrowser
-    webbrowser.open_new("https://github.com/Maxim1993271")
+    webbrowser.open_new("https://github.com/Maximka1993271")
 
 author_label = tk.Label(root, text="Автор: Максим (GitHub)", fg="blue", cursor="hand2")
 author_label.grid(row=10, column=0, columnspan=2, pady=(10, 5))
 author_label.bind("<Button-1>", open_github)
 
-# Центрировать элементы в окне
 root.grid_columnconfigure(0, weight=1)
 root.grid_columnconfigure(1, weight=1)
-
-# Устанавливаем минимальный размер окна
 root.minsize(400, 300)
-
-# Изначально устанавливаем светлый режим
+center_window(root)
 change_theme('light')
 
-# Запуск
 root.mainloop()
