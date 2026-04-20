@@ -5,7 +5,6 @@
 
 <p align="center">
   <img src="Secure_Pass_MainWindow.png" width="380" title="Русский интерфейс (Темная тема)">
-  <img src="Secure_Pass_MainWindow2.png" width="380" title="English Interface (Dark Theme)">
 </p>
 
 > **Примечание:** Программа поддерживает мгновенное переключение между RU, EN и UA языками через меню «Настройки» / «Settings».
