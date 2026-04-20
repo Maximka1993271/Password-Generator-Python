@@ -76,7 +76,6 @@ def get_system_theme():
     except: return 'light'
 
 def on_closing():
-    """ Безопасное закрытие с очисткой памяти """
     root.clipboard_clear()
     root.destroy()
 
@@ -127,7 +126,7 @@ def change_theme(mode):
     root.current_theme_colors = {'btn': btn, 'btn_h': btn_h}
     for widget in root.winfo_children():
         if isinstance(widget, (tk.Label, tk.Button, tk.Checkbutton, tk.Entry)):
-            if widget == author_label: continue
+            if widget in [author_label, stars_label]: continue # Игнорируем спец-метки
             if isinstance(widget, tk.Label): widget.config(bg=bg, fg=fg)
             if isinstance(widget, tk.Button): widget.config(bg=btn, fg=fg, activebackground=btn_h)
             if isinstance(widget, tk.Checkbutton): widget.config(bg=bg, fg=fg, selectcolor=check_sel, activebackground=bg)
@@ -136,6 +135,7 @@ def change_theme(mode):
         cb.config(bg=bg, fg=fg, selectcolor=check_sel, activebackground=bg)
     strength_label.config(bg=bg)
     author_label.config(bg=btn, fg=fg)
+    stars_label.config(bg=bg) # Звезды всегда на фоне окна
 
 def setup_hover(widget):
     widget.bind("<Enter>", lambda e: widget.config(bg=root.current_theme_colors['btn_h']))
@@ -180,7 +180,6 @@ def generate_password():
         if not chars:
             messagebox.showerror(L['err'], L['choose_set'])
             return
-            
         pwd = ''.join(secrets.choice(chars) for _ in range(length))
         result_var.set(pwd)
         
@@ -190,8 +189,7 @@ def generate_password():
         elif 10 <= length < 14: score = 2 if variety < 3 else 3
         else: score = 4 if variety < 4 else 5
         update_strength_meter(score)
-    except Exception:
-        messagebox.showerror(L['err'], L['check_input'])
+    except: messagebox.showerror(L['err'], L['check_input'])
 
 def copy_to_clipboard():
     pwd = result_var.get()
@@ -199,11 +197,10 @@ def copy_to_clipboard():
     if pwd:
         root.clipboard_clear()
         root.clipboard_append(pwd)
-        # Поток для безопасной очистки буфера и памяти
         def secure_wipe():
             time.sleep(60)
             root.clipboard_clear()
-            result_var.set("") # Сброс поля после копирования
+            result_var.set("")
         threading.Thread(target=secure_wipe, daemon=True).start()
         show_custom_info(L['success'], L['success'], L['copied'])
 
@@ -231,18 +228,17 @@ def save_as():
             try:
                 with open(path, "w", encoding="utf-8") as f: f.write(result_var.get())
                 show_custom_info(L['save_title'], L['success'], os.path.basename(path))
-            except Exception:
-                messagebox.showerror(L['err'], "Permission denied")
+            except: messagebox.showerror(L['err'], "Permission denied")
 
 def open_github():
     webbrowser.open("https://github.com/Maximka1993271/Password-Generator-Python")
 
 # =============================================================================
-# [RU] ЗАПУСК / [EN] RUN / [UA] ЗАПУСК
+# [RU] ИНТЕРФЕЙС / [EN] UI / [UA] ІНТЕРФЕЙС
 # =============================================================================
 root = tk.Tk()
 root.title("Secure Pass Pro v1.8.3")
-root.geometry("400x700")
+root.geometry("400x730") # Увеличил высоту для звезд
 root.resizable(False, False)
 root.protocol("WM_DELETE_WINDOW", on_closing)
 
@@ -321,8 +317,12 @@ btn_copy = tk.Button(root, text="", command=copy_to_clipboard, width=25, height=
 btn_copy.pack(pady=10)
 setup_hover(btn_copy)
 
+# Блок рейтинга и GitHub
+stars_label = tk.Label(root, text="★★★★★", font=("Arial", 14, "bold"), fg="#FFD700") # Золотые звезды
+stars_label.pack(side='bottom', pady=(20, 0))
+
 author_label = tk.Label(root, text="GitHub ©", cursor="hand2", font=("Arial", 9, "bold"), padx=10, pady=5)
-author_label.pack(side='bottom', pady=20)
+author_label.pack(side='bottom', pady=(5, 20))
 author_label.bind("<Button-1>", lambda e: open_github())
 
 change_theme('system')
