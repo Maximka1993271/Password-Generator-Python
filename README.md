@@ -2,7 +2,7 @@
 
 ![Version](https://img.shields.io/badge/version-1.8.3-blue) ![Python](https://img.shields.io/badge/python-3.8+-yellow) ![License](https://img.shields.io/badge/license-MIT-green)
 
-**Secure Pass Pro** — это мощный и интуитивно понятный генератор паролей на Python, созданный с фокусом на безопасность и удобство пользователя.
+**Secure Pass Pro** - это мощный и интуитивно понятный генератор паролей на Python, созданный с фокусом на безопасность и удобство пользователя.
 
 ---
 
