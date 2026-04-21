@@ -31,7 +31,7 @@ Secure Wipe: Автоматическая очистка буфера обмен
 Валидация ввода: Реализована жесткая проверка поля длины пароля (isdigit check).
 
 📊 Анализ надежности и UX
-Графический Canvas: Индикатор сложности с 6-уровневой шкалой оценки в реальном времени.
+Графический Canvas: Индикатор сложности с 6-уровневой шкалой оценки надежности в реальном времени.
 
 Adaptive UI: Полная поддержка системной темной и светлой темы оформления Windows.
 
@@ -39,13 +39,9 @@ Adaptive UI: Полная поддержка системной темной и 
 
 🛠 Установка и запуск / Installation
 📥 Для пользователей (Windows)
-Перейдите в раздел Релизы:
+Перейдите в раздел Релизы: https://github.com/Maximka1993271/Password-Generator-Python/releases
 
-https://github.com/Maximka1993271/Password-Generator-Python/releases
-
-Скачайте актуальный файл 📥 Secure_Pass_Pro.exe:
-
-https://github.com/Maximka1993271/Password-Generator-Python/releases/download/SecurePassProv1.8.9/Secure_Pass_Pro.exe
+Скачайте актуальный файл 📥 Secure_Pass_Pro.exe: https://github.com/Maximka1993271/Password-Generator-Python/releases/download/SecurePassProv1.8.9/Secure_Pass_Pro.exe
 
 Программа работает как Portable (установка не требуется).
 
