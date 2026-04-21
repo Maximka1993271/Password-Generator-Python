@@ -41,7 +41,7 @@ Adaptive UI: Полная поддержка системной темной и 
 📥 Для пользователей (Windows)
 Перейдите в раздел **[Релизы](https://github.com/Maximka1993271/Password-Generator-Python/releases)**.
 
-Скачайте файл **[📥 Secure_Pass_Pro.exe]([https://github.com/Maximka1993271/Password-Generator-Python/releases/download/SecurePassProv1.8.3/Secure_Pass_Pro.exe](https://github.com/Maximka1993271/Password-Generator-Python/releases/download/SecurePassProv1.8.9/Secure_Pass_Pro.exe))**.
+Скачайте файл **[📥 Secure_Pass_Pro.exe](https://github.com/Maximka1993271/Password-Generator-Python/releases/download/SecurePassProv1.8.9/Secure_Pass_Pro.exe)**.
 
 Программа работает как Portable (установка не требуется).
 
