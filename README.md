@@ -46,7 +46,7 @@ Secure Wipe: Автоматическая очистка буфера обмен
 
 📥 Для пользователей (Windows Portable)
 1. Перейдите в раздел **[Релизы](https://github.com/Maximka1993271/Password-Generator-Python/releases)**.
-2. Скачайте актуальный файл **[📥 Secure_Pass_Pro.exe](https://github.com/Maximka1993271/Password-Generator-Python/releases/latest)**.
+2. Скачайте актуальный файл **[📥 Secure_Pass_Pro.exe]([https://github.com/Maximka1993271/Password-Generator-Python/releases/latest](https://github.com/Maximka1993271/Password-Generator-Python/releases/download/SecurePassProv1.8.9/Secure_Pass_Pro.exe))**.
 3. Программа работает как Portable (установка не требуется).
 
 💻 Для разработчиков
