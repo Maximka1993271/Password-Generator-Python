@@ -1,5 +1,5 @@
 🔐 Secure Pass Pro v1.8.9 Stable
-Secure Pass Pro — это мощный, кроссплатформенный инструмент для генерации паролей, созданный на Python. Программа сочетает в себе максимальную криптостойкость и современный интерфейс в стиле "Amoled Black".
+Secure Pass Pro - это мощный, кроссплатформенный инструмент для генерации паролей, созданный на Python. Программа сочетает в себе максимальную криптостойкость и современный интерфейс в стиле "Amoled Black".
 
 📸 Интерфейс / Interface
 <p align="center">
@@ -10,7 +10,7 @@ Secure Pass Pro — это мощный, кроссплатформенный и
 🎨 Дизайн и UX
 Amoled Dark Theme: Глубокий черный интерфейс в стиле AdGuard для комфортной работы ночью.
 
-Full Localization: Полная поддержка трех языков — Русский, English, Українська.
+Full Localization: Полная поддержка трех языков - Русский, English, Українська.
 
 Dynamic Feedback: Анимированные кнопки и интерактивные подсказки при наведении.
 
@@ -42,9 +42,6 @@ Clean Code: Исходный код снабжен подробными комм
 3. Программа работает как Portable (установка не требуется).
 
 Для разработчиков
-# Клонировать репозиторий
-git clone [https://github.com/Maximka1993271/Password-Generator-Python.git](https://github.com/Maximka1993271/Password-Generator-Python.git)
-
 # Установить зависимости
 pip install pillow qrcode
 
