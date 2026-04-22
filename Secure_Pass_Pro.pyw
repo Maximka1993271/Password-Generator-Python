@@ -7,15 +7,17 @@ import threading
 import time
 import os
 import sys
+import qrcode # QR generation library / Библиотека для QR / Бібліотека для QR
+from PIL import ImageTk, Image # Image handling / Работа с изображениями / Робота з зображеннями
 
 # =============================================================================
 # RESOURCE PATH / ПУТЬ К РЕСУРСАМ / ШЛЯХ ДО РЕСУРСІВ
 # =============================================================================
 def resource_path(relative_path):
-    """ 
-    EN: Get absolute path to resource (for .exe)
-    RU: Получение абсолютного пути к ресурсам (для сборки в .exe)
-    UA: Отримання абсолютного шляху до ресурсів (для збірки в .exe)
+    """
+    Get absolute path to resource (for PyInstaller)
+    Получение абсолютного пути к ресурсу (для PyInstaller)
+    Отримання абсолютного шляху до ресурсу (для PyInstaller)
     """
     try:
         base_path = sys._MEIPASS
@@ -38,7 +40,8 @@ LANGUAGES = {
         'upper': "Заглавные буквы", 'lower': "Строчные буквы", 'digits': "Цифры", 'symb': "Спецсимволы",
         'exclude': "Исключить похожие (0/O, 1/l/I)", 'ambiguous': "Исключить неоднозначные", 'hide': "Скрывать символы",
         'at_least': "Минимум 1 из каждой категории",
-        'gen_btn': "СГЕНЕРИРОВАТЬ", 'open_btn': "ОТКРЫТЬ ФАЙЛ", 'copy_btn': "КОПИРОВАТЬ ПАРОЛЬ", 'strength': "Сложность",
+        'gen_btn': "СГЕНЕРИРОВАТЬ", 'open_btn': "ОТКРЫТЬ ФАЙЛ", 'copy_btn': "КОПИРОВАТЬ ПАРОЛЬ", 'qr_btn': "QR-КОД ПАРОЛЯ",
+        'strength': "Сложность",
         'strength_lvls': ["Очень слабый", "Слабый", "Средний", "Неплохой", "Сильный", "Очень сильный"],
         'warn': "Внимание", 'min_len': "Длина должна быть от 4 до 64", 'err': "Ошибка", 'choose_set': "Выберите наборы символов",
         'check_input': "Проверьте ввод", 'copied': "Пароль скопирован. Очистка через 60 сек.", 'success': "Успешно!",
@@ -64,7 +67,8 @@ LANGUAGES = {
         'upper': "Uppercase", 'lower': "Lowercase", 'digits': "Digits", 'symb': "Symbols",
         'exclude': "Exclude similar (0/O, 1/l/I)", 'ambiguous': "Exclude ambiguous", 'hide': "Hide symbols",
         'at_least': "At least 1 from each category",
-        'gen_btn': "GENERATE", 'open_btn': "OPEN FILE", 'copy_btn': "COPY PASSWORD", 'strength': "Strength",
+        'gen_btn': "GENERATE", 'open_btn': "OPEN FILE", 'copy_btn': "COPY PASSWORD", 'qr_btn': "PASSWORD QR-CODE",
+        'strength': "Strength",
         'strength_lvls': ["Very Weak", "Weak", "Medium", "Good", "Strong", "Very Strong"],
         'warn': "Warning", 'min_len': "Length must be between 4 and 64", 'err': "Error", 'choose_set': "Select character sets",
         'check_input': "Check input", 'copied': "Password copied. Clear in 60 sec.", 'success': "Success!",
@@ -80,17 +84,18 @@ LANGUAGES = {
         'crack_never': "Practically uncrackable"
     },
     'ua': {
-        'menu_file': "Файл", 'menu_opts': "Опції", 'menu_about': "Про програму",
+        'menu_file': "Файл", 'menu_opts': "Опції", 'menu_about': "Про программу",
         'save': "Зберегти", 'save_as': "Зберегти як...", 'exit': "Вихід",
         'themes': "Теми", 'lang': "Мова", 'light': "Світла", 'dark': "Темна", 'system': "Системна",
         'author_btn': "Автор програми", 'author_title': "Автор", 'author_main': "Maxim Melnikov", 'author_label_text': "Програму розробив:",
         'ver_btn': "Версія програми", 'ver_title': "Версія", 'ver_main': "v1.8.9 Stable", 'ver_label_text': "Поточна збірка:",
         'site_btn': "Сайт проєкту (GitHub)",
         'header': "Налаштування генерації", 'len_label': "Довжина пароля (4-64):",
-        'upper': "Великі літери", 'lower': "Малі літери", 'digits': "Цифри", 'spec': "Спецсимволи",
+        'upper': "Великі літери", 'lower': "Малі літери", 'digits': "Цифри", 'symb': "Спецсимволи",
         'exclude': "Виключити схожі (0/O, 1/l/I)", 'ambiguous': "Виключити неоднозначні", 'hide': "Приховати символи",
         'at_least': "Мінімум 1 з кожної категорії",
-        'gen_btn': "ЗГЕНЕРУВАТИ", 'open_btn': "ВІДКРИТИ ФАЙЛ", 'copy_btn': "КОПІЮВАТИ ПАРОЛЬ", 'strength': "Складність",
+        'gen_btn': "ЗГЕНЕРУВАТИ", 'open_btn': "ВІДКРИТИ ФАЙЛ", 'copy_btn': "КОПІЮВАТИ ПАРОЛЬ", 'qr_btn': "QR-КОД ПАРОЛЯ",
+        'strength': "Складність",
         'strength_lvls': ["Дуже слабкий", "Слабкий", "Середній", "Непоганий", "Сильний", "Дуже сильний"],
         'warn': "Увага", 'min_len': "Довжина має бути від 4 до 64", 'err': "Помилка", 'choose_set': "Оберіть набори символів",
         'check_input': "Перевірте введення", 'copied': "Пароль скопійовано. Очистка через 60 сек.", 'success': "Успішно!",
@@ -103,7 +108,7 @@ LANGUAGES = {
         'crack_days': "Зламають за ~{} дн.",
         'crack_years': "Зламають за ~{} років",
         'crack_centuries': "Зламають за ~{} віків",
-        'crack_never': "Практично неможливо зламати"
+        'crack_never': "Практически неможливо зламати"
     }
 }
 
@@ -120,7 +125,7 @@ current_file_path = None
 # =============================================================================
 
 def get_system_theme():
-    """ EN: Get Windows theme / RU: Получение темы Windows / UA: Отримання теми Windows """
+    """ Detects Windows system theme / Определяет тему системы Windows / Визначає тему системи Windows """
     try:
         import winreg
         key = winreg.OpenKey(winreg.HKEY_CURRENT_USER, r"Software\Microsoft\Windows\CurrentVersion\Themes\Personalize")
@@ -129,7 +134,7 @@ def get_system_theme():
     except: return 'light'
 
 def estimate_crack_time(password):
-    """ EN: Logic for crack time / RU: Расчет времени взлома / UA: Розрахунок часу зламу """
+    """ Estimates time to crack / Расчет времени на взлом / Розрахунок часу на злам """
     if not password: return -1, ""
     charset = 0
     if any(c.islower() for c in password): charset += 26
@@ -149,13 +154,13 @@ def estimate_crack_time(password):
     else: return 7, L['crack_never']
 
 def on_closing():
-    """ EN: Exit handler / RU: Обработка выхода / UA: Обробка виходу """
+    """ Cleanup on exit / Очистка при выходе / Очищення при виході """
     try: root.clipboard_clear()
     except: pass
     root.destroy()
 
 def change_lang(lang_code):
-    """ EN: Switch language / RU: Смена языка интерфейса / UA: Зміна мови інтерфейсу """
+    """ Changes UI language / Смена языка интерфейса / Зміна мови інтерфейсу """
     global current_lang
     current_lang = lang_code
     L = LANGUAGES[lang_code]
@@ -178,10 +183,11 @@ def change_lang(lang_code):
     btn_gen.config(text=L['gen_btn'])
     btn_open.config(text=L['open_btn'])
     btn_copy.config(text=L['copy_btn'])
+    btn_qr.config(text=L['qr_btn'])
     cb_upper.config(text=L['upper'])
     cb_lower.config(text=L['lower'])
     cb_digits.config(text=L['digits'])
-    cb_symb.config(text=L.get('spec', L.get('symb')))
+    cb_symb.config(text=L['symb'])
     cb_exclude.config(text=L['exclude'])
     cb_ambiguous.config(text=L['ambiguous'])
     cb_hide.config(text=L['hide'])
@@ -189,7 +195,7 @@ def change_lang(lang_code):
     update_strength_meter(last_score, result_var.get())
 
 def change_theme(mode):
-    """ EN: UI Theme switcher / RU: Переключение темы / UA: Перемикання теми """
+    """ Changes UI theme / Смена темы оформления / Зміна теми оформлення """
     if mode == 'system': mode = get_system_theme()
     if mode == 'dark':
         bg, fg, btn, btn_h, entry_bg = '#252526', '#FFFFFF', '#3E3E42', '#454545', '#333333'
@@ -221,15 +227,48 @@ def change_theme(mode):
     stars_label.config(bg=bg)
 
 def setup_hover(widget):
-    """ EN: Hover effect / RU: Наведение / UA: Наведення """
+    """ Hover effect for buttons / Эффект при наведении / Ефект при наведенні """
     widget.bind("<Enter>", lambda e: widget.config(bg=root.current_theme_colors['btn_h']))
     widget.bind("<Leave>", lambda e: widget.config(bg=root.current_theme_colors['btn']))
 
 # =============================================================================
-# STRENGTH METER LOGIC / ШКАЛЫ СЛОЖНОСТИ / ШКАЛИ СКЛАДНОСТІ
+# QR CODE FUNCTION / ФУНКЦИЯ QR-КОДА / ФУНКЦІЯ QR-КОДУ
+# =============================================================================
+def generate_qr():
+    """ Generates QR code window with theme support / Генерация окна QR-кода с темой / Генерація вікна QR-коду з темою """
+    pwd = result_var.get()
+    if not pwd: return
+    
+    qr_win = tk.Toplevel(root)
+    qr_win.title("QR Code")
+    qr_win.geometry("250x250")
+    qr_win.resizable(False, False)
+    
+    # Theme application / Применение темы / Застосування теми
+    current_bg = root.cget("bg")
+    qr_win.configure(bg=current_bg)
+    
+    icon_p = resource_path("app_icon.ico")
+    if os.path.exists(icon_p):
+        try: qr_win.iconbitmap(icon_p)
+        except: pass
+
+    # QR Generation / Создание QR / Створення QR
+    qr = qrcode.QRCode(version=1, box_size=8, border=2)
+    qr.add_data(pwd) 
+    qr.make(fit=True)
+    img_qr = qr.make_image(fill_color="black", back_color="white")
+    
+    img_tk = ImageTk.PhotoImage(img_qr.resize((220, 220)))
+    lbl = tk.Label(qr_win, image=img_tk, bg=current_bg)
+    lbl.image = img_tk 
+    lbl.pack(expand=True)
+
+# =============================================================================
+# STRENGTH METER LOGIC / ЛОГИКА СЛОЖНОСТИ / ЛОГІКА СКЛАДНОСТІ
 # =============================================================================
 def update_strength_meter(score, password=""):
-    """ EN: Update both progress bars / RU: Обновление обеих полосок / UA: Оновлення обох смужок """
+    """ Visualizes password strength / Визуализация сложности / Візуалізація складності """
     global last_score
     last_score = score
     strength_canvas.delete("all")
@@ -239,35 +278,31 @@ def update_strength_meter(score, password=""):
     if score == -1:
         strength_var.set(""); crack_var.set(""); return
 
-    # MAIN BAR / ОСНОВНАЯ ШКАЛА / ОСНОВНА ШКАЛА
     colors = ["#e74c3c", "#e74c3c", "#f39c12", "#f39c12", "#27ae60", "#27ae60"]
     strength_canvas.create_rectangle(0, 0, 200, 6, fill="#333333", outline="")
     width = (score + 1) * 33.33 
     strength_canvas.create_rectangle(0, 0, width, 6, fill=colors[score], outline="")
     strength_var.set(f"{L['strength']}: {L['strength_lvls'][score]}")
 
-    # CRACK TIME BAR (Dynamic colors: 4-red, 10-orange, 14-green)
-    # ПОЛОСКА ВРЕМЕНИ (Цвета: 4-красный, 10-оранжевый, 14-зеленый)
-    # СМУЖКА ЧАСУ (Кольори: 4-червоний, 10-помаранчевий, 14-зелений)
     if password:
         p_len = len(password)
         crack_score, crack_text = estimate_crack_time(password)
         crack_var.set(crack_text)
         
-        # Determine color / Определяем цвет / Визначаємо колір
-        if p_len <= 4: bar_color = "#e74c3c" # Red / Красный / Червоний
-        elif p_len <= 10: bar_color = "#f39c12" # Orange / Оранжевый / Помаранчевий
-        else: bar_color = "#27ae60" # Green / Зеленый / Зелений
+        if p_len <= 4: bar_color = "#e74c3c" 
+        elif p_len <= 10: bar_color = "#f39c12" 
+        else: bar_color = "#27ae60" 
         
         crack_canvas.create_rectangle(0, 0, 200, 4, fill="#333333", outline="")
         crack_width = (crack_score + 1) * (200 / 8) 
         crack_canvas.create_rectangle(0, 0, crack_width, 4, fill=bar_color, outline="")
 
 # =============================================================================
-# GENERATOR CORE / ЯДРО ГЕНЕРАЦИИ / ЯДРО ГЕНЕРАЦІЇ
+# GENERATOR CORE / ЯДРО ГЕНЕРАТОРА / ЯДРО ГЕНЕРАТОРА
 # =============================================================================
 
 def generate_password():
+    """ Main password generation logic / Логика генерации пароля / Логіка генерації пароля """
     L = LANGUAGES[current_lang]
     try:
         raw_len = length_var.get().strip()
@@ -282,6 +317,7 @@ def generate_password():
         if not categories:
             messagebox.showerror(L['err'], L['choose_set']); return
 
+        # Exclude chars / Исключение символов / Виключення символів
         if exclude_similar_var.get():
             categories = [''.join(c for c in cat if c not in "Il1O0") for cat in categories]
         if exclude_ambiguous_var.get():
@@ -312,6 +348,7 @@ def generate_password():
         messagebox.showerror(L['err'], L['check_input'])
 
 def copy_to_clipboard():
+    """ Copy with auto-wipe / Копирование с авто-очисткой / Копіювання з авто-очищенням """
     pwd = result_var.get()
     L = LANGUAGES[current_lang]
     if pwd:
@@ -325,6 +362,7 @@ def copy_to_clipboard():
         show_custom_info(L['success'], L['success'], L['copied'])
 
 def save_file():
+    """ Quick save to file / Быстрое сохранение / Швидке збереження """
     global current_file_path
     pwd = result_var.get()
     if not pwd: return
@@ -334,6 +372,7 @@ def save_file():
     except: pass
 
 def save_as():
+    """ Save as... dialog / Сохранить как... / Зберегти як... """
     global current_file_path
     L = LANGUAGES[current_lang]
     pwd = result_var.get()
@@ -342,12 +381,14 @@ def save_as():
                                           defaultextension=".txt", filetypes=FULL_FILETYPES)
         if path:
             try:
-                with open(path, "w", encoding="utf-8") as f: f.write(pwd)
+                with open(path, "w", encoding="utf-8") as f:
+                    f.write(pwd)
                 current_file_path = path 
                 show_custom_info(L['success'], L['success'], L['saved'])
             except Exception as e: messagebox.showerror(L['err'], str(e))
 
 def open_file():
+    """ Open file dialog / Открыть файл / Відкрити файл """
     global current_file_path
     L = LANGUAGES[current_lang]
     path = filedialog.askopenfilename(title=L['open_title'], filetypes=FULL_FILETYPES)
@@ -360,6 +401,7 @@ def open_file():
         except Exception as e: messagebox.showerror(L['err'], str(e))
 
 def show_custom_info(title_key, label_key, main_val, is_static_main=True):
+    """ Custom pop-up window / Кастомное окно уведомления / Кастомне вікно сповіщення """
     L = LANGUAGES[current_lang]
     info_win = tk.Toplevel(root)
     info_win.title(L.get(title_key, title_key))
@@ -380,10 +422,11 @@ def show_custom_info(title_key, label_key, main_val, is_static_main=True):
              bg="#3E3E42" if current_bg == "#252526" else "#E1E1E1", fg=current_fg, relief='flat').pack(pady=10)
 
 def open_github():
+    """ Opens project GitHub / Открывает GitHub / Відкриває GitHub """
     webbrowser.open("https://github.com/Maximka1993271/Password-Generator-Python")
 
 # =============================================================================
-# MAIN WINDOW / ГЛАВНОЕ ОКНО / ГОЛОВНЕ ВІКНО
+# MAIN WINDOW SETUP / ГЛАВНОЕ ОКНО / ГОЛОВНЕ ВІКНО
 # =============================================================================
 root = tk.Tk()
 root.title("Secure Pass Pro")
@@ -395,6 +438,7 @@ if os.path.exists(icon_p):
     try: root.iconbitmap(icon_p)
     except: pass
 
+# Variables / Переменные / Змінні
 length_var = tk.StringVar(value="12")
 upper_var, lower_var = tk.BooleanVar(value=True), tk.BooleanVar(value=True)
 digits_var, symbols_var = tk.BooleanVar(value=True), tk.BooleanVar(value=True)
@@ -402,6 +446,7 @@ exclude_similar_var, exclude_ambiguous_var = tk.BooleanVar(value=True), tk.Boole
 at_least_one_var, hide_var = tk.BooleanVar(value=True), tk.BooleanVar(value=False)
 result_var, strength_var, crack_var = tk.StringVar(), tk.StringVar(), tk.StringVar()
 
+# Menu Bar / Главное меню / Головне меню
 menubar = tk.Menu(root)
 file_menu = tk.Menu(menubar, tearoff=0)
 file_menu.add_command(label="Save", command=save_file)
@@ -430,6 +475,7 @@ about_menu.add_command(label="GitHub", command=open_github)
 menubar.add_cascade(label="About", menu=about_menu)
 root.config(menu=menubar)
 
+# UI Widgets / Виджеты интерфейса / Віджети інтерфейсу
 header_label = tk.Label(root, text="", font=("Arial", 11, "bold"))
 header_label.pack(pady=(10, 2))
 len_info_label = tk.Label(root, font=("Arial", 9)); len_info_label.pack()
@@ -454,7 +500,6 @@ btn_open.pack(pady=2); setup_hover(btn_open)
 result_entry = tk.Entry(root, textvariable=result_var, font=("Consolas", 12), width=22, state='readonly', justify='center')
 result_entry.pack(pady=4)
 
-# --- BARS / ПОЛОСКИ / СМУЖКИ ---
 strength_canvas = tk.Canvas(root, width=200, height=6); strength_canvas.pack()
 strength_label_widget = tk.Label(root, textvariable=strength_var, font=("Arial", 9, "italic")); strength_label_widget.pack()
 
@@ -465,10 +510,14 @@ crack_canvas = tk.Canvas(root, width=200, height=4); crack_canvas.pack(pady=(0, 
 btn_copy = tk.Button(root, text="", command=copy_to_clipboard, width=22, relief='flat')
 btn_copy.pack(pady=5); setup_hover(btn_copy)
 
+btn_qr = tk.Button(root, text="", command=generate_qr, width=22, relief='flat')
+btn_qr.pack(pady=2); setup_hover(btn_qr)
+
 stars_label = tk.Label(root, text="★★★★★", font=("Arial", 12, "bold"), fg="#FFD700"); stars_label.pack(side='bottom', pady=(0, 5))
 author_label = tk.Label(root, text="GitHub ©", cursor="hand2", font=("Arial", 8, "bold"), padx=8, pady=3); author_label.pack(side='bottom', pady=2)
 author_label.bind("<Button-1>", lambda e: open_github())
 
+# Init app / Запуск приложения / Запуск додатка
 change_theme('system')
 change_lang('ru')
 
