@@ -56,7 +56,6 @@ Secure Wipe: Автоматическая очистка буфера обмен
    ```bash
    python Secure_Pass_Pro.pyw
    
-   📦 Сборка (PyInstaller)
 Для корректной работы QR-кода и иконок используйте:
 ```bash
 pyinstaller --onefile --noconsole --icon="app_icon.ico" --add-data "app_icon.ico;." --hidden-import=qrcode --collect-submodules qrcode Secure_Pass_Pro.pyw
