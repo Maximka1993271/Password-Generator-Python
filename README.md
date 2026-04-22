@@ -53,8 +53,8 @@ Secure Wipe: Автоматическая очистка буфера обмен
 1. Установите зависимости
    pip install pillow qrcode
 2. Скачайте исходный код и запустите основной файл:
-   ```bash
-   python Secure_Pass_Pro.pyw
+```bash
+python Secure_Pass_Pro.pyw
    
 Для корректной работы QR-кода и иконок используйте:
 ```bash
