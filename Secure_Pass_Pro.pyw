@@ -9,7 +9,7 @@ import os
 import sys
 
 # =============================================================================
-# RESOURCE PATH FUNCTION (Для коректного відображення іконки)
+# RESOURCE PATH FUNCTION
 # =============================================================================
 def resource_path(relative_path):
     """ Отримує абсолютний шлях до ресурсів. Працює для dev і для PyInstaller """
@@ -100,30 +100,13 @@ LANGUAGES = {
         'crack_days': "Зламають за ~{} дн.",
         'crack_years': "Зламають за ~{} років",
         'crack_centuries': "Зламають за ~{} віків",
-        'crack_never': "Практично неможливо зламати"
+        'crack_never': "Практически неможливо зламати"
     }
 }
 
 FULL_FILETYPES = [
-    ("Python file", "*.py;*.pyw;*.pyx"),
     ("Normal text file", "*.txt"),
-    ("JavaScript file", "*.js;*.jsx;*.mjs"),
-    ("JSON file", "*.json"),
-    ("C source file", "*.c;*.h"),
-    ("C++ source file", "*.cpp;*.cxx;*.cc;*.hpp"),
-    ("C# source file", "*.cs"),
-    ("Java source file", "*.java"),
-    ("Go source file", "*.go"),
-    ("Rust file", "*.rs"),
-    ("TypeScript file", "*.ts;*.tsx"),
-    ("YAML file", "*.yml;*.yaml"),
-    ("Markdown", "*.md;*.markdown"),
-    ("Shell script", "*.sh;*.bash"),
-    ("Batch file", "*.bat;*.cmd"),
-    ("Windows PowerShell", "*.ps1;*.psm1"),
-    ("HTML file", "*.html;*.htm"),
-    ("CSS file", "*.css"),
-    ("SQL file", "*.sql"),
+    ("Python file", "*.py;*.pyw"),
     ("All files", "*.*")
 ]
 
@@ -145,8 +128,7 @@ def get_system_theme():
         return 'light'
 
 def estimate_crack_time(password):
-    if not password:
-        return -1, ""
+    if not password: return -1, ""
     charset = 0
     if any(c.islower() for c in password): charset += 26
     if any(c.isupper() for c in password): charset += 26
@@ -155,34 +137,21 @@ def estimate_crack_time(password):
     if charset == 0: return -1, ""
 
     combinations = charset ** len(password)
-    guesses_per_sec = 10_000_000_000
-    seconds = combinations / guesses_per_sec
-
+    seconds = combinations / 10_000_000_000 # 10 billion guesses/sec
     L = LANGUAGES[current_lang]
-    if seconds < 1:
-        return 0, L['crack_instantly']
-    elif seconds < 60:
-        return 1, L['crack_seconds'].format(int(seconds))
-    elif seconds < 3600:
-        return 2, L['crack_minutes'].format(int(seconds // 60))
-    elif seconds < 86400:
-        return 3, L['crack_hours'].format(int(seconds // 3600))
-    elif seconds < 86400 * 365:
-        return 4, L['crack_days'].format(int(seconds // 86400))
-    elif seconds < 86400 * 365 * 100:
-        years = int(seconds // (86400 * 365))
-        return 5, L['crack_years'].format(years)
-    elif seconds < 86400 * 365 * 10000:
-        centuries = int(seconds // (86400 * 365 * 100))
-        return 6, L['crack_centuries'].format(centuries)
-    else:
-        return 7, L['crack_never']
+    
+    if seconds < 1: return 0, L['crack_instantly']
+    elif seconds < 60: return 1, L['crack_seconds'].format(int(seconds))
+    elif seconds < 3600: return 2, L['crack_minutes'].format(int(seconds // 60))
+    elif seconds < 86400: return 3, L['crack_hours'].format(int(seconds // 3600))
+    elif seconds < 86400 * 365: return 4, L['crack_days'].format(int(seconds // 86400))
+    elif seconds < 86400 * 365 * 100: return 5, L['crack_years'].format(int(seconds // (86400 * 365)))
+    elif seconds < 86400 * 365 * 10000: return 6, L['crack_centuries'].format(int(seconds // (86400 * 365 * 100)))
+    else: return 7, L['crack_never']
 
 def on_closing():
-    try:
-        root.clipboard_clear()
-    except:
-        pass
+    try: root.clipboard_clear()
+    except: pass
     root.destroy()
 
 def change_lang(lang_code):
@@ -216,36 +185,33 @@ def change_lang(lang_code):
     cb_ambiguous.config(text=L['ambiguous'])
     cb_hide.config(text=L['hide'])
     cb_at_least.config(text=L['at_least'])
-    update_strength_meter(last_score)
+    update_strength_meter(last_score, result_var.get())
 
 def change_theme(mode):
-    if mode == 'system':
-        mode = get_system_theme()
+    if mode == 'system': mode = get_system_theme()
     if mode == 'dark':
         bg, fg, btn, btn_h, entry_bg = '#252526', '#FFFFFF', '#3E3E42', '#454545', '#333333'
         res_bg, res_fg, check_sel = '#1E1E1E', '#4EC9B0', '#3E3E42'
     else:
         bg, fg, btn, btn_h, entry_bg = '#F3F3F3', '#000000', '#E1E1E1', '#D0D0D0', '#FFFFFF'
         res_bg, res_fg, check_sel = '#FFFFFF', '#005FB8', '#FFFFFF'
+    
     root.configure(bg=bg)
     result_entry.config(readonlybackground=res_bg, fg=res_fg, bg=res_bg)
     frame_checks.config(bg=bg)
     strength_canvas.config(bg=bg, highlightthickness=0)
     root.current_theme_colors = {'btn': btn, 'btn_h': btn_h}
-    for widget in root.winfo_children():
-        if isinstance(widget, (tk.Label, tk.Button, tk.Checkbutton, tk.Entry)):
-            if widget in [author_label, stars_label]:
-                continue
-            if isinstance(widget, tk.Label):
-                widget.config(bg=bg, fg=fg)
-            if isinstance(widget, tk.Button):
-                widget.config(bg=btn, fg=fg, activebackground=btn_h)
-            if isinstance(widget, tk.Checkbutton):
-                widget.config(bg=bg, fg=fg, selectcolor=check_sel, activebackground=bg)
-            if isinstance(widget, tk.Entry) and widget != result_entry:
-                widget.config(bg=entry_bg, fg=fg, insertbackground=fg)
-    for cb in frame_checks.winfo_children():
-        cb.config(bg=bg, fg=fg, selectcolor=check_sel, activebackground=bg)
+    
+    def apply_style(parent):
+        for widget in parent.winfo_children():
+            if isinstance(widget, tk.Frame): apply_style(widget)
+            elif isinstance(widget, tk.Label):
+                if widget not in [author_label, stars_label]: widget.config(bg=bg, fg=fg)
+            elif isinstance(widget, tk.Button): widget.config(bg=btn, fg=fg, activebackground=btn_h)
+            elif isinstance(widget, tk.Checkbutton): widget.config(bg=bg, fg=fg, selectcolor=check_sel, activebackground=bg)
+            elif isinstance(widget, tk.Entry) and widget != result_entry: widget.config(bg=entry_bg, fg=fg, insertbackground=fg)
+
+    apply_style(root)
     strength_label_widget.config(bg=bg, fg=fg)
     crack_label_widget.config(bg=bg)
     author_label.config(bg=btn, fg=fg)
@@ -274,11 +240,10 @@ def update_strength_meter(score, password=""):
         crack_var.set(crack_text)
 
 def generate_password():
-    global last_score
     L = LANGUAGES[current_lang]
     try:
         raw_len = length_var.get().strip()
-        if not raw_len.isdigit() or int(raw_len) < 4 or int(raw_len) > 64:
+        if not raw_len.isdigit() or not (4 <= int(raw_len) <= 64):
             messagebox.showwarning(L['warn'], L['min_len'])
             return
         length = int(raw_len)
@@ -287,14 +252,16 @@ def generate_password():
         if lower_var.get(): categories.append(string.ascii_lowercase)
         if digits_var.get(): categories.append(string.digits)
         if symbols_var.get(): categories.append(string.punctuation)
+        
+        if not categories:
+            messagebox.showerror(L['err'], L['choose_set'])
+            return
+
         if exclude_similar_var.get():
             categories = [''.join(c for c in cat if c not in "Il1O0") for cat in categories]
         if exclude_ambiguous_var.get():
             categories = [''.join(c for c in cat if c not in ".,:;\'~\"/()[]{}|") for cat in categories]
-        categories = [c for c in categories if c]
-        if not categories:
-            messagebox.showerror(L['err'], L['choose_set'])
-            return
+        
         all_chars = "".join(categories)
         pwd_list = []
         if at_least_one_var.get() and length >= len(categories):
@@ -302,17 +269,19 @@ def generate_password():
             for _ in range(length - len(categories)): pwd_list.append(secrets.choice(all_chars))
         else:
             for _ in range(length): pwd_list.append(secrets.choice(all_chars))
+        
         secrets.SystemRandom().shuffle(pwd_list)
         pwd = "".join(pwd_list)
         result_var.set(pwd)
         result_entry.config(show="*" if hide_var.get() else "")
+        
         variety = sum([any(c.isupper() for c in pwd), any(c.islower() for c in pwd),
                       any(c.isdigit() for c in pwd), any(c in string.punctuation for c in pwd)])
         if length < 10: score = 0 if variety < 2 else 1
         elif 10 <= length < 14: score = 2 if variety < 3 else 3
         else: score = 4 if variety < 4 else 5
         update_strength_meter(score, pwd)
-    except:
+    except Exception:
         messagebox.showerror(L['err'], L['check_input'])
 
 def copy_to_clipboard():
@@ -331,16 +300,11 @@ def copy_to_clipboard():
 
 def save_file():
     global current_file_path
-    L = LANGUAGES[current_lang]
-    pwd = result_var.get()
-    if not pwd:
-        messagebox.showwarning(L['warn'], L['no_pwd'])
-        return
     if current_file_path:
         try:
-            with open(current_file_path, "w", encoding="utf-8") as f: f.write(pwd)
-            show_custom_info(L['success'], L['success'], L['saved'])
-        except Exception as e: messagebox.showerror(L['err'], str(e))
+            with open(current_file_path, "w", encoding="utf-8") as f: f.write(result_var.get())
+            show_custom_info("success", "success", LANGUAGES[current_lang]['saved'])
+        except: save_as()
     else: save_as()
 
 def save_as():
@@ -351,11 +315,9 @@ def save_as():
         path = filedialog.asksaveasfilename(title=L['save_title'], initialfile="SecurePass.txt",
                                           defaultextension=".txt", filetypes=FULL_FILETYPES)
         if path:
-            try:
-                with open(path, "w", encoding="utf-8") as f: f.write(pwd)
-                current_file_path = path
-                show_custom_info(L['success'], L['success'], L['saved'])
-            except Exception as e: messagebox.showerror(L['err'], str(e))
+            with open(path, "w", encoding="utf-8") as f: f.write(pwd)
+            current_file_path = path
+            show_custom_info(L['success'], L['success'], L['saved'])
 
 def open_file():
     global current_file_path
@@ -365,7 +327,6 @@ def open_file():
         with open(path, "r", encoding="utf-8") as f: result_var.set(f.read().strip())
         current_file_path = path
         update_strength_meter(-1)
-        crack_var.set("")
 
 def show_custom_info(title_key, label_key, main_val, is_static_main=True):
     L = LANGUAGES[current_lang]
@@ -373,13 +334,22 @@ def show_custom_info(title_key, label_key, main_val, is_static_main=True):
     info_win.title(L.get(title_key, title_key))
     info_win.geometry("280x130")
     info_win.resizable(False, False)
+    
+    # Установка иконки для дочернего окна
+    try:
+        icon_p = resource_path("app_icon.ico")
+        if os.path.exists(icon_p):
+            info_win.iconbitmap(icon_p)
+    except: pass
+
     current_bg = root.cget("bg")
     current_fg = "#FFFFFF" if current_bg == "#252526" else "#000000"
     info_win.configure(bg=current_bg)
+    
     main_text = main_val if is_static_main else L.get(main_val, main_val)
-    tk.Label(info_win, text=L.get(label_key, label_key), font=("Arial", 9), bg=current_bg, fg=current_fg).pack(pady=(15, 2))
-    tk.Label(info_win, text=main_text, font=("Arial", 10, "bold"), bg=current_bg, fg=current_fg, wraplength=250).pack(pady=5)
-    tk.Button(info_win, text="OK", command=info_win.destroy, width=10,
+    tk.Label(info_win, text=L.get(label_key, label_key), bg=current_bg, fg=current_fg).pack(pady=(15, 2))
+    tk.Label(info_win, text=main_text, font=("Arial", 10, "bold"), bg=current_bg, fg=current_fg).pack(pady=5)
+    tk.Button(info_win, text="OK", command=info_win.destroy, width=10, 
               bg="#3E3E42" if current_bg == "#252526" else "#E1E1E1", fg=current_fg, relief='flat').pack(pady=10)
 
 def open_github():
@@ -394,13 +364,11 @@ root.geometry("340x610")
 root.resizable(False, False)
 root.protocol("WM_DELETE_WINDOW", on_closing)
 
-# ВСТАНОВЛЕННЯ ІКОНКИ (ОНОВЛЕНО)
+# Установка иконки главного окна
 try:
-    icon_path = resource_path("app_icon.ico")
-    if os.path.exists(icon_path):
-        root.iconbitmap(icon_path)
-except Exception:
-    pass
+    icon_p = resource_path("app_icon.ico")
+    if os.path.exists(icon_p): root.iconbitmap(icon_p)
+except: pass
 
 length_var = tk.StringVar(value="12")
 upper_var, lower_var = tk.BooleanVar(value=True), tk.BooleanVar(value=True)
@@ -409,6 +377,7 @@ exclude_similar_var, exclude_ambiguous_var = tk.BooleanVar(value=True), tk.Boole
 at_least_one_var, hide_var = tk.BooleanVar(value=True), tk.BooleanVar(value=False)
 result_var, strength_var, crack_var = tk.StringVar(), tk.StringVar(), tk.StringVar()
 
+# Меню
 menubar = tk.Menu(root)
 file_menu = tk.Menu(menubar, tearoff=0)
 file_menu.add_command(label="Save", command=save_file)
@@ -438,6 +407,7 @@ about_menu.add_command(label="GitHub", command=open_github)
 menubar.add_cascade(label="About", menu=about_menu)
 root.config(menu=menubar)
 
+# Виджеты
 header_label = tk.Label(root, text="", font=("Arial", 11, "bold"))
 header_label.pack(pady=(10, 2))
 len_info_label = tk.Label(root, font=("Arial", 9))
@@ -446,32 +416,31 @@ tk.Entry(root, textvariable=length_var, width=6, justify='center', font=("Arial"
 
 frame_checks = tk.Frame(root)
 frame_checks.pack(pady=2)
-cb_font = ("Arial", 9)
-cb_upper = tk.Checkbutton(frame_checks, variable=upper_var, font=cb_font); cb_upper.pack(anchor='w')
-cb_lower = tk.Checkbutton(frame_checks, variable=lower_var, font=cb_font); cb_lower.pack(anchor='w')
-cb_digits = tk.Checkbutton(frame_checks, variable=digits_var, font=cb_font); cb_digits.pack(anchor='w')
-cb_symb = tk.Checkbutton(frame_checks, variable=symbols_var, font=cb_font); cb_symb.pack(anchor='w')
-cb_at_least = tk.Checkbutton(frame_checks, variable=at_least_one_var, font=cb_font); cb_at_least.pack(anchor='w')
-cb_exclude = tk.Checkbutton(frame_checks, variable=exclude_similar_var, font=cb_font); cb_exclude.pack(anchor='w')
-cb_ambiguous = tk.Checkbutton(frame_checks, variable=exclude_ambiguous_var, font=cb_font); cb_ambiguous.pack(anchor='w')
-cb_hide = tk.Checkbutton(frame_checks, variable=hide_var, font=cb_font, command=lambda: result_entry.config(show="*" if hide_var.get() else ""))
+cb_upper = tk.Checkbutton(frame_checks, variable=upper_var, font=("Arial", 9)); cb_upper.pack(anchor='w')
+cb_lower = tk.Checkbutton(frame_checks, variable=lower_var, font=("Arial", 9)); cb_lower.pack(anchor='w')
+cb_digits = tk.Checkbutton(frame_checks, variable=digits_var, font=("Arial", 9)); cb_digits.pack(anchor='w')
+cb_symb = tk.Checkbutton(frame_checks, variable=symbols_var, font=("Arial", 9)); cb_symb.pack(anchor='w')
+cb_at_least = tk.Checkbutton(frame_checks, variable=at_least_one_var, font=("Arial", 9)); cb_at_least.pack(anchor='w')
+cb_exclude = tk.Checkbutton(frame_checks, variable=exclude_similar_var, font=("Arial", 9)); cb_exclude.pack(anchor='w')
+cb_ambiguous = tk.Checkbutton(frame_checks, variable=exclude_ambiguous_var, font=("Arial", 9)); cb_ambiguous.pack(anchor='w')
+cb_hide = tk.Checkbutton(frame_checks, variable=hide_var, font=("Arial", 9), command=lambda: result_entry.config(show="*" if hide_var.get() else ""))
 cb_hide.pack(anchor='w')
 
-btn_gen = tk.Button(root, text="", command=generate_password, width=22, height=1, font=("Arial", 9, "bold"), relief='flat', bd=0)
+btn_gen = tk.Button(root, text="", command=generate_password, width=22, font=("Arial", 9, "bold"), relief='flat')
 btn_gen.pack(pady=(8, 2)); setup_hover(btn_gen)
-btn_open = tk.Button(root, text="", command=open_file, width=22, height=1, font=("Arial", 9, "bold"), relief='flat', bd=0)
+btn_open = tk.Button(root, text="", command=open_file, width=22, font=("Arial", 9, "bold"), relief='flat')
 btn_open.pack(pady=2); setup_hover(btn_open)
 
 result_entry = tk.Entry(root, textvariable=result_var, font=("Consolas", 12), width=22, state='readonly', justify='center')
-result_entry.pack(pady=4, padx=15)
+result_entry.pack(pady=4)
 strength_canvas = tk.Canvas(root, width=200, height=6)
-strength_canvas.pack(pady=(2, 0))
+strength_canvas.pack()
 strength_label_widget = tk.Label(root, textvariable=strength_var, font=("Arial", 9, "italic"))
-strength_label_widget.pack(pady=(0, 0))
+strength_label_widget.pack()
 crack_label_widget = tk.Label(root, textvariable=crack_var, font=("Arial", 8), fg="#888888")
-crack_label_widget.pack(pady=(0, 2))
+crack_label_widget.pack()
 
-btn_copy = tk.Button(root, text="", command=copy_to_clipboard, width=22, height=1, font=("Arial", 9), relief='flat', bd=0)
+btn_copy = tk.Button(root, text="", command=copy_to_clipboard, width=22, relief='flat')
 btn_copy.pack(pady=5); setup_hover(btn_copy)
 
 stars_label = tk.Label(root, text="★★★★★", font=("Arial", 12, "bold"), fg="#FFD700")
@@ -480,6 +449,8 @@ author_label = tk.Label(root, text="GitHub ©", cursor="hand2", font=("Arial", 8
 author_label.pack(side='bottom', pady=2)
 author_label.bind("<Button-1>", lambda e: open_github())
 
+# Инициализация темы и языка
 change_theme('system')
 change_lang('ru')
+
 root.mainloop()
