@@ -46,7 +46,7 @@ Clean Code: Исходный код снабжен подробными комм
 # Установить зависимости
 pip install pillow qrcode
 
-# Запустить python Secure_Pass_Pro.pyw **[📥 Secure_Pass_Pro.pyw]([https://github.com/Maximka1993271/Password-Generator-Python/releases/download/SecurePassProv1.8.9/Secure_Pass_Pro.exe](https://github.com/Maximka1993271/Password-Generator-Python/blob/main/Secure_Pass_Pro.pyw)**.
+# Запустить python Secure_Pass_Pro.pyw **[python Secure_Pass_Pro.pyw]([https://github.com/Maximka1993271/Password-Generator-Python/releases/download/SecurePassProv1.8.9/Secure_Pass_Pro.exe](https://github.com/Maximka1993271/Password-Generator-Python/blob/main/Secure_Pass_Pro.pyw)**
 
 👨‍💻 Автор
 Разработчик: Максим Мельников
