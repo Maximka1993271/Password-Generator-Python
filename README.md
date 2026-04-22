@@ -47,3 +47,8 @@
 1. Перейдите в раздел **[Релизы](https://github.com/Maximka1993271/Password-Generator-Python/releases)**.
 2. Скачайте актуальный файл **[📥 Secure_Pass_Pro.exe](https://github.com/Maximka1993271/Password-Generator-Python/releases/latest)**.
 3. Программа работает как Portable (установка не требуется).
+
+### 💻 Для разработчиков
+1. Скачайте исходный код и запустите основной файл:
+   ```bash
+   python Secure_Pass_Pro.pyw
