@@ -7,7 +7,7 @@ import threading
 import time
 import os
 import sys
-import platform # Added for cross-platform checks
+import platform
 import qrcode
 from PIL import ImageTk, Image
 
@@ -22,7 +22,7 @@ def resource_path(relative_path):
     return os.path.join(base_path, relative_path)
 
 # =============================================================================
-# TRANSLATIONS / ПЕРЕВОДЫ / ПЕРЕКЛАДИ (Блок без изменений для краткости)
+# TRANSLATIONS / ПЕРЕВОДЫ / ПЕРЕКЛАДИ
 # =============================================================================
 LANGUAGES = {
     'ru': {
@@ -94,50 +94,26 @@ LANGUAGES = {
 }
 
 # =============================================================================
-# CROSS-PLATFORM HELPER / КРОСПЛАТФОРМЕННІСТЬ
+# CROSS-PLATFORM SYSTEM THEME / СИСТЕМНА ТЕМА / СИСТЕМНА ТЕМА
 # =============================================================================
 def get_system_theme():
-    """ 
-    Safely detects system theme for Windows, macOS, and Linux
-    Безпечно визначає тему для Windows, macOS та Linux
-    """
     try:
         if platform.system() == "Windows":
             import winreg
             key = winreg.OpenKey(winreg.HKEY_CURRENT_USER, r"Software\Microsoft\Windows\CurrentVersion\Themes\Personalize")
             value, _ = winreg.QueryValueEx(key, "AppsUseLightTheme")
             return 'light' if value == 1 else 'dark'
-        elif platform.system() == "Darwin": # macOS
+        elif platform.system() == "Darwin":
             import subprocess
             cmd = 'defaults read -g AppleInterfaceStyle'
             p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
             return 'dark' if p.communicate()[0].decode('utf-8').strip() == "Dark" else 'light'
-    except:
-        pass
-    return 'light' # Default for Linux or on error
-
-def set_app_icon(window):
-    """
-    Sets icon compatible with current OS
-    Встановлює іконку, сумісну з поточною ОС
-    """
-    icon_path = resource_path("app_icon.ico")
-    if os.path.exists(icon_path):
-        try:
-            if platform.system() == "Windows":
-                window.iconbitmap(icon_path)
-            else:
-                # Use PIL to load .ico as PhotoImage for Linux/macOS
-                img = Image.open(icon_path)
-                photo = ImageTk.PhotoImage(img)
-                window.wm_iconphoto(True, photo)
-        except:
-            pass
+    except: pass
+    return 'light'
 
 # =============================================================================
-# LOGIC & UI (Основные функции без изменений, адаптирован вызов темы)
+# APP LOGIC / ЛОГИКА / ЛОГІКА
 # =============================================================================
-
 current_lang = 'ru'
 last_score = -1
 current_file_path = None
@@ -201,10 +177,12 @@ def change_lang(lang_code):
     update_strength_meter(last_score, result_var.get())
 
 def change_theme(mode):
+    """ AMOLED BLACK THEME INTEGRATION / ЧЕРНЫЙ ЦВЕТ ADGUARD """
     if mode == 'system': mode = get_system_theme()
     if mode == 'dark':
-        bg, fg, btn, btn_h, entry_bg = '#252526', '#FFFFFF', '#3E3E42', '#454545', '#333333'
-        res_bg, res_fg, check_sel = '#1E1E1E', '#4EC9B0', '#3E3E42'
+        # Pure Black Style (AdGuard inspired)
+        bg, fg, btn, btn_h, entry_bg = '#000000', '#FFFFFF', '#1A1A1A', '#2D2D2D', '#121212'
+        res_bg, res_fg, check_sel = '#000000', '#4EC9B0', '#1A1A1A'
     else:
         bg, fg, btn, btn_h, entry_bg = '#F3F3F3', '#000000', '#E1E1E1', '#D0D0D0', '#FFFFFF'
         res_bg, res_fg, check_sel = '#FFFFFF', '#005FB8', '#FFFFFF'
@@ -240,27 +218,25 @@ def generate_qr():
     if not pwd: return
     qr_win = tk.Toplevel(root)
     qr_win.title("QR Code")
-    qr_win.geometry("250x250")
-    qr_win.resizable(False, False)
+    qr_win.geometry("250x250"); qr_win.resizable(False, False)
     current_bg = root.cget("bg")
     qr_win.configure(bg=current_bg)
-    set_app_icon(qr_win)
+    try:
+        icon_path = resource_path("app_icon.ico")
+        if os.path.exists(icon_path): qr_win.iconbitmap(icon_path)
+    except: pass
 
     qr = qrcode.QRCode(version=1, box_size=8, border=2)
-    qr.add_data(pwd) 
-    qr.make(fit=True)
+    qr.add_data(pwd); qr.make(fit=True)
     img_qr = qr.make_image(fill_color="black", back_color="white")
-    
     img_tk = ImageTk.PhotoImage(img_qr.resize((220, 220)))
     lbl = tk.Label(qr_win, image=img_tk, bg=current_bg)
-    lbl.image = img_tk 
-    lbl.pack(expand=True)
+    lbl.image = img_tk; lbl.pack(expand=True)
 
 def update_strength_meter(score, password=""):
     global last_score
     last_score = score
-    strength_canvas.delete("all")
-    crack_canvas.delete("all")
+    strength_canvas.delete("all"); crack_canvas.delete("all")
     L = LANGUAGES[current_lang]
     if score == -1: strength_var.set(""); crack_var.set(""); return
     colors = ["#e74c3c", "#e74c3c", "#f39c12", "#f39c12", "#27ae60", "#27ae60"]
@@ -352,8 +328,7 @@ def open_file():
     if path:
         try:
             with open(path, "r", encoding="utf-8") as f: result_var.set(f.read().strip())
-            current_file_path = path 
-            update_strength_meter(-1)
+            current_file_path = path; update_strength_meter(-1)
         except Exception as e: messagebox.showerror(L['err'], str(e))
 
 def show_custom_info(title_key, label_key, main_val, is_static_main=True):
@@ -361,27 +336,32 @@ def show_custom_info(title_key, label_key, main_val, is_static_main=True):
     info_win = tk.Toplevel(root)
     info_win.title(L.get(title_key, title_key))
     info_win.geometry("280x130"); info_win.resizable(False, False)
-    set_app_icon(info_win)
+    try:
+        icon_path = resource_path("app_icon.ico")
+        if os.path.exists(icon_path): info_win.iconbitmap(icon_path)
+    except: pass
     current_bg = root.cget("bg")
-    current_fg = "#FFFFFF" if current_bg == "#252526" else "#000000"
+    current_fg = "#FFFFFF" if current_bg == "#000000" else "#000000"
     info_win.configure(bg=current_bg)
     main_text = main_val if is_static_main else L.get(main_val, main_val)
     tk.Label(info_win, text=L.get(label_key, label_key), bg=current_bg, fg=current_fg).pack(pady=(15, 2))
     tk.Label(info_win, text=main_text, font=("Arial", 10, "bold"), bg=current_bg, fg=current_fg).pack(pady=5)
-    tk.Button(info_win, text="OK", command=info_win.destroy, width=10, bg="#3E3E42" if current_bg == "#252526" else "#E1E1E1", fg=current_fg, relief='flat').pack(pady=10)
+    tk.Button(info_win, text="OK", command=info_win.destroy, width=10, bg="#1A1A1A" if current_bg == "#000000" else "#E1E1E1", fg=current_fg, relief='flat').pack(pady=10)
 
 def open_github(): webbrowser.open("https://github.com/Maximka1993271/Password-Generator-Python")
 
 # =============================================================================
-# MAIN WINDOW SETUP / ГОЛОВНЕ ВІКНО
+# MAIN WINDOW / ГОЛОВНЕ ВІКНО
 # =============================================================================
 root = tk.Tk()
 root.title("Secure Pass Pro")
 root.geometry("340x650"); root.resizable(False, False)
 root.protocol("WM_DELETE_WINDOW", on_closing)
 
-# Apply OS-specific icon / Застосування іконки залежно від ОС
-set_app_icon(root)
+try:
+    icon_path = resource_path("app_icon.ico")
+    if os.path.exists(icon_path): root.iconbitmap(icon_path)
+except: pass
 
 length_var = tk.StringVar(value="12")
 upper_var, lower_var = tk.BooleanVar(value=True), tk.BooleanVar(value=True)
@@ -444,14 +424,11 @@ result_entry.pack(pady=4)
 
 strength_canvas = tk.Canvas(root, width=200, height=6); strength_canvas.pack()
 strength_label_widget = tk.Label(root, textvariable=strength_var, font=("Arial", 9, "italic")); strength_label_widget.pack()
-
-crack_label_widget = tk.Label(root, textvariable=crack_var, font=("Arial", 8), fg="#888888")
-crack_label_widget.pack(pady=(5, 0))
+crack_label_widget = tk.Label(root, textvariable=crack_var, font=("Arial", 8), fg="#888888"); crack_label_widget.pack(pady=(5, 0))
 crack_canvas = tk.Canvas(root, width=200, height=4); crack_canvas.pack(pady=(0, 5))
 
 btn_copy = tk.Button(root, text="", command=copy_to_clipboard, width=22, relief='flat')
 btn_copy.pack(pady=5); setup_hover(btn_copy)
-
 btn_qr = tk.Button(root, text="", command=generate_qr, width=22, relief='flat')
 btn_qr.pack(pady=2); setup_hover(btn_qr)
 
@@ -461,5 +438,4 @@ author_label.bind("<Button-1>", lambda e: open_github())
 
 change_theme('system')
 change_lang('ru')
-
 root.mainloop()
