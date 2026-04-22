@@ -8,8 +8,18 @@ import time
 import os
 import sys
 import platform
-import qrcode
-from PIL import ImageTk, Image
+
+# =============================================================================
+# DEPENDENCIES / ЗАВИСИМОСТИ / ЗАЛЕЖНОСТІ
+# =============================================================================
+try:
+    import qrcode
+    from PIL import ImageTk, Image
+except ImportError:
+    root_err = tk.Tk()
+    root_err.withdraw()
+    messagebox.showerror("Error", "Missing dependencies! Please run: pip install qrcode[pil] pillow")
+    sys.exit(1)
 
 # =============================================================================
 # RESOURCE PATH / ПУТЬ К РЕСУРСАМ / ШЛЯХ ДО РЕСУРСІВ
@@ -20,6 +30,16 @@ def resource_path(relative_path):
     except Exception:
         base_path = os.path.abspath(".")
     return os.path.join(base_path, relative_path)
+
+# =============================================================================
+# FILE TYPES / ТИПЫ ФАЙЛОВ / ТИПИ ФАЙЛІВ
+# =============================================================================
+def get_filetypes(L):
+    return [
+        (L['text_files'], "*.txt"),
+        ("Python Files", "*.py;*.pyw"),
+        (L['all_files'], "*.*")
+    ]
 
 # =============================================================================
 # TRANSLATIONS / ПЕРЕВОДЫ / ПЕРЕКЛАДИ
@@ -37,12 +57,12 @@ LANGUAGES = {
         'exclude': "Исключить похожие (0/O, 1/l/I)", 'ambiguous': "Исключить неоднозначные", 'hide': "Скрывать символы",
         'at_least': "Минимум 1 из каждой категории",
         'gen_btn': "СГЕНЕРИРОВАТЬ", 'open_btn': "ОТКРЫТЬ ФАЙЛ", 'copy_btn': "КОПИРОВАТЬ ПАРОЛЬ", 'qr_btn': "QR-КОД ПАРОЛЯ",
-        'strength': "Сложность",
+        'strength': "Сложность", 'qr_scan': "Отсканируйте камерой",
         'strength_lvls': ["Очень слабый", "Слабый", "Средний", "Неплохой", "Сильный", "Очень сильный"],
         'warn': "Внимание", 'min_len': "Длина должна быть от 4 до 64", 'err': "Ошибка", 'choose_set': "Выберите наборы символов",
         'check_input': "Проверьте ввод", 'copied': "Пароль скопирован. Очистка через 60 сек.", 'success': "Успешно!",
         'save_title': "Сохранить как", 'open_title': "Открыть пароль", 'text_files': "Текстовые файлы", 'all_files': "Все файлы",
-        'saved': "Файл сохранён.", 'no_pwd': "Нет пароля для сохранения.",
+        'saved': "Файл сохранён.", 'no_pwd': "Нет пароля для сохранения.", 'empty_file': "Файл пуст!",
         'crack_instantly': "Взломают мгновенно", 'crack_seconds': "Взломают за ~{} сек.", 'crack_minutes': "Взломают за ~{} мин.",
         'crack_hours': "Взломают за ~{} ч.", 'crack_days': "Взломают за ~{} дн.", 'crack_years': "Взломают за ~{} лет",
         'crack_centuries': "Взломают за ~{} веков", 'crack_never': "Практически невозможно взломать"
@@ -59,18 +79,18 @@ LANGUAGES = {
         'exclude': "Exclude similar (0/O, 1/l/I)", 'ambiguous': "Exclude ambiguous", 'hide': "Hide symbols",
         'at_least': "At least 1 from each category",
         'gen_btn': "GENERATE", 'open_btn': "OPEN FILE", 'copy_btn': "COPY PASSWORD", 'qr_btn': "PASSWORD QR-CODE",
-        'strength': "Strength",
+        'strength': "Strength", 'qr_scan': "Scan with camera",
         'strength_lvls': ["Very Weak", "Weak", "Medium", "Good", "Strong", "Very Strong"],
         'warn': "Warning", 'min_len': "Length must be between 4 and 64", 'err': "Error", 'choose_set': "Select character sets",
         'check_input': "Check input", 'copied': "Password copied. Clear in 60 sec.", 'success': "Success!",
         'save_title': "Save as", 'open_title': "Open Password", 'text_files': "Text files", 'all_files': "All files",
-        'saved': "File saved.", 'no_pwd': "No password to save.",
+        'saved': "File saved.", 'no_pwd': "No password to save.", 'empty_file': "File is empty!",
         'crack_instantly': "Cracked instantly", 'crack_seconds': "Cracked in ~{} sec.", 'crack_minutes': "Cracked in ~{} min.",
         'crack_hours': "Cracked in ~{} hrs.", 'crack_days': "Cracked in ~{} days", 'crack_years': "Cracked in ~{} years",
         'crack_centuries': "Cracked in ~{} centuries", 'crack_never': "Practically uncrackable"
     },
     'ua': {
-        'menu_file': "Файл", 'menu_opts': "Опції", 'menu_about': "Про программу",
+        'menu_file': "Файл", 'menu_opts': "Опції", 'menu_about': "Про програму",
         'save': "Зберегти", 'save_as': "Зберегти як...", 'exit': "Вихід",
         'themes': "Теми", 'lang': "Мова", 'light': "Світла", 'dark': "Темна", 'system': "Системна",
         'author_btn': "Автор програми", 'author_title': "Автор", 'author_main': "Maxim Melnikov", 'author_label_text': "Програму розробив:",
@@ -81,21 +101,25 @@ LANGUAGES = {
         'exclude': "Виключити схожі (0/O, 1/l/I)", 'ambiguous': "Виключити неоднозначні", 'hide': "Приховати символи",
         'at_least': "Мінімум 1 з кожної категорії",
         'gen_btn': "ЗГЕНЕРУВАТИ", 'open_btn': "ВІДКРИТИ ФАЙЛ", 'copy_btn': "КОПІЮВАТИ ПАРОЛЬ", 'qr_btn': "QR-КОД ПАРОЛЯ",
-        'strength': "Складність",
+        'strength': "Складність", 'qr_scan': "Відскануйте камерою",
         'strength_lvls': ["Дуже слабкий", "Слабкий", "Середній", "Непоганий", "Сильний", "Дуже сильний"],
         'warn': "Увага", 'min_len': "Довжина має бути від 4 до 64", 'err': "Помилка", 'choose_set': "Оберіть набори символів",
         'check_input': "Перевірте введення", 'copied': "Пароль скопійовано. Очистка через 60 сек.", 'success': "Успішно!",
-        'save_title': "Зберегти як", 'open_title': "Відкрити пароль", 'text_files': "Текстові файлы", 'all_files': "Усі файли",
-        'saved': "Файл збережено.", 'no_pwd': "Немає пароля для збереження.",
+        'save_title': "Зберегти як", 'open_title': "Відкрити пароль", 'text_files': "Текстові файли", 'all_files': "Усі файли",
+        'saved': "Файл збережено.", 'no_pwd': "Немає пароля для збереження.", 'empty_file': "Файл порожній!",
         'crack_instantly': "Зламають миттєво", 'crack_seconds': "Зламають за ~{} сек.", 'crack_minutes': "Зламають за ~{} хв.",
         'crack_hours': "Зламають за ~{} год.", 'crack_days': "Зламають за ~{} дн.", 'crack_years': "Зламають за ~{} років",
-        'crack_centuries': "Зламають за ~{} віків", 'crack_never': "Практически неможливо зламати"
+        'crack_centuries': "Зламають за ~{} віків", 'crack_never': "Практично неможливо зламати"
     }
 }
 
 # =============================================================================
-# CROSS-PLATFORM SYSTEM THEME / СИСТЕМНА ТЕМА / СИСТЕМНА ТЕМА
+# UTILS / СЛУЖЕБНЫЕ / СЛУЖБОВІ
 # =============================================================================
+current_lang = 'ru'
+last_score = -1
+current_file_path = None
+
 def get_system_theme():
     try:
         if platform.system() == "Windows":
@@ -114,10 +138,6 @@ def get_system_theme():
 # =============================================================================
 # APP LOGIC / ЛОГИКА / ЛОГІКА
 # =============================================================================
-current_lang = 'ru'
-last_score = -1
-current_file_path = None
-
 def estimate_crack_time(password):
     if not password: return -1, ""
     charset = 0
@@ -125,6 +145,8 @@ def estimate_crack_time(password):
     if any(c.isupper() for c in password): charset += 26
     if any(c.isdigit() for c in password): charset += 10
     if any(c in string.punctuation for c in password): charset += 32
+    if charset == 0: return 0, LANGUAGES[current_lang]['crack_instantly']
+    
     combinations = charset ** len(password)
     seconds = combinations / 10_000_000_000 
     L = LANGUAGES[current_lang]
@@ -136,11 +158,6 @@ def estimate_crack_time(password):
     elif seconds < 86400 * 365 * 100: return 5, L['crack_years'].format(int(seconds // (86400 * 365)))
     elif seconds < 86400 * 365 * 10000: return 6, L['crack_centuries'].format(int(seconds // (86400 * 365 * 100)))
     else: return 7, L['crack_never']
-
-def on_closing():
-    try: root.clipboard_clear()
-    except: pass
-    root.destroy()
 
 def change_lang(lang_code):
     global current_lang
@@ -177,10 +194,8 @@ def change_lang(lang_code):
     update_strength_meter(last_score, result_var.get())
 
 def change_theme(mode):
-    """ AMOLED BLACK THEME INTEGRATION / ЧЕРНЫЙ ЦВЕТ ADGUARD """
     if mode == 'system': mode = get_system_theme()
     if mode == 'dark':
-        # Pure Black Style (AdGuard inspired)
         bg, fg, btn, btn_h, entry_bg = '#000000', '#FFFFFF', '#1A1A1A', '#2D2D2D', '#121212'
         res_bg, res_fg, check_sel = '#000000', '#4EC9B0', '#1A1A1A'
     else:
@@ -205,7 +220,7 @@ def change_theme(mode):
 
     apply_style(root)
     strength_label_widget.config(bg=bg, fg=fg)
-    crack_label_widget.config(bg=bg)
+    crack_label_widget.config(bg=bg, fg='#FFFFFF' if bg=='#000000' else '#888888')
     author_label.config(bg=btn, fg=fg)
     stars_label.config(bg=bg)
 
@@ -215,43 +230,54 @@ def setup_hover(widget):
 
 def generate_qr():
     pwd = result_var.get()
-    if not pwd: return
+    L = LANGUAGES[current_lang]
+    if not pwd:
+        messagebox.showwarning(L['warn'], L['no_pwd']); return
     qr_win = tk.Toplevel(root)
     qr_win.title("QR Code")
-    qr_win.geometry("250x250"); qr_win.resizable(False, False)
     current_bg = root.cget("bg")
-    qr_win.configure(bg=current_bg)
+    qr_win.configure(bg=current_bg); qr_win.resizable(False, False)
     try:
         icon_path = resource_path("app_icon.ico")
         if os.path.exists(icon_path): qr_win.iconbitmap(icon_path)
     except: pass
-
-    qr = qrcode.QRCode(version=1, box_size=8, border=2)
+    qr_fill = "white" if current_bg == "#000000" else "black"
+    qr_back = "black" if current_bg == "#000000" else "white"
+    qr = qrcode.QRCode(version=None, error_correction=qrcode.constants.ERROR_CORRECT_L, box_size=8, border=2)
     qr.add_data(pwd); qr.make(fit=True)
-    img_qr = qr.make_image(fill_color="black", back_color="white")
-    img_tk = ImageTk.PhotoImage(img_qr.resize((220, 220)))
+    img_qr = qr.make_image(fill_color=qr_fill, back_color=qr_back)
+    display_size = max(220, qr.modules_count * 8 + 32)
+    resample_method = getattr(Image, 'Resampling', Image).LANCZOS
+    img_tk = ImageTk.PhotoImage(img_qr.resize((display_size, display_size), resample_method))
+    tk.Label(qr_win, text=L['qr_scan'], bg=current_bg, fg=qr_fill, font=("Arial", 9)).pack(pady=(10, 0))
     lbl = tk.Label(qr_win, image=img_tk, bg=current_bg)
-    lbl.image = img_tk; lbl.pack(expand=True)
+    lbl.image = img_tk; lbl.pack(pady=10, padx=20)
+    tk.Button(qr_win, text="OK", command=qr_win.destroy, width=10, relief='flat', 
+              bg="#1A1A1A" if current_bg == "#000000" else "#E1E1E1", fg=qr_fill).pack(pady=(0, 10))
+    qr_win.update_idletasks()
 
 def update_strength_meter(score, password=""):
     global last_score
     last_score = score
     strength_canvas.delete("all"); crack_canvas.delete("all")
     L = LANGUAGES[current_lang]
-    if score == -1: strength_var.set(""); crack_var.set(""); return
+    if score == -1: 
+        strength_var.set(""); crack_var.set(""); return
     colors = ["#e74c3c", "#e74c3c", "#f39c12", "#f39c12", "#27ae60", "#27ae60"]
     strength_canvas.create_rectangle(0, 0, 200, 6, fill="#333333", outline="")
     width = (score + 1) * 33.33 
     strength_canvas.create_rectangle(0, 0, width, 6, fill=colors[score], outline="")
     strength_var.set(f"{L['strength']}: {L['strength_lvls'][score]}")
     if password:
-        p_len = len(password)
         crack_score, crack_text = estimate_crack_time(password)
         crack_var.set(crack_text)
+        p_len = len(password)
         bar_color = "#e74c3c" if p_len <= 4 else ("#f39c12" if p_len <= 10 else "#27ae60")
         crack_canvas.create_rectangle(0, 0, 200, 4, fill="#333333", outline="")
         crack_width = (crack_score + 1) * (200 / 8) 
         crack_canvas.create_rectangle(0, 0, crack_width, 4, fill=bar_color, outline="")
+    else:
+        crack_var.set("")
 
 def generate_password():
     L = LANGUAGES[current_lang]
@@ -266,8 +292,12 @@ def generate_password():
         if digits_var.get(): categories.append(string.digits)
         if symbols_var.get(): categories.append(string.punctuation)
         if not categories: messagebox.showerror(L['err'], L['choose_set']); return
-        if exclude_similar_var.get(): categories = [''.join(c for c in cat if c not in "Il1O0") for cat in categories]
-        if exclude_ambiguous_var.get(): categories = [''.join(c for c in cat if c not in ".,:;\'~\"/()[]{}|") for cat in categories]
+        if exclude_similar_var.get(): 
+            categories = [''.join(c for c in cat if c not in "Il1O0") for cat in categories]
+        if exclude_ambiguous_var.get(): 
+            categories = [''.join(c for c in cat if c not in ".,:;\'~\"/()[]{}|") for cat in categories]
+        categories = [c for c in categories if c]
+        if not categories: messagebox.showerror(L['err'], L['choose_set']); return
         all_chars = "".join(categories)
         pwd_list = []
         if at_least_one_var.get() and length >= len(categories):
@@ -292,7 +322,7 @@ def copy_to_clipboard():
     if pwd:
         root.clipboard_clear(); root.clipboard_append(pwd)
         def safe_wipe():
-            time.sleep(60)
+            time.sleep(60) 
             try:
                 if root.winfo_exists(): root.clipboard_clear()
             except: pass
@@ -302,33 +332,50 @@ def copy_to_clipboard():
 def save_file():
     global current_file_path
     pwd = result_var.get()
-    if not pwd: return
-    if not current_file_path: current_file_path = "passwords.txt"
+    L = LANGUAGES[current_lang]
+    if not pwd: 
+        messagebox.showwarning(L['warn'], L['no_pwd']); return
+    if not current_file_path: 
+        save_as(); return
     try:
         with open(current_file_path, "w", encoding="utf-8") as f: f.write(pwd)
-    except: pass
+        show_custom_info(L['success'], L['success'], L['saved'])
+    except Exception as e: messagebox.showerror(L['err'], str(e))
 
 def save_as():
     global current_file_path
     L = LANGUAGES[current_lang]
     pwd = result_var.get()
     if pwd:
-        path = filedialog.asksaveasfilename(title=L['save_title'], initialfile="SecurePass.txt", defaultextension=".txt", filetypes=[("Normal text file", "*.txt"), ("Python file", "*.py;*.pyw"), ("All files", "*.*")])
+        path = filedialog.asksaveasfilename(title=L['save_title'], initialfile="SecurePass.txt", defaultextension=".txt", filetypes=get_filetypes(L))
         if path:
             try:
                 with open(path, "w", encoding="utf-8") as f: f.write(pwd)
                 current_file_path = path 
                 show_custom_info(L['success'], L['success'], L['saved'])
             except Exception as e: messagebox.showerror(L['err'], str(e))
+    else:
+        messagebox.showwarning(L['warn'], L['no_pwd'])
 
 def open_file():
     global current_file_path
     L = LANGUAGES[current_lang]
-    path = filedialog.askopenfilename(title=L['open_title'], filetypes=[("Normal text file", "*.txt"), ("Python file", "*.py;*.pyw"), ("All files", "*.*")])
+    path = filedialog.askopenfilename(title=L['open_title'], filetypes=get_filetypes(L))
     if path:
         try:
-            with open(path, "r", encoding="utf-8") as f: result_var.set(f.read().strip())
-            current_file_path = path; update_strength_meter(-1)
+            with open(path, "r", encoding="utf-8") as f: 
+                current_file_path = path 
+                content = f.read().strip()
+                if not content:
+                    messagebox.showinfo(L['warn'], L['empty_file'])
+                    result_var.set(""); update_strength_meter(-1); return
+                result_var.set(content)
+                variety = sum([any(c.isupper() for c in content), any(c.islower() for c in content), any(c.isdigit() for c in content), any(c in string.punctuation for c in content)])
+                length = len(content)
+                if length < 10: score = 0 if variety < 2 else 1
+                elif 10 <= length < 14: score = 2 if variety < 3 else 3
+                else: score = 4 if variety < 4 else 5
+                update_strength_meter(score, content)
         except Exception as e: messagebox.showerror(L['err'], str(e))
 
 def show_custom_info(title_key, label_key, main_val, is_static_main=True):
@@ -341,17 +388,23 @@ def show_custom_info(title_key, label_key, main_val, is_static_main=True):
         if os.path.exists(icon_path): info_win.iconbitmap(icon_path)
     except: pass
     current_bg = root.cget("bg")
-    current_fg = "#FFFFFF" if current_bg == "#000000" else "#000000"
+    current_fg = "#000000" if current_bg == "#F3F3F3" else "#FFFFFF"
     info_win.configure(bg=current_bg)
     main_text = main_val if is_static_main else L.get(main_val, main_val)
     tk.Label(info_win, text=L.get(label_key, label_key), bg=current_bg, fg=current_fg).pack(pady=(15, 2))
     tk.Label(info_win, text=main_text, font=("Arial", 10, "bold"), bg=current_bg, fg=current_fg).pack(pady=5)
-    tk.Button(info_win, text="OK", command=info_win.destroy, width=10, bg="#1A1A1A" if current_bg == "#000000" else "#E1E1E1", fg=current_fg, relief='flat').pack(pady=10)
+    tk.Button(info_win, text="OK", command=info_win.destroy, width=10, 
+              bg="#1A1A1A" if current_bg == "#000000" else "#E1E1E1", fg=current_fg, relief='flat').pack(pady=10)
 
 def open_github(): webbrowser.open("https://github.com/Maximka1993271/Password-Generator-Python")
 
+def on_closing():
+    try: root.clipboard_clear()
+    except: pass
+    root.destroy()
+
 # =============================================================================
-# MAIN WINDOW / ГОЛОВНЕ ВІКНО
+# MAIN WINDOW / ГЛАВНОЕ ОКНО / ГОЛОВНЕ ВІКНО
 # =============================================================================
 root = tk.Tk()
 root.title("Secure Pass Pro")
@@ -370,6 +423,9 @@ exclude_similar_var, exclude_ambiguous_var = tk.BooleanVar(value=True), tk.Boole
 at_least_one_var, hide_var = tk.BooleanVar(value=True), tk.BooleanVar(value=False)
 result_var, strength_var, crack_var = tk.StringVar(), tk.StringVar(), tk.StringVar()
 
+# =============================================================================
+# MENU BAR / СТРОКА МЕНЮ / РЯДОК МЕНЮ
+# =============================================================================
 menubar = tk.Menu(root)
 file_menu = tk.Menu(menubar, tearoff=0)
 file_menu.add_command(label="Save", command=save_file)
@@ -398,6 +454,9 @@ about_menu.add_command(label="GitHub", command=open_github)
 menubar.add_cascade(label="About", menu=about_menu)
 root.config(menu=menubar)
 
+# =============================================================================
+# WIDGETS / ВИДЖЕТЫ / ВІДЖЕТИ
+# =============================================================================
 header_label = tk.Label(root, text="", font=("Arial", 11, "bold"))
 header_label.pack(pady=(10, 2))
 len_info_label = tk.Label(root, font=("Arial", 9)); len_info_label.pack()
@@ -424,8 +483,9 @@ result_entry.pack(pady=4)
 
 strength_canvas = tk.Canvas(root, width=200, height=6); strength_canvas.pack()
 strength_label_widget = tk.Label(root, textvariable=strength_var, font=("Arial", 9, "italic")); strength_label_widget.pack()
-crack_label_widget = tk.Label(root, textvariable=crack_var, font=("Arial", 8), fg="#888888"); crack_label_widget.pack(pady=(5, 0))
-crack_canvas = tk.Canvas(root, width=200, height=4); crack_canvas.pack(pady=(0, 5))
+
+crack_canvas = tk.Canvas(root, width=200, height=4); crack_canvas.pack(pady=(4, 0))
+crack_label_widget = tk.Label(root, textvariable=crack_var, font=("Arial", 8)); crack_label_widget.pack()
 
 btn_copy = tk.Button(root, text="", command=copy_to_clipboard, width=22, relief='flat')
 btn_copy.pack(pady=5); setup_hover(btn_copy)
@@ -436,6 +496,9 @@ stars_label = tk.Label(root, text="★★★★★", font=("Arial", 12, "bold"),
 author_label = tk.Label(root, text="GitHub ©", cursor="hand2", font=("Arial", 8, "bold"), padx=8, pady=3); author_label.pack(side='bottom', pady=2)
 author_label.bind("<Button-1>", lambda e: open_github())
 
+# =============================================================================
+# INITIALIZATION / ИНИЦИАЛИЗАЦИЯ / ІНІЦІАЛІЗАЦІЯ
+# =============================================================================
 change_theme('system')
 change_lang('ru')
 root.mainloop()
