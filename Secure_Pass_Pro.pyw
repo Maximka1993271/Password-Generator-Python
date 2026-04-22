@@ -10,11 +10,13 @@ import sys
 
 # =============================================================================
 # RESOURCE PATH FUNCTION
+# RU: Получение пути к ресурсам для корректной работы иконки в .exe
+# EN: Getting the path to resources for correct icon display in .exe
+# UA: Отримання шляху до ресурсів для коректної роботи іконки в .exe
 # =============================================================================
 def resource_path(relative_path):
-    """ Отримує абсолютний шлях до ресурсів. Працює для dev і для PyInstaller """
+    """ Get absolute path to resource, works for dev and for PyInstaller """
     try:
-        # PyInstaller створює тимчасову папку _MEIPASS
         base_path = sys._MEIPASS
     except Exception:
         base_path = os.path.abspath(".")
@@ -22,6 +24,9 @@ def resource_path(relative_path):
 
 # =============================================================================
 # TRANSLATION DICTIONARY
+# RU: Словари локализации интерфейса (RU/EN/UA)
+# EN: Interface localization dictionaries (RU/EN/UA)
+# UA: Словники локалізації інтерфейсу (RU/EN/UA)
 # =============================================================================
 LANGUAGES = {
     'ru': {
@@ -100,10 +105,16 @@ LANGUAGES = {
         'crack_days': "Зламають за ~{} дн.",
         'crack_years': "Зламають за ~{} років",
         'crack_centuries': "Зламають за ~{} віків",
-        'crack_never': "Практически неможливо зламати"
+        'crack_never': "Практично неможливо зламати"
     }
 }
 
+# =============================================================================
+# STANDARD FILE FORMATS
+# RU: Стандартный список форматов для сохранения (по умолчанию TXT)
+# EN: Standard list of formats for saving (TXT by default)
+# UA: Стандартний список форматів для збереження (за замовчуванням TXT)
+# =============================================================================
 FULL_FILETYPES = [
     ("Normal text file", "*.txt"),
     ("Python file", "*.py;*.pyw"),
@@ -115,10 +126,14 @@ last_score = -1
 current_file_path = None
 
 # =============================================================================
-# FUNCTIONS
+# CORE FUNCTIONS
+# RU: Основная логика: Темы, Локализация, Генерация, Безопасность
+# EN: Core Logic: Themes, Localization, Generation, Security
+# UA: Основна логіка: Теми, Локалізація, Генерація, Безпека
 # =============================================================================
 
 def get_system_theme():
+    """ Determines if Windows is in Light or Dark mode """
     try:
         import winreg
         key = winreg.OpenKey(winreg.HKEY_CURRENT_USER, r"Software\Microsoft\Windows\CurrentVersion\Themes\Personalize")
@@ -128,6 +143,7 @@ def get_system_theme():
         return 'light'
 
 def estimate_crack_time(password):
+    """ Estimates how long it takes to brute-force the password """
     if not password: return -1, ""
     charset = 0
     if any(c.islower() for c in password): charset += 26
@@ -150,11 +166,13 @@ def estimate_crack_time(password):
     else: return 7, L['crack_never']
 
 def on_closing():
+    """ Securely wipes clipboard and closes application """
     try: root.clipboard_clear()
     except: pass
     root.destroy()
 
 def change_lang(lang_code):
+    """ Switches UI language dynamically """
     global current_lang
     current_lang = lang_code
     L = LANGUAGES[lang_code]
@@ -188,6 +206,7 @@ def change_lang(lang_code):
     update_strength_meter(last_score, result_var.get())
 
 def change_theme(mode):
+    """ Switches between Light, Dark, and System theme """
     if mode == 'system': mode = get_system_theme()
     if mode == 'dark':
         bg, fg, btn, btn_h, entry_bg = '#252526', '#FFFFFF', '#3E3E42', '#454545', '#333333'
@@ -218,10 +237,12 @@ def change_theme(mode):
     stars_label.config(bg=bg)
 
 def setup_hover(widget):
+    """ Adds hover effect to buttons """
     widget.bind("<Enter>", lambda e: widget.config(bg=root.current_theme_colors['btn_h']))
     widget.bind("<Leave>", lambda e: widget.config(bg=root.current_theme_colors['btn']))
 
 def update_strength_meter(score, password=""):
+    """ Updates the visual strength bar and text """
     global last_score
     last_score = score
     strength_canvas.delete("all")
@@ -240,6 +261,7 @@ def update_strength_meter(score, password=""):
         crack_var.set(crack_text)
 
 def generate_password():
+    """ Generates a cryptographically secure password based on user choices """
     L = LANGUAGES[current_lang]
     try:
         raw_len = length_var.get().strip()
@@ -285,6 +307,7 @@ def generate_password():
         messagebox.showerror(L['err'], L['check_input'])
 
 def copy_to_clipboard():
+    """ Copies password to clipboard and wipes it after 60 seconds """
     pwd = result_var.get()
     L = LANGUAGES[current_lang]
     if pwd:
@@ -299,6 +322,7 @@ def copy_to_clipboard():
         show_custom_info(L['success'], L['success'], L['copied'])
 
 def save_file():
+    """ Quick save to current file path """
     global current_file_path
     if current_file_path:
         try:
@@ -308,6 +332,7 @@ def save_file():
     else: save_as()
 
 def save_as():
+    """ Save password to a new file with format selection """
     global current_file_path
     L = LANGUAGES[current_lang]
     pwd = result_var.get()
@@ -320,6 +345,7 @@ def save_as():
             show_custom_info(L['success'], L['success'], L['saved'])
 
 def open_file():
+    """ Opens an existing password file """
     global current_file_path
     L = LANGUAGES[current_lang]
     path = filedialog.askopenfilename(title=L['open_title'], filetypes=FULL_FILETYPES)
@@ -329,17 +355,17 @@ def open_file():
         update_strength_meter(-1)
 
 def show_custom_info(title_key, label_key, main_val, is_static_main=True):
+    """ Displays a custom styled modal window for Author/Version/Success """
     L = LANGUAGES[current_lang]
     info_win = tk.Toplevel(root)
     info_win.title(L.get(title_key, title_key))
     info_win.geometry("280x130")
     info_win.resizable(False, False)
     
-    # Установка иконки для дочернего окна
+    # Apply icon to child window
     try:
         icon_p = resource_path("app_icon.ico")
-        if os.path.exists(icon_p):
-            info_win.iconbitmap(icon_p)
+        if os.path.exists(icon_p): info_win.iconbitmap(icon_p)
     except: pass
 
     current_bg = root.cget("bg")
@@ -357,6 +383,9 @@ def open_github():
 
 # =============================================================================
 # UI CONSTRUCTION
+# RU: Сборка основного интерфейса приложения
+# EN: Assembling the main application interface
+# UA: Збірка основного інтерфейсу програми
 # =============================================================================
 root = tk.Tk()
 root.title("Secure Pass Pro")
@@ -364,7 +393,7 @@ root.geometry("340x610")
 root.resizable(False, False)
 root.protocol("WM_DELETE_WINDOW", on_closing)
 
-# Установка иконки главного окна
+# Apply main window icon
 try:
     icon_p = resource_path("app_icon.ico")
     if os.path.exists(icon_p): root.iconbitmap(icon_p)
@@ -377,7 +406,7 @@ exclude_similar_var, exclude_ambiguous_var = tk.BooleanVar(value=True), tk.Boole
 at_least_one_var, hide_var = tk.BooleanVar(value=True), tk.BooleanVar(value=False)
 result_var, strength_var, crack_var = tk.StringVar(), tk.StringVar(), tk.StringVar()
 
-# Меню
+# Menu Setup
 menubar = tk.Menu(root)
 file_menu = tk.Menu(menubar, tearoff=0)
 file_menu.add_command(label="Save", command=save_file)
@@ -407,7 +436,7 @@ about_menu.add_command(label="GitHub", command=open_github)
 menubar.add_cascade(label="About", menu=about_menu)
 root.config(menu=menubar)
 
-# Виджеты
+# Widget Setup
 header_label = tk.Label(root, text="", font=("Arial", 11, "bold"))
 header_label.pack(pady=(10, 2))
 len_info_label = tk.Label(root, font=("Arial", 9))
@@ -449,7 +478,7 @@ author_label = tk.Label(root, text="GitHub ©", cursor="hand2", font=("Arial", 8
 author_label.pack(side='bottom', pady=2)
 author_label.bind("<Button-1>", lambda e: open_github())
 
-# Инициализация темы и языка
+# Initialize Theme and Language
 change_theme('system')
 change_lang('ru')
 
