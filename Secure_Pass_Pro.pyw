@@ -3,7 +3,6 @@ from tkinter import messagebox, filedialog
 import secrets
 import string
 import webbrowser
-import threading
 import time
 import os
 import sys
@@ -16,9 +15,7 @@ try:
     import qrcode
     from PIL import ImageTk, Image
 except ImportError:
-    root_err = tk.Tk()
-    root_err.withdraw()
-    messagebox.showerror("Error", "Missing dependencies! Please run: pip install qrcode[pil] pillow")
+    print("Missing dependencies! Please run: pip install qrcode[pil] pillow")
     sys.exit(1)
 
 # =============================================================================
@@ -105,7 +102,7 @@ LANGUAGES = {
         'strength_lvls': ["Дуже слабкий", "Слабкий", "Середній", "Непоганий", "Сильний", "Дуже сильний"],
         'warn': "Увага", 'min_len': "Довжина має бути від 4 до 64", 'err': "Помилка", 'choose_set': "Оберіть набори символів",
         'check_input': "Перевірте введення", 'copied': "Пароль скопійовано. Очистка через 60 сек.", 'success': "Успішно!",
-        'save_title': "Зберегти як", 'open_title': "Відкрити пароль", 'text_files': "Текстові файли", 'all_files': "Усі файли",
+        'save_title': "Зберегти як", 'open_title': "Відкрити пароль", 'text_files': "Текстові файлы", 'all_files': "Усі файли",
         'saved': "Файл збережено.", 'no_pwd': "Немає пароля для збереження.", 'empty_file': "Файл порожній!",
         'crack_instantly': "Зламають миттєво", 'crack_seconds': "Зламають за ~{} сек.", 'crack_minutes': "Зламають за ~{} хв.",
         'crack_hours': "Зламають за ~{} год.", 'crack_days': "Зламають за ~{} дн.", 'crack_years': "Зламають за ~{} років",
@@ -282,22 +279,28 @@ def update_strength_meter(score, password=""):
 def generate_password():
     L = LANGUAGES[current_lang]
     try:
-        raw_len = length_var.get().strip()
-        if not raw_len.isdigit() or not (4 <= int(raw_len) <= 64):
+        raw_input = length_var.get().strip()
+        try:
+            length = int(raw_input)
+            if not (4 <= length <= 64): raise ValueError
+        except ValueError:
             messagebox.showwarning(L['warn'], L['min_len']); return
-        length = int(raw_len)
+
         categories = []
         if upper_var.get(): categories.append(string.ascii_uppercase)
         if lower_var.get(): categories.append(string.ascii_lowercase)
         if digits_var.get(): categories.append(string.digits)
         if symbols_var.get(): categories.append(string.punctuation)
         if not categories: messagebox.showerror(L['err'], L['choose_set']); return
+        
         if exclude_similar_var.get(): 
             categories = [''.join(c for c in cat if c not in "Il1O0") for cat in categories]
         if exclude_ambiguous_var.get(): 
             categories = [''.join(c for c in cat if c not in ".,:;\'~\"/()[]{}|") for cat in categories]
+        
         categories = [c for c in categories if c]
         if not categories: messagebox.showerror(L['err'], L['choose_set']); return
+        
         all_chars = "".join(categories)
         pwd_list = []
         if at_least_one_var.get() and length >= len(categories):
@@ -305,10 +308,14 @@ def generate_password():
             for _ in range(length - len(categories)): pwd_list.append(secrets.choice(all_chars))
         else:
             for _ in range(length): pwd_list.append(secrets.choice(all_chars))
-        secrets.SystemRandom().shuffle(pwd_list)
+        
+        rand = secrets.SystemRandom()
+        rand.shuffle(pwd_list)
+        
         pwd = "".join(pwd_list)
         result_var.set(pwd)
         result_entry.config(show="*" if hide_var.get() else "")
+        
         variety = sum([any(c.isupper() for c in pwd), any(c.islower() for c in pwd), any(c.isdigit() for c in pwd), any(c in string.punctuation for c in pwd)])
         if length < 10: score = 0 if variety < 2 else 1
         elif 10 <= length < 14: score = 2 if variety < 3 else 3
@@ -321,41 +328,68 @@ def copy_to_clipboard():
     L = LANGUAGES[current_lang]
     if pwd:
         root.clipboard_clear(); root.clipboard_append(pwd)
-        def safe_wipe():
-            time.sleep(60) 
-            try:
-                if root.winfo_exists(): root.clipboard_clear()
-            except: pass
-        threading.Thread(target=safe_wipe, daemon=True).start()
-        show_custom_info(L['success'], L['success'], L['copied'])
+        root.after(60000, lambda: root.clipboard_clear() if root.winfo_exists() else None)
+        show_custom_info('success', 'success', L['copied'])
 
+# =============================================================================
+# FILE LOGIC / ФАЙЛОВАЯ ЛОГИКА / ФАЙЛОВА ЛОГІКА
+# =============================================================================
 def save_file():
     global current_file_path
     pwd = result_var.get()
     L = LANGUAGES[current_lang]
-    if not pwd: 
-        messagebox.showwarning(L['warn'], L['no_pwd']); return
-    if not current_file_path: 
-        save_as(); return
+
+    if not pwd:
+        messagebox.showwarning(L['warn'], L['no_pwd'])
+        return
+
+    # ЕСЛИ ФАЙЛ НЕ ВЫБРАН — Save As
+    if not current_file_path:
+        save_as()
+        return
+
+    # ЕСЛИ ФАЙЛ УДАЛЕН ИЛИ ПЕРЕМЕЩЕН — ТОЖЕ Save As
+    if not os.path.exists(current_file_path):
+        current_file_path = None
+        save_as()
+        return
+
     try:
-        with open(current_file_path, "w", encoding="utf-8") as f: f.write(pwd)
-        show_custom_info(L['success'], L['success'], L['saved'])
-    except Exception as e: messagebox.showerror(L['err'], str(e))
+        with open(current_file_path, "w", encoding="utf-8") as f:
+            f.write(pwd)
+        show_custom_info('success', 'success', L['saved'])
+    except Exception as e:
+        messagebox.showerror(L['err'], str(e))
 
 def save_as():
     global current_file_path
     L = LANGUAGES[current_lang]
     pwd = result_var.get()
-    if pwd:
-        path = filedialog.asksaveasfilename(title=L['save_title'], initialfile="SecurePass.txt", defaultextension=".txt", filetypes=get_filetypes(L))
-        if path:
-            try:
-                with open(path, "w", encoding="utf-8") as f: f.write(pwd)
-                current_file_path = path 
-                show_custom_info(L['success'], L['success'], L['saved'])
-            except Exception as e: messagebox.showerror(L['err'], str(e))
-    else:
+
+    if not pwd:
         messagebox.showwarning(L['warn'], L['no_pwd'])
+        return
+
+    path = filedialog.asksaveasfilename(
+        title=L['save_title'],
+        initialfile="SecurePass.txt",
+        defaultextension=".txt",
+        filetypes=get_filetypes(L)
+    )
+
+    if not path:
+        return
+
+    try:
+        with open(path, "w", encoding="utf-8") as f:
+            f.write(pwd)
+
+        # 🔥 ВАЖНО: обновляем путь ТОЛЬКО после успешной записи
+        current_file_path = path
+
+        show_custom_info('success', 'success', L['saved'])
+    except Exception as e:
+        messagebox.showerror(L['err'], str(e))
 
 def open_file():
     global current_file_path
