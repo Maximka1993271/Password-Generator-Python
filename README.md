@@ -54,16 +54,13 @@ Clean Code: Исходный код снабжен подробными комм
 💻 Для разработчиков
 Требования: Python 3.x
 
-Установка зависимостей:
-Bash
+# Установка зависимостей:
 pip install pillow qrcode
 
-Запуск:
-Bash
+# Запуск:
 python Secure_Pass_Pro.pyw
 
-Сборка в .exe (Windows):
-Bash
+# Сборка в .exe (Windows):
 pyinstaller --onefile --noconsole --icon="app_icon.ico" --add-data "app_icon.ico;." Secure_Pass_Pro.pyw
 
 👨‍💻 Автор
