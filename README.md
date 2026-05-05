@@ -88,7 +88,7 @@ History Manager: Быстрый доступ к 5 последним сгене�
 ## 📥 Для пользователей (Windows Portable)
 
 1. Перейдите в раздел **[Релизы](https://github.com/Maximka1993271/Password-Generator-Python/releases)**.
-2. Скачайте актуальный файл **[📥 Secure_Pass_Pro.exe](https://github.com/Maximka1993271/Password-Generator-Python/releases/download/SecurePassProv1.9.2/Secure_Pass_Pro.exe)**.
+2. Скачайте актуальный файл **[📥 Secure_Pass_Pro.exe](https://github.com/Maximka1993271/Password-Generator-Python/releases/download/SecurePassProv1.9.7/Secure_Pass_Pro.exe)**.
 3. Программа является Portable — просто запустите её, установка не требуется.
 
 ---
