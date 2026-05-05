@@ -6,6 +6,7 @@
 ![v3.9 Preview](https://github.com/Maximka1993271/Password-Generator-Python/raw/main/Secure_Pass_MainWindow39.png)
 
 ### Что нового:
+* **Дизайн**: Новый дизайн.
 * **QR-Технологии**: Мгновенный перенос пароля на смартфон.
 * **Entropy Analysis**: Детальный расчет энтропии и времени взлома.
 * **Triple Localization**: Поддержка RU, EN, UA языков.
@@ -18,6 +19,7 @@
 ## 💾 Классическая версия v2.0.0
 ![v2.0.0 Preview](https://github.com/Maximka1993271/Password-Generator-Python/raw/main/Secure_Pass_MainWindow.png)
 
+* Старый Дизайн. 
 * Стабильная работа без лишних файлов (Zero-Config).
 * История сессий и звуковое сопровождение.
 
