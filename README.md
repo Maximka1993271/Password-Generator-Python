@@ -277,7 +277,8 @@ python Secure_Pass_Pro.pyw
 ### Сборка в .exe (Windows):
 
 ```bash
-pyinstaller --noconsole --onefile --clean --icon="app_icon.ico" --add-data "app_icon.ico;." --collect-all qrcode --hidden-import="PIL._tkinter_finder" --hidden-import="winsound" Secure_Pass_Pro.pyw
+pyinstaller --noconsole --onefile --clean --icon="app_icon.ico" --add-data "app_icon.ico;." --collect-all qrcode --collect-all customtkinter --hidden-import="PIL._tkinter_finder" --hidden-import="winsound" --name "SecurePassPro" Secure_Pass_Pro.pyw
+
 ```
 
 ---
