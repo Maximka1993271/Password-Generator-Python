@@ -45,7 +45,7 @@ if platform.system() == "Windows":
 # CONSTANTS & LANGUAGES / КОНСТАНТЫ И ЯЗЫКИ / КОНСТАНТИ ТА МОВИ
 # =============================================================================
 
-UPDATE_URL = "https://github.com/Maximka1993271/Password-Generator-Python/releases/download/SecurePassProv1.9.2/Secure_Pass_Pro.exe"
+UPDATE_URL = "https://github.com/Maximka1993271/Password-Generator-Python/releases/download/SecurePassProv1.9.7/Secure_Pass_Pro.exe"
 GITHUB_URL = "https://github.com/Maximka1993271/Password-Generator-Python"
 CRACK_SPEED = 100_000_000_000 # Keys per second for MD5 / Ключей в секунду / Ключів на секунду
 
