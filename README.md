@@ -11,6 +11,7 @@
 * **Entropy Analysis**: Детальный расчет энтропии и времени взлома.
 * **Triple Localization**: Поддержка RU, EN, UA языков.
 * **Amoled UI**: Оптимизация под High DPI и OLED экраны.
+* **Звуки кнопок. 
 
 [📥 Скачать v3.9 Stable](https://github.com/Maximka1993271/Password-Generator-Python/releases/download/SecurePassProv3.9/SecurePassPro.exe)
 
@@ -22,6 +23,7 @@
 * Старый Дизайн. 
 * Стабильная работа без лишних файлов (Zero-Config).
 * История сессий и звуковое сопровождение.
+* Звуки кнопок. 
 
 [📥 Скачать v2.0.0 Classic](https://github.com/Maximka1993271/Password-Generator-Python/releases/download/SecurePassProv2.0.0/Secure_Pass_Pro.exe)
 
