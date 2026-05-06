@@ -14,11 +14,6 @@ import platform
 # SOUND ENGINE / ЗВУКОВОЙ ДВИЖОК / ЗВУКОВИЙ ДВИГУН
 # =============================================================================
 def _beep(freq: int, ms: int) -> None:
-    """
-    EN: System beep for Windows. Ignored on other OS.
-    RU: Системный звук для Windows. Игнорируется на других ОС.
-    UA: Системний звук для Windows. Ігнорується на інших ОС.
-    """
     if platform.system() == "Windows":
         try:
             import winsound
@@ -26,13 +21,13 @@ def _beep(freq: int, ms: int) -> None:
         except Exception:
             pass
 
-def sound_generate(): _beep(800, 50); _beep(1200, 50)  # Success / Успех / Успіх
-def sound_copy(): _beep(1500, 100)                    # Copy / Копирование / Копіювання
-def sound_action(): _beep(1000, 60)                   # Action / Действие / Дія
-def sound_error(): _beep(400, 150); _beep(300, 150)   # Error / Ошибка / Помилка
+def sound_generate(): _beep(800, 50); _beep(1200, 50)
+def sound_copy(): _beep(1500, 100)
+def sound_action(): _beep(1000, 60)
+def sound_error(): _beep(400, 150); _beep(300, 150)
 
 # =============================================================================
-# DEPENDENCIES CHECK / ПРОВЕРКА ЗАВИСИМОСТЕЙ / ПЕРЕВІРКА ЗАЛЕЖНОСТЕЙ
+# DEPENDENCIES CHECK
 # =============================================================================
 try:
     import qrcode
@@ -47,7 +42,7 @@ except ImportError:
     sys.exit(1)
 
 # =============================================================================
-# TOOLTIP CLASS / КЛАСС ПОДСКАЗОК / КЛАС ПІДКАЗОК
+# TOOLTIP CLASS
 # =============================================================================
 class ToolTip:
     def __init__(self, widget, text):
@@ -56,10 +51,8 @@ class ToolTip:
         self.tip_window = None
 
     def show_tip(self):
-        """EN: Display tooltip. RU: Показать подсказку. UA: Показати підказку."""
         if self.tip_window or not self.text:
             return
-        x, y, _cx, cy = self.widget.bbox("insert")
         x = self.widget.winfo_rootx() + 25
         y = self.widget.winfo_rooty() + 35
         self.tip_window = tw = tk.Toplevel(self.widget)
@@ -71,16 +64,14 @@ class ToolTip:
         label.pack(ipadx=1)
 
     def hide_tip(self):
-        """EN: Hide tooltip. RU: Скрыть подсказку. UA: Приховати підказку."""
         tw = self.tip_window
         self.tip_window = None
         if tw:
             tw.destroy()
 
 # =============================================================================
-# GLOBAL SETTINGS / ГЛОБАЛЬНЫЕ НАСТРОЙКИ / ГЛОБАЛЬНІ НАЛАШТУВАННЯ
+# GLOBAL SETTINGS
 # =============================================================================
-CONFIG_FILE = "config.ini"
 HISTORY_MAX = 50
 UPD_URL = "https://github.com/Maximka1993271/Password-Generator-Python/releases/download/SecurePassProv3.9/SecurePassPro.exe"
 
@@ -139,7 +130,7 @@ LANGUAGES = {
 }
 
 # =============================================================================
-# MAIN APP CLASS / ОСНОВНОЙ КЛАСС / ОСНОВНИЙ КЛАС
+# MAIN APP CLASS
 # =============================================================================
 class SecurePassPro(ctk.CTk):
     def __init__(self):
@@ -160,7 +151,6 @@ class SecurePassPro(ctk.CTk):
         self._load_config()
 
     def _setup_vars(self):
-        """EN: Initialize variables. RU: Инициализация переменных. UA: Ініціалізація змінних."""
         self.upper_var = tk.BooleanVar(value=True)
         self.lower_var = tk.BooleanVar(value=True)
         self.digits_var = tk.BooleanVar(value=True)
@@ -170,7 +160,6 @@ class SecurePassPro(ctk.CTk):
         self.hide_var = tk.BooleanVar(value=False)
 
     def _setup_ui(self):
-        """EN: Build interface. RU: Создание интерфейса. UA: Створення інтерфейсу."""
         self.lbl_title = ctk.CTkLabel(self, text="", font=("Segoe UI", 22, "bold"))
         self.lbl_title.pack(pady=(15, 0))
         self.lbl_author = ctk.CTkLabel(self, text="", font=("Segoe UI", 12, "italic"), text_color="gray")
@@ -235,14 +224,12 @@ class SecurePassPro(ctk.CTk):
         self.theme_sw.pack(side="right")
 
     def _create_cb(self, var, command=None):
-        """EN: Helper for CheckBoxes. RU: Помощник для чекбоксов. UA: Помічник для чекбоксів."""
         cb = ctk.CTkCheckBox(self.opt_frame, text="", variable=var, font=("Segoe UI", 12), 
                              command=lambda: (command() if command else None, self._refresh_strength()))
         cb.pack(anchor="w", padx=35, pady=2)
         return cb
 
     def _create_btn(self, cmd, key, color, tt_key, bold=False):
-        """EN: Helper for Buttons. RU: Помощник для кнопок. UA: Помічник для кнопок."""
         btn = ctk.CTkButton(self, text="", command=cmd, fg_color=color, height=35, 
                              font=("Segoe UI", 13 if bold else 12, "bold" if bold else "normal"))
         btn.pack(pady=3, padx=40, fill="x")
@@ -255,7 +242,6 @@ class SecurePassPro(ctk.CTk):
         return btn
 
     def _generate(self):
-        """EN: Password generation logic. RU: Логика генерации пароля. UA: Логіка генерації пароля."""
         ambig = "il1Lo0O"
         def get_pool(var, src):
             if not var.get(): return ""
@@ -292,7 +278,6 @@ class SecurePassPro(ctk.CTk):
         self._refresh_strength()
 
     def _refresh_strength(self):
-        """EN: Entropy and strength calculation. RU: Расчет энтропии и сложности. UA: Розрахунок ентропії та складності."""
         pwd = self.entry_res.get()
         L = LANGUAGES[self.current_lang]
         if not pwd:
@@ -325,7 +310,6 @@ class SecurePassPro(ctk.CTk):
         self.lbl_strength.configure(text=f"{L['strength']}: {int(entropy)} {L['bits']}")
 
     def _copy(self):
-        """EN: Copy to clipboard. RU: Копирование в буфер. UA: Копіювання в буфер."""
         pwd = self.entry_res.get()
         if not pwd:
             sound_error()
@@ -340,7 +324,6 @@ class SecurePassPro(ctk.CTk):
         self.after(2000, lambda: self.lbl_time_to_crack.configure(text=old_text, text_color=old_color))
 
     def _save(self):
-        """EN: Save to file. RU: Сохранение в файл. UA: Збереження у файл."""
         pwd = self.entry_res.get()
         if not pwd: 
             sound_error()
@@ -352,7 +335,6 @@ class SecurePassPro(ctk.CTk):
             sound_action()
 
     def _open(self):
-        """EN: Open from file. RU: Открытие из файла. UA: Відкриття з файлу."""
         file = filedialog.askopenfilename(filetypes=[("Text Files", "*.txt *.log *.key"), ("All Files", "*.*")])
         if file:
             with open(file, "r", encoding="utf-8") as f:
@@ -362,7 +344,6 @@ class SecurePassPro(ctk.CTk):
                 self._refresh_strength()
 
     def _show_history(self):
-        """EN: History window. RU: Окно истории. UA: Вікно історії."""
         sound_action()
         L = LANGUAGES[self.current_lang]
         if self.history_window is None or not self.history_window.winfo_exists():
@@ -378,7 +359,6 @@ class SecurePassPro(ctk.CTk):
             self.history_window.focus()
 
     def _show_qr(self):
-        """EN: QR Code generation. RU: Генерация QR-кода. UA: Генератція QR-коду."""
         pwd = self.entry_res.get()
         if not pwd:
             sound_error()
@@ -398,14 +378,12 @@ class SecurePassPro(ctk.CTk):
             self.qr_window.focus()
 
     def _center_window(self, win, w, h):
-        """EN: Center top-level windows. RU: Центрирование окон. UA: Центрування вікон."""
         self.update_idletasks()
         x = self.winfo_x() + (self.winfo_width() // 2) - (w // 2)
         y = self.winfo_y() + (self.winfo_height() // 2) - (h // 2)
         win.geometry(f"{w}x{h}+{x}+{y}")
 
     def _change_radius(self, val):
-        """EN: UI corner radius change. RU: Изменение радиуса углов. UA: Зміна радіусу кутів."""
         r = int(val)
         for w in self._radius_widgets: 
             try: w.configure(corner_radius=r)
@@ -413,7 +391,6 @@ class SecurePassPro(ctk.CTk):
         self.lbl_radius.configure(text=f"{LANGUAGES[self.current_lang]['radius']}: {r}")
 
     def _apply_lang(self, lang):
-        """EN: Localization engine. RU: Движок локализации. UA: Двигун локалізації."""
         self.current_lang = lang
         L = LANGUAGES[lang]
         self.title(L["win_title"])
@@ -433,6 +410,9 @@ class SecurePassPro(ctk.CTk):
 
         self.theme_sw.configure(values=[L["sys"], L["dark"], L["light"]])
         self.lang_sw.set(lang)
+        current_theme_localized = { "System": L["sys"], "Dark": L["dark"], "Light": L["light"] }.get(self.current_theme)
+        self.theme_sw.set(current_theme_localized)
+
         self._update_len_text(self.slider.get())
         self._refresh_strength()
 
@@ -441,7 +421,6 @@ class SecurePassPro(ctk.CTk):
         self._save_config()
 
     def _on_theme_change(self, choice):
-        """EN: Theme switcher. RU: Переключатель темы. UA: Перемикач теми."""
         L = LANGUAGES[self.current_lang]
         rmap = {L["sys"]: "System", L["dark"]: "Dark", L["light"]: "Light"}
         self.current_theme = rmap.get(choice, "System")
@@ -449,22 +428,13 @@ class SecurePassPro(ctk.CTk):
         self._save_config()
 
     def _load_config(self):
-        """EN: Config loader. RU: Загрузка конфигурации. UA: Завантаження конфігурації."""
-        config = configparser.ConfigParser()
-        if os.path.exists(CONFIG_FILE):
-            config.read(CONFIG_FILE)
-            self.current_theme = config.get("Settings", "theme", fallback="System")
-            self._apply_lang(config.get("Settings", "lang", fallback="RU"))
-            ctk.set_appearance_mode(self.current_theme)
-        else: 
-            self._apply_lang("RU")
+        """Всегда запускаем с настройками по умолчанию без чтения файла"""
+        self._apply_lang("RU")
+        ctk.set_appearance_mode("System")
 
     def _save_config(self):
-        """EN: Config saver. RU: Сохранение конфигурации. UA: Збереження конфігурації."""
-        config = configparser.ConfigParser()
-        config["Settings"] = {"lang": self.current_lang, "theme": self.current_theme}
-        with open(CONFIG_FILE, "w") as f: 
-            config.write(f)
+        """Ничего не сохраняем на диск"""
+        pass
 
     def _update_app(self): 
         webbrowser.open(UPD_URL)
@@ -475,9 +445,6 @@ class SecurePassPro(ctk.CTk):
     def _update_len_text(self, val): 
         self.lbl_len.configure(text=f"{LANGUAGES[self.current_lang]['len']}: {int(val)}")
 
-# =============================================================================
-# ENTRY POINT / ТОЧКА ВХОДА / ТОЧКА ВХОДУ
-# =============================================================================
 if __name__ == "__main__":
     app = SecurePassPro()
     app.mainloop()
