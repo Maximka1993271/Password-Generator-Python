@@ -67,3 +67,28 @@ pip install qrcode[pil] pillow
 git clone https://github.com/Maximka1993271/Password-Generator-Python.git
 cd Password-Generator-Python
 python Secure_Pass_Pro.py
+
+Готовый .exe
+Скачайте готовый файл из Releases — не требует установки Python.
+
+🛠 Технологии
+
+Python + Tkinter (нативный GUI)
+secrets + string — криптографически стойкая генерация
+qrcode[pil] — генерация QR-кодов
+Pillow — обработка изображений
+
+📄 Лицензия
+Проект распространяется под лицензией MIT.
+
+Разработал Максим Мельников 👨‍💻
+⭐ Если проект вам понравился — поставьте звезду на GitHub!
+
+
+### Рекомендации по улучшению:
+- Добавьте в будущем ** badges** (Python version, License, Downloads, Stars).
+- Создайте папку `/screenshots` и добавьте больше скриншотов.
+- Добавьте раздел **Как использовать** с примерами.
+- Добавьте **Contributing** и **Changelog.md**.
+
+Хотите более минималистичную версию или, наоборот, максимально подробную?
