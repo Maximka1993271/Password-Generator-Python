@@ -60,7 +60,7 @@ Ctrl + O - Открытие файла.
 
 Анализ MD5: Обновленные алгоритмы расчета времени взлома (Brute-force) на современных GPU.
 
-[📥 Скачать v2.0.0 Classic](https://github.com/Maximka1993271/Password-Generator-Python/releases/download/SecurePassProv2.0.0/Secure_Pass_Pro.exe)
+[📥 Скачать v2.0.0 Classic](https://github.com/Maximka1993271/Password-Generator-Python/releases/download/SecurePassProv2.0.0/SecurePassPro.exe)
 
 ⚙️ Требования и Установка
 Для работы QR-кодов и обработки изображений требуются сторонние библиотеки:
