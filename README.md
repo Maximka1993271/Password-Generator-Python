@@ -61,3 +61,9 @@
 
 ```bash
 pip install qrcode[pil] pillow
+
+Запуск из исходников
+
+git clone https://github.com/Maximka1993271/Password-Generator-Python.git
+cd Password-Generator-Python
+python Secure_Pass_Pro.py
