@@ -215,6 +215,7 @@ LANGUAGES: Dict[str, Dict[str, str]] = {
         "digits":     "Цифры",
         "symb":       "Спецсимволы",
         "ambig":      "Исключить похожие (i, l, 1, L, o, 0, O)",
+        "unambig":    "Исключить неоднозначные ({} [] () / \ ' \" ` ~ , ; : . < >)",
         "at_least":   "Минимум 1 из каждой категории",
         "hide":       "Скрывать символы",
         "btn_gen":    "СГЕНЕРИРОВАТЬ",
@@ -267,6 +268,7 @@ LANGUAGES: Dict[str, Dict[str, str]] = {
         "digits":     "Digits",
         "symb":       "Special Symbols",
         "ambig":      "Exclude ambiguous (i, l, 1, L, o, 0, O)",
+        "unambig":    "Exclude symbols ({} [] () / \ ' \" ` ~ , ; : . < >)",
         "at_least":   "At least one from each category",
         "hide":       "Hide symbols",
         "btn_gen":    "GENERATE",
@@ -319,6 +321,7 @@ LANGUAGES: Dict[str, Dict[str, str]] = {
         "digits":     "Цифри",
         "symb":       "Спецсимволи",
         "ambig":      "Виключити схожі (i, l, 1, L, o, 0, O)",
+        "unambig":    "Виключити неоднозначні ({} [] () / \ ' \" ` ~ , ; : . < >)",
         "at_least":   "Мінімум 1 з кожної категорії",
         "hide":       "Приховати символи",
         "btn_gen":    "ЗГЕНЕРУВАТИ",
@@ -473,6 +476,7 @@ class SecurePassPro(ctk.CTk):
         self.digits_var        = tk.BooleanVar(value=True)
         self.symb_var          = tk.BooleanVar(value=True)
         self.exclude_ambig_var = tk.BooleanVar(value=False)
+        self.exclude_unambig_var = tk.BooleanVar(value=False)
         self.at_least_one_var  = tk.BooleanVar(value=True)
         self.hide_var          = tk.BooleanVar(value=False)
 
@@ -532,6 +536,7 @@ class SecurePassPro(ctk.CTk):
         self.cb_digits   = self._create_cb(self.digits_var)
         self.cb_symb     = self._create_cb(self.symb_var)
         self.cb_ambig    = self._create_cb(self.exclude_ambig_var)
+        self.cb_unambig  = self._create_cb(self.exclude_unambig_var)
         self.cb_at_least = self._create_cb(self.at_least_one_var)
         self.cb_hide     = self._create_cb(self.hide_var, command=self._toggle_visibility)
 
@@ -661,6 +666,11 @@ class SecurePassPro(ctk.CTk):
         Returns: (category_pools: List[str], full_combined_pool: str)
         """
         exclude = set(AMBIGUOUS_CHARS) if self.exclude_ambig_var.get() else set()
+        
+        if self.exclude_unambig_var.get():
+            # Символы, которые часто вызывают проблемы в коде или терминалах
+            unambig_chars = "{}[]()/\\'\"`~,;:.<>"
+            exclude.update(unambig_chars)
 
         def _pool(var: tk.BooleanVar, src: str) -> str:
             if not var.get():
@@ -1140,6 +1150,7 @@ class SecurePassPro(ctk.CTk):
         self.cb_digits.configure(text=L["digits"])
         self.cb_symb.configure(text=L["symb"])
         self.cb_ambig.configure(text=L["ambig"])
+        self.cb_unambig.configure(text=L["unambig"])
         self.cb_at_least.configure(text=L["at_least"])
         self.cb_hide.configure(text=L["hide"])
 
