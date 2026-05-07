@@ -35,18 +35,6 @@
 
 ---
 
-⚙️ Установка и запуск
-Требования
-Python 3.9+ (полная совместимость вплоть до версии 3.14).
-
-Необходимые библиотеки:
-
-pip install qrcode[pil] pillow customtkinter
-
-## 📜 Версия 2.0.0 Classic (стабильная)
-
----
-
 ![v2.0.0 Preview](https://github.com/Maximka1993271/Password-Generator-Python/raw/main/Secure_Pass_MainWindow.png)
 
 **Secure Pass Pro v2.0.0** - это надежная классическая ветка проекта. Она идеально подходит для пользователей, которым важна максимальная стабильность и минималистичный интерфейс на базе стандартного Tkinter.
