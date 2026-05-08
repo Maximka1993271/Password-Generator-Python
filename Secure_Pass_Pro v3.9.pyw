@@ -727,6 +727,18 @@ class SecurePassPro(ctk.CTk):
             return False
         return actual_hash == expected_hash
 
+    def _get_supported_extension(self, path, allowed_extensions):
+        """
+        Validate selected file extension
+        Проверка выбранного расширения файла
+        Перевірка вибраного розширення файлу
+        """
+        ext = os.path.splitext(path)[1].lower()
+        if ext not in allowed_extensions:
+            L = LANGUAGES[self.current_lang]
+            raise ValueError(L["err_unsupported"].format(ext or "no extension"))
+        return ext
+
     def _save(self):
         """
         Save to TXT/KEY/LOG/PDF / Сохранение / Збереження
@@ -748,7 +760,8 @@ class SecurePassPro(ctk.CTk):
         )
         if path:
             try:
-                if path.lower().endswith(".pdf"):
+                ext = self._get_supported_extension(path, SUPPORTED_EXTENSIONS)
+                if ext == ".pdf":
                     pdf = FPDF()
                     pdf.set_author("Maxim Melnikov")
                     pdf.set_creator("Secure Pass Pro v3.9")
@@ -782,7 +795,7 @@ class SecurePassPro(ctk.CTk):
                         f.write(pwd_bytes)
                     if not self._verify_text_file(path, pwd_bytes): raise IOError(L["err_integrity"])
                 self._play_sound("success")
-            except Exception as e: 
+            except (OSError, ValueError, RuntimeError, UnicodeEncodeError, tk.TclError) as e:
                 messagebox.showerror("Error", L["err_save"].format(e))
 
     def _open(self):
@@ -798,15 +811,13 @@ class SecurePassPro(ctk.CTk):
         )
         if path:
             try:
-                ext = os.path.splitext(path)[1].lower()
-                if ext not in TEXT_EXTENSIONS:
-                    raise ValueError(L["err_unsupported"].format(ext or "no extension"))
+                self._get_supported_extension(path, TEXT_EXTENSIONS)
                 with open(path, "r", encoding="utf-8") as f:
                     content = f.read().strip()
                     self.entry_res.delete(0, "end")
                     self.entry_res.insert(0, content)
                 self._play_sound("success")
-            except Exception as e: 
+            except (OSError, ValueError, UnicodeDecodeError, tk.TclError) as e:
                 messagebox.showerror("Error", L["err_open"].format(e))
 
     def _show_qr(self):
