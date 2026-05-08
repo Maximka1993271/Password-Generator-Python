@@ -1,67 +1,39 @@
 # 🛡️ Secure Pass Pro v3.9
 
-**🔐 Professional Crypto-Secure Password Generator for Windows 11 Pro**
 **🔐 Профессиональный генератор криптостойких паролей для Windows 11 Pro**
-**🔐 Професійний генератор криптостійких паролів для Windows 11 Pro**
+
+Современный инструмент на Python 3.14+, объединяющий глубокую кастомизацию интерфейса, интерактивный звук и криптостойкий движок для обеспечения вашей безопасности.
 
 ![v3.9 Preview](https://github.com/Maximka1993271/Password-Generator-Python/raw/main/Secure_Pass_MainWindow39.png)
 
 ---
 
-## ✨ Features | Возможности | Можливості
+## ✨ Основные возможности v3.9
 
-### 🇺🇸 English
-- **Crypto-Secure**: Built using the `secrets` module (CSPRNG) for maximum randomness.
-- **Custom UI**: Real-time corner radius adjustment for all interface elements.
-- **Stability**: Fixed window size (no resizing) for a consistent professional layout.
-- **Smart Filtering**: Option to exclude ambiguous (i, l, 1) and **non-obvious** symbols.
-- **Security**: Automatic clipboard clearing after 60 seconds.
-- **Localization**: Full RU, EN, UA support with on-the-fly switching.
-
-### 🇷🇺 Русский
-- **Криптостойкость**: Генерация на базе модуля `secrets` (CSPRNG) для максимальной защиты.
-- **Custom UI**: Регулировка закругления углов всех элементов интерфейса в реальном времени.
-- **Стабильность**: Фиксированный размер окна (запрет масштабирования) для идеального отображения.
-- **Умная фильтрация**: Исключение похожих (i, l, 1) и **не однозначных** знаков.
-- **Безопасность**: Автоматическая очистка буфера обмена через 60 секунд.
-- **Локализация**: Полная поддержка RU, EN, UA с мгновенным переключением.
-
-### 🇺🇦 Українська
-- **Криптостійкість**: Генерація на базі модуля `secrets` (CSPRNG) для максимального захисту.
-- **Custom UI**: Регулювання закруглення кутів усіх елементів інтерфейсу у реальному часі.
-- **Стабільність**: Фіксований розмір вікна (заборона масштабування) для ідеального вигляду.
-- **Розумна фільтрація**: Виключення схожих (i, l, 1) та **не однозначних** знаків.
-- **Безпека**: Автоматичне очищення буфера обміну через 60 секунд.
-- **Локалізація**: Повна підтримка RU, EN, UA з миттєвим перемиканням.
+- **Криптостойкость**: Использование модуля `secrets` (CSPRNG) для генерации паролей, устойчивых к предсказанию.
+- **Amoled Dark Theme**: Глубокий черный интерфейс, оптимизированный для OLED-экранов и High DPI мониторов.
+- **Аудит безопасности**: 
+  - Точный расчет **энтропии** пароля в битах.
+  - Оценка времени взлома (от «мгновенно» до «столетий»).
+  - Пятизвездочный визуальный индикатор надежности.
+- **Приватность и контроль**:
+  - **Очистка истории**: Кнопка мгновенного удаления логов сгенерированных паролей.
+  - **Автоочистка буфера**: Безопасное удаление пароля из памяти через 60 секунд.
+  - **Unicode PDF Fix**: Исправлен экспорт отчетов — теперь кириллица в PDF отображается корректно.
+- **Dynamic UI**: Слайдер регулировки закругления углов (0–25px) всех элементов в реальном времени.
+- **QR-код**: Быстрая передача пароля на смартфон через генерацию изображения.
 
 ---
 
-## 🚀 What's New in v3.9 | Что нового | Що нового
+## 🚀 Что нового в финальной версии 3.9
 
-### 🇺🇸 English
-1. **Design 2.0**: Full redesign using `CustomTkinter` with a sidebar and adaptive light/dark themes.
-2. **Audio Control**: Added a new **Sound: ON/OFF** toggle button on the bottom panel.
-3. **Terminology**: "Complex symbols" replaced with more accurate **"non-obvious"**.
-4. **Win 11 Optimization**: Native `winsound` support and correct High DPI rendering.
-5. **File Support**: Full compatibility with `.key`, `.log`, and `.txt` extensions.
+1. **Рефакторинг интерфейса**: Дизайн стал более сбалансированным. Кнопки управления логически сгруппированы в боковом меню с цветовой кодировкой.
+2. **Sound Engine Integration**: Интерактивное звуковое сопровождение действий через нативный Windows API (`winsound`) с возможностью отключения на панели.
+3. **Triple Localization**: Мгновенное переключение между RU, EN и UA языками интерфейса.
+4. **Умная фильтрация**: Исключение похожих символов (`i, l, 1, o, 0`) и неоднозначных знаков для удобства чтения.
+5. **Расширенный экспорт**: Стабильная поддержка сохранения паролей в форматах `.txt`, `.log`, `.key` и `.pdf`.
 
-### 🇷🇺 Русский
-1. **Дизайн 2.0**: Полный редизайн на `CustomTkinter` с боковым меню и адаптивными темами.
-2. **Контроль звука**: Добавлена кнопка **«Звук: ВКЛ/ВЫКЛ»** на нижней панели управления.
-3. **Обновление терминологии**: «Сложные знаки» заменены на более точные **«не однозначные»**.
-4. **Оптимизация Win 11**: Нативная поддержка `winsound` и корректный рендеринг High DPI.
-5. **Поддержка файлов**: Полная совместимость с расширениями `.key`, `.log` и `.txt`.
-
-### 🇺🇦 Українська
-1. **Дизайн 2.0**: Повний редизайн на `CustomTkinter` з бічним меню та адаптивними темами.
-2. **Керування звуком**: Додано нову кнопку **«Звук: ВКЛ/ВИКЛ»** на нижній панелі.
-3. **Оновлення термінології**: «Складні знаки» замінені на більш точні **«не однозначні»**.
-4. **Оптимізація Win 11**: Нативна підтримка `winsound` та коректний рендеринг High DPI.
-5. **Підтримка файлів**: Повна сумісність з розширеннями `.key`, `.log` та `.txt`.
-
----
-
-**[📥 Download v3.9 Stable (Windows)](https://github.com/Maximka1993271/Password-Generator-Python/releases/download/SecurePassProv3.9/SecurePassPro.exe)**
+**[📥 Скачать v3.9 Stable (.exe)](https://github.com/Maximka1993271/Password-Generator-Python/releases/download/SecurePassProv3.9/SecurePassPro.exe)**
 
 ---
 
@@ -69,45 +41,21 @@
 
 ![v2.0.0 Preview](https://github.com/Maximka1993271/Password-Generator-Python/raw/main/Secure_Pass_MainWindow.png)
 
-**Secure Pass Pro v2.0.0** — reliable classic version based on standard Tkinter.  
-**Secure Pass Pro v2.0.0** — надежная классическая ветка на базе стандартного Tkinter.  
-**Secure Pass Pro v2.0.0** — надійна класична гілка на базі стандартного Tkinter.
+Классическая ветка проекта для пользователей, предпочитающих минималистичный интерфейс на стандартной библиотеке Tkinter.
+- **Стабильность**: Проверенный временем движок для любых версий Windows.
+- **Базовый функционал**: Генерация, история и основные темы оформления.
 
-### 🇺🇸 English
-- **Stability**: Time-tested generation engine for legacy systems.
-- **Themes**: Support for light, dark, and system themes.
-- **History**: Basic log of generated passwords for quick access.
-
-### 🇷🇺 Русский
-- **Стабильность**: Проверенный временем движок для старых систем.
-- **Темы**: Поддержка светлой, темной и системной тем оформления.
-- **История**: Базовый лог сгенерированных паролей для быстрого доступа.
-
-### 🇺🇦 Українська
-- **Стабільність**: Перевірений часом двигун для старих систем.
-- **Теми**: Підтримка світлої, темної та системної тем оформлення.
-- **Історія**: Базовий лог згенерованих паролів для швидкого доступу.
-
-**[📥 Download v2.0.0 Classic](https://github.com/Maximka1993271/Password-Generator-Python/releases/download/SecurePassProv2.0.0/SecurePassPro.exe)**
+**[📥 Скачать v2.0.0 Classic](https://github.com/Maximka1993271/Password-Generator-Python/releases/download/SecurePassProv2.0.0/SecurePassPro.exe)**
 
 ---
 
-## ⚙️ Tech Specs | Техническая информация | Технічна інформація
+## ⚙️ Информация для разработчиков
 
-### 🇺🇸 English
-- **Language**: Python 3.9+
-- **OS**: Windows 11 Pro (Optimized)
-- **Libraries**: `customtkinter`, `qrcode`, `pillow`
+### Стек технологий
+- **Язык**: Python 3.14.4 (совместимо с 3.9+).
+- **Библиотеки**: `customtkinter`, `Pillow`, `qrcode`, `secrets`.
 
-### 🇷🇺 Русский
-- **Язык**: Python 3.9+
-- **ОС**: Windows 11 Pro (Оптимизировано)
-- **Библиотеки**: `customtkinter`, `qrcode`, `pillow`
-
-### 🇺🇦 Українська
-- **Мова**: Python 3.9+
-- **ОС**: Windows 11 Pro (Оптимізовано)
-- **Бібліотеки**: `customtkinter`, `qrcode`, `pillow`
-
+### Команда для сборки в один файл
+Для создания исполняемого файла (`.exe`) используйте следующую команду:
 ```bash
-pip install qrcode[pil] pillow customtkinter
+pyinstaller --noconsole --onefile --clean --icon="app_icon.ico" --add-data "app_icon.ico;." --collect-all qrcode --collect-all customtkinter --hidden-import="PIL._tkinter_finder" --hidden-import="winsound" --name "SecurePassPro" Secure_Pass_Pro.pyw
