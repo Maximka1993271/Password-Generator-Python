@@ -4,6 +4,8 @@
 **🔐 Профессиональный генератор криптостойких паролей для Windows 11 Pro**
 **🔐 Професійний генератор криптостійких паролів для Windows 11 Pro**
 
+![v3.9 Preview](https://github.com/Maximka1993271/Password-Generator-Python/raw/main/Secure_Pass_MainWindow39.png)
+
 ---
 
 ## ✨ Main Features | Основные возможности | Основні можливості
@@ -43,6 +45,8 @@
 ---
 
 ## 📜 Classic Branch: v2.0.0
+
+![v2.0.0 Preview](https://github.com/Maximka1993271/Password-Generator-Python/raw/main/Secure_Pass_MainWindow.png)
 
 **Secure Pass Pro v2.0.0** — reliable classic version based on standard Tkinter.
 **Secure Pass Pro v2.0.0** — надежная классическая ветка на базе стандартного Tkinter.
