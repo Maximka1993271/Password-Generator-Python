@@ -1,26 +1,47 @@
 """
-не трогать .key, .log, .txt pdf
-не трогать коменты оставить на 3 языках коменты 
+Do not modify user .key, .log, .txt, or PDF files during audit.
+Не изменять пользовательские .key, .log, .txt и PDF-файлы во время аудита.
+Не змінювати користувацькі .key, .log, .txt та PDF-файли під час аудиту.
+
+Keep comments in 3 languages.
+Оставлять комментарии на 3 языках.
+Залишати коментарі 3 мовами.
 
 SecurePassPro v3.9 — Cryptographically secure password generator
 Author / Автор: Maxim Melnikov
 """
 
 from __future__ import annotations
+from collections import deque
+import hashlib
+import logging
 import math
 import platform
+import random
 import secrets
 import string
 import sys
 import os
-import threading
 import webbrowser
 import datetime
 import tkinter as tk
 from tkinter import filedialog, messagebox
-from typing import Optional, List, Dict, Callable
-import customtkinter as ctk
+from typing import Dict
 import ctypes  # Added for Windows API (corner rounding) / Добавлено для API Windows (скругление углов) / Додано для API Windows (заокруглення кутів)
+
+
+def _show_startup_error(title, text):
+    """
+    Startup error dialog with root cleanup
+    Диалог ошибки запуска с очисткой корневого окна
+    Діалог помилки запуску з очищенням кореневого вікна
+    """
+    root = tk.Tk()
+    root.withdraw()
+    try:
+        messagebox.showerror(title, text)
+    finally:
+        root.destroy()
 
 # Check OS for sound support / Проверка ОС для поддержки звука / Перевірка ОС для підтримки звуку
 _IS_WINDOWS = platform.system() == "Windows"
@@ -29,26 +50,26 @@ if _IS_WINDOWS:
 
 # Requirements check / Проверка системных требований / Перевірка системних вимог
 if sys.version_info < (3, 9):
-    _ver_root = tk.Tk()
-    _ver_root.withdraw()
-    messagebox.showerror("Error", "Python 3.9+ required!")
+    _show_startup_error("Error", "Python 3.9+ required!")
     sys.exit(1)
 
 # Dependencies check / Проверка библиотек / Перевірка бібліотек
 try:
+    import customtkinter as ctk
     import qrcode
-    from PIL import Image, ImageTk
-    from fpdf import FPDF  
-except ImportError:
-    _err_root = tk.Tk()
-    _err_root.withdraw()
-    messagebox.showerror("Error", "Required: pip install qrcode[pil] pillow customtkinter fpdf")
+    from PIL import Image  # Pillow availability check / Проверка наличия Pillow / Перевірка наявності Pillow
+    from fpdf import FPDF
+except ImportError as exc:
+    _show_startup_error("Error", f"Required: pip install qrcode[pil] pillow customtkinter fpdf\n\n{exc}")
     sys.exit(1)
 
 HISTORY_MAX = 50
 AMBIGUOUS_CHARS = "il1Lo0O"
 UNAMBIG_CHARS = "{}[]()/\\'\"`~,;:.<>"
 UPD_URL = "https://github.com/Maximka1993271/Password-Generator-Python/releases"
+
+SUPPORTED_EXTENSIONS = (".key", ".log", ".txt", ".pdf")
+TEXT_EXTENSIONS = (".key", ".log", ".txt")
 
 class ToolTip:
     """
@@ -125,14 +146,16 @@ LANGUAGES: Dict[str, Dict[str, str]] = {
         "tt_gen": "Создать новый случайный пароль",
         "tt_copy": "Копировать в буфер (очистка через 60 сек)",
         "tt_save": "Сохранить текущий пароль в файл",
-        "tt_open": "Открыть пароль из файла .key, .log, .txt или .pdf",
+        "tt_open": "Открыть пароль из файла .key, .log или .txt",
         "tt_qr": "Создать QR-код для быстрого сканирования",
         "tt_hist": "Показать последние 50 паролей",
         "tt_upd": "Проверить наличие новой версии на GitHub",
         "tt_about": "Информация о разработчике и программе",
         "err_cat": "Выберите хотя бы одну категорию!",
+        "err_pool_small": "Слишком мало доступных символов после исключений!",
         "err_save": "Ошибка сохранения: {0}",
         "err_open": "Не удалось прочитать файл: {0}",
+        "err_unsupported": "Неподдерживаемый тип файла: {0}",
         "err_integrity": "Критическая ошибка: Файл поврежден после записи!",
         "hist_empty": "История пуста...",
         "btn_clear_hist": "Очистить историю",
@@ -177,14 +200,16 @@ LANGUAGES: Dict[str, Dict[str, str]] = {
         "tt_gen": "Create a new random password",
         "tt_copy": "Copy to clipboard (clears in 60 sec)",
         "tt_save": "Save current password to file",
-        "tt_open": "Open password from .key, .log, .txt or .pdf",
+        "tt_open": "Open password from .key, .log or .txt",
         "tt_qr": "Create a QR code for quick scanning",
         "tt_hist": "Show last 50 generated passwords",
         "tt_upd": "Check for new version on GitHub",
         "tt_about": "Developer and program info",
         "err_cat": "Select at least one category!",
+        "err_pool_small": "Too few available characters after exclusions!",
         "err_save": "Save failed: {0}",
         "err_open": "Could not read file: {0}",
+        "err_unsupported": "Unsupported file type: {0}",
         "err_integrity": "Critical error: File corrupted after write!",
         "hist_empty": "History is empty...",
         "btn_clear_hist": "Clear History",
@@ -211,7 +236,7 @@ LANGUAGES: Dict[str, Dict[str, str]] = {
         "btn_open": "Відкрити файл",
         "btn_qr": "QR-код пароль",
         "btn_hist": "Історія",
-        "btn_upd": "Оновити программу",
+        "btn_upd": "Оновити програму",
         "btn_about": "Про програму",
         "btn_theme": "Колір програми",
         "radius": "Закруглення кутів",
@@ -229,14 +254,16 @@ LANGUAGES: Dict[str, Dict[str, str]] = {
         "tt_gen": "Створити новий випадковий пароль",
         "tt_copy": "Копіювати в буфер (очищення через 60 сек)",
         "tt_save": "Зберегти поточний пароль у файл",
-        "tt_open": "Відкрити пароль з файлу .key, .log, .txt або .pdf",
+        "tt_open": "Відкрити пароль з файлу .key, .log або .txt",
         "tt_qr": "Створити QR-код для швидкого сканування",
-        "tt_hist": "Показать последние 50 паролів",
+        "tt_hist": "Показати останні 50 паролів",
         "tt_upd": "Перевірити наявність нової версії на GitHub",
-        "tt_about": "Інформація про розробника та программу",
+        "tt_about": "Інформація про розробника та програму",
         "err_cat": "Виберіть хоча б одну категорію!",
+        "err_pool_small": "Занадто мало доступних символів після виключень!",
         "err_save": "Помилка збереження: {0}",
         "err_open": "Не вдалося прочитати файл: {0}",
+        "err_unsupported": "Непідтримуваний тип файлу: {0}",
         "err_integrity": "Критична помилка: Файл пошкоджений після запису!",
         "hist_empty": "Історія порожня...",
         "btn_clear_hist": "Очистити історію",
@@ -249,14 +276,17 @@ class SecurePassPro(ctk.CTk):
     def __init__(self):
         super().__init__()
         self.current_lang = "RU"
-        self.history = []
+        self.current_theme_key = "theme_sys"
+        self.history = deque(maxlen=HISTORY_MAX)
         self._radius_widgets = []
         self._clipboard_timer = None
         self._tooltips = {}
+        self._icon_image = None
+        self._pdf_font_path = self._get_resource_path("DejaVuSans.ttf")
+        self._secure_random = random.SystemRandom()
         self.sound_enabled = tk.BooleanVar(value=True)
         
         self.title("Secure Pass Pro v3.9")
-        self.geometry("850x780")
         self.resizable(False, False)
 
         self._setup_main_icon()
@@ -289,19 +319,30 @@ class SecurePassPro(ctk.CTk):
             window.update()
             HWND = ctypes.windll.user32.GetParent(window.winfo_id())
             DWMWA_WINDOW_CORNER_PREFERENCE = 33
-            DWMWCP_ROUND = 2  # Standard rounding
+            DWMWCP_ROUND = 2  # Standard rounding / Стандартное скругление / Стандартне заокруглення
             ctypes.windll.dwmapi.DwmSetWindowAttribute(
                 HWND, 
                 DWMWA_WINDOW_CORNER_PREFERENCE, 
                 ctypes.byref(ctypes.c_int(DWMWCP_ROUND)), 
                 ctypes.sizeof(ctypes.c_int(DWMWCP_ROUND))
             )
-        except: pass
+        except (AttributeError, OSError, tk.TclError) as exc:
+            logging.debug("Window rounding failed: %s", exc)
 
     def _get_icon_path(self):
+        return self._get_resource_path("icon.ico")
+
+    def _get_resource_path(self, filename):
+        """
+        Resource path for source and PyInstaller builds
+        Путь к ресурсу для исходника и сборки PyInstaller
+        Шлях до ресурсу для джерельного файлу та збірки PyInstaller
+        """
         if hasattr(sys, '_MEIPASS'):
-            return os.path.join(sys._MEIPASS, "icon.ico")
-        return "icon.ico"
+            base_dir = sys._MEIPASS
+        else:
+            base_dir = os.path.dirname(os.path.abspath(__file__))
+        return os.path.join(base_dir, filename)
 
     def _set_window_icon(self, window):
         icon_path = self._get_icon_path()
@@ -310,9 +351,10 @@ class SecurePassPro(ctk.CTk):
                 if _IS_WINDOWS:
                     window.iconbitmap(icon_path)
                 else:
-                    self.icon_img = tk.PhotoImage(file=icon_path)
-                    window.iconphoto(True, self.icon_img)
-            except Exception:
+                    if self._icon_image is None:
+                        self._icon_image = tk.PhotoImage(file=icon_path)
+                    window.iconphoto(True, self._icon_image)
+            except (OSError, tk.TclError):
                 pass
 
     def _setup_main_icon(self):
@@ -328,13 +370,14 @@ class SecurePassPro(ctk.CTk):
                 "error": winsound.MB_ICONHAND
             }
             winsound.MessageBeep(sounds.get(sound_type, winsound.MB_OK))
-        except: pass
+        except RuntimeError:
+            pass
 
     def _center_main_window(self):
         self.update_idletasks()
         x = (self.winfo_screenwidth() // 2) - (850 // 2)
         y = (self.winfo_screenheight() // 2) - (780 // 2)
-        self.geometry(f"+{x}+{y}")
+        self.geometry(f"850x780+{x}+{y}")
 
     def _center_window(self, window, width, height):
         window.update_idletasks()
@@ -354,7 +397,7 @@ class SecurePassPro(ctk.CTk):
         self.grid_columnconfigure(1, weight=0)
         self.grid_rowconfigure(0, weight=1)
 
-        # Left Panel (Settings & Result)
+        # Left Panel (Settings & Result) / Левая панель (настройки и результат) / Ліва панель (налаштування та результат)
         self.left_panel = ctk.CTkFrame(self, fg_color="transparent")
         self.left_panel.grid(row=0, column=0, sticky="nsew", padx=20, pady=(10, 0))
 
@@ -366,7 +409,7 @@ class SecurePassPro(ctk.CTk):
 
         self.lbl_len = ctk.CTkLabel(self.left_panel, text="", font=("Segoe UI", 16, "bold"))
         self.lbl_len.pack()
-        self.slider_len = ctk.CTkSlider(self.left_panel, from_=4, to=64, width=400, command=self._update_len_label)
+        self.slider_len = ctk.CTkSlider(self.left_panel, from_=4, to=64, number_of_steps=60, width=400, command=self._update_len_label)
         self.slider_len.set(20)
         self.slider_len.pack(pady=5)
 
@@ -396,7 +439,7 @@ class SecurePassPro(ctk.CTk):
         self.entry_res.pack(pady=10, padx=40, fill="x")
         self._radius_widgets.append(self.entry_res)
 
-        # Strength indicators
+        # Strength indicators / Индикаторы стойкости / Індикатори стійкості
         self.strength_bar = ctk.CTkProgressBar(self.left_panel, width=400, height=8)
         self.strength_bar.set(0)
         self.strength_bar.pack(pady=(5, 5))
@@ -412,7 +455,7 @@ class SecurePassPro(ctk.CTk):
         self.lbl_crack = ctk.CTkLabel(self.left_panel, text="", font=("Segoe UI", 13, "bold"), wraplength=500)
         self.lbl_crack.pack(pady=(0, 5))
 
-        # Right Panel (Menu)
+        # Right Panel (Menu) / Правая панель (меню) / Права панель (меню)
         self.right_panel = ctk.CTkFrame(self, width=250)
         self.right_panel.grid(row=0, column=1, sticky="nsew", padx=(0, 20), pady=20)
         self.right_panel.grid_propagate(False)
@@ -427,10 +470,10 @@ class SecurePassPro(ctk.CTk):
         self.btn_open = self._create_menu_btn(self.right_panel, "btn_open", "tt_open", self._open, "#0078d4")
         self.btn_qr = self._create_menu_btn(self.right_panel, "btn_qr", "tt_qr", self._show_qr, "#8764b8")
         self.btn_hist = self._create_menu_btn(self.right_panel, "btn_hist", "tt_hist", self._show_history, "#4b4b4b")
-        self.btn_upd = self._create_menu_btn(self.right_panel, "btn_upd", "tt_upd", lambda: [self._play_sound("click"), webbrowser.open(UPD_URL)], "#ca5010")
+        self.btn_upd = self._create_menu_btn(self.right_panel, "btn_upd", "tt_upd", lambda: webbrowser.open(UPD_URL), "#ca5010")
         self.btn_about = self._create_menu_btn(self.right_panel, "btn_about", "tt_about", self._show_about, "#4b4b4b")
 
-        # Bottom Panel (Control & Personalization)
+        # Bottom Panel (Control & Personalization) / Нижняя панель (управление и персонализация) / Нижня панель (керування та персоналізація)
         self.bottom_frame = ctk.CTkFrame(self, fg_color=("#e0e0e0", "#1e1e1e"), corner_radius=15)
         self.bottom_frame.grid(row=1, column=0, columnspan=2, sticky="ew", padx=20, pady=(0, 15))
         
@@ -459,7 +502,7 @@ class SecurePassPro(ctk.CTk):
     def _create_menu_btn(self, parent, lang_key, tt_key, cmd, color):
         btn = ctk.CTkButton(
             parent, text="", 
-            command=lambda: [self._play_sound("click"), cmd()], 
+            command=lambda command=cmd: self._run_menu_command(command),
             fg_color=color, height=45, font=("Segoe UI Variable", 13, "bold")
         )
         btn.pack(pady=5, padx=15, fill="x")
@@ -468,6 +511,15 @@ class SecurePassPro(ctk.CTk):
         self._radius_widgets.append(btn)
         self._tooltips[lang_key] = ToolTip(btn)
         return btn
+
+    def _run_menu_command(self, command):
+        """
+        Run menu action with click feedback
+        Запуск действия меню со звуком клика
+        Запуск дії меню зі звуком кліка
+        """
+        self._play_sound("click")
+        command()
 
     def _change_radius(self, val):
         """
@@ -492,9 +544,13 @@ class SecurePassPro(ctk.CTk):
 
     def _change_theme(self, choice):
         L = LANGUAGES[self.current_lang]
-        if choice == L["theme_sys"]: ctk.set_appearance_mode("System")
-        elif choice == L["theme_dark"]: ctk.set_appearance_mode("Dark")
-        else: ctk.set_appearance_mode("Light")
+        theme_map = {
+            L["theme_sys"]: ("theme_sys", "System"),
+            L["theme_dark"]: ("theme_dark", "Dark"),
+            L["theme_light"]: ("theme_light", "Light"),
+        }
+        self.current_theme_key, mode = theme_map.get(choice, ("theme_light", "Light"))
+        self.after(0, lambda: ctk.set_appearance_mode(mode))
 
     def _apply_lang(self, lang):
         """
@@ -523,7 +579,7 @@ class SecurePassPro(ctk.CTk):
             if btn.lang_key in self._tooltips:
                 self._tooltips[btn.lang_key].set_text(L[btn.tt_key])
         self.btn_theme.configure(values=[L["theme_sys"], L["theme_dark"], L["theme_light"]])
-        self.btn_theme.set(L["btn_theme"])
+        self.btn_theme.set(L[self.current_theme_key])
         self._change_radius(self.slider_radius.get())
         self.title(L["win_title"])
 
@@ -571,6 +627,10 @@ class SecurePassPro(ctk.CTk):
             self._play_sound("error")
             messagebox.showwarning("Error", L["err_cat"])
             return
+        if len(set(full_pool)) < 2:
+            self._play_sound("error")
+            messagebox.showwarning("Error", L["err_pool_small"])
+            return
             
         self._play_sound("success")
         length = int(self.slider_len.get())
@@ -580,20 +640,26 @@ class SecurePassPro(ctk.CTk):
             for p in [p_upper, p_lower, p_digits, p_symb]:
                 if p: result.append(secrets.choice(p))
                 
-        while len(result) < length: result.append(secrets.choice(full_pool))
-        secrets.SystemRandom().shuffle(result)
-        pwd = "".join(result[:length])
+        if len(result) > length:
+            self._secure_random.shuffle(result)
+            result = result[:length]
+        else:
+            while len(result) < length:
+                result.append(secrets.choice(full_pool))
+        self._secure_random.shuffle(result)
+        pwd = "".join(result)
         
         self.entry_res.delete(0, "end")
         self.entry_res.insert(0, pwd)
         
         pool_size = len(full_pool)
+        entropy_bits = math.log2(pool_size) * length if pool_size else 0
         combinations = f"{pool_size**length:.1e}"
         self.lbl_strength.configure(text=L["strength"].format(combinations))
         
-        if length <= 6: crack_phrase, color, progress, stars = L["time_sec"], "#FF4C4C", 0.25, "★☆☆☆☆"
-        elif length <= 10: crack_phrase, color, progress, stars = L["time_day"], "#FFA500", 0.5, "★★★☆☆"
-        elif length <= 14: crack_phrase, color, progress, stars = L["time_year"], "#FFFF00", 0.75, "★★★★☆"
+        if entropy_bits < 40: crack_phrase, color, progress, stars = L["time_sec"], "#FF4C4C", 0.25, "★☆☆☆☆"
+        elif entropy_bits < 60: crack_phrase, color, progress, stars = L["time_day"], "#FFA500", 0.5, "★★★☆☆"
+        elif entropy_bits < 80: crack_phrase, color, progress, stars = L["time_year"], "#FFFF00", 0.75, "★★★★☆"
         else: crack_phrase, color, progress, stars = L["time_cent"], "#2ECC71", 1.0, "★★★★★"
         
         self.strength_bar.configure(progress_color=color)
@@ -605,29 +671,61 @@ class SecurePassPro(ctk.CTk):
         
         now = datetime.datetime.now().strftime("%H:%M:%S")
         self.history.append(f"[{now}] {pwd}")
-        if len(self.history) > HISTORY_MAX: self.history.pop(0)
 
     def _copy(self):
-        pwd = self.entry_res.get()
+        pwd = str(self.entry_res.get())
         if not pwd: return
         L = LANGUAGES[self.current_lang]
         self._play_sound("copy")
         self.clipboard_clear()
         self.clipboard_append(pwd)
         
-        if self._clipboard_timer: self.after_cancel(self._clipboard_timer)
-        self._clipboard_timer = self.after(60000, lambda: [self.clipboard_clear(), self.clipboard_append(" ")])
+        if self._clipboard_timer:
+            try:
+                self.after_cancel(self._clipboard_timer)
+            except (tk.TclError, ValueError):
+                pass
+        self._clipboard_timer = self.after(60000, lambda value=pwd: self._clear_clipboard_if_current(value))
         
         old_text = L["btn_copy"]
         self.btn_copy.configure(text=L["copied"])
         self.after(2000, lambda: self.btn_copy.configure(text=old_text))
+
+    def _clear_clipboard_if_current(self, expected):
+        """
+        Clipboard auto-cleanup after copying
+        Автоочистка буфера после копирования
+        Автоочищення буфера після копіювання
+        """
+        try:
+            if self.clipboard_get() == expected:
+                self.clipboard_clear()
+        except (tk.TclError, RuntimeError, AttributeError):
+            pass
+        finally:
+            self._clipboard_timer = None
 
     def _verify_pdf(self, path):
         try:
             with open(path, "rb") as f:
                 header = f.read(5)
                 return header == b"%PDF-"
-        except: return False
+        except OSError:
+            return False
+
+    def _verify_text_file(self, path, expected_bytes):
+        """
+        Text save integrity check
+        Проверка целостности сохранения текста
+        Перевірка цілісності збереження тексту
+        """
+        expected_hash = hashlib.sha256(expected_bytes).hexdigest()
+        try:
+            with open(path, "rb") as f:
+                actual_hash = hashlib.sha256(f.read()).hexdigest()
+        except OSError:
+            return False
+        return actual_hash == expected_hash
 
     def _save(self):
         """
@@ -640,7 +738,7 @@ class SecurePassPro(ctk.CTk):
         path = filedialog.asksaveasfilename(
             defaultextension=".txt",
             filetypes=[
-                ("Supported Files", "*.key *.log *.txt *.pdf"),
+                ("Supported Files", " ".join(f"*{ext}" for ext in SUPPORTED_EXTENSIONS)),
                 ("Text File", "*.txt"),
                 ("Password File", "*.key"), 
                 ("Log File", "*.log"), 
@@ -652,11 +750,14 @@ class SecurePassPro(ctk.CTk):
             try:
                 if path.lower().endswith(".pdf"):
                     pdf = FPDF()
+                    pdf.set_author("Maxim Melnikov")
+                    pdf.set_creator("Secure Pass Pro v3.9")
+                    pdf.set_title("Secure Pass Pro Password")
                     pdf.add_page()
                     
                     font_name = "Arial"
-                    if os.path.exists("DejaVuSans.ttf"):
-                        pdf.add_font("DejaVu", "", "DejaVuSans.ttf", uni=True)
+                    if os.path.exists(self._pdf_font_path):
+                        pdf.add_font("DejaVu", "", self._pdf_font_path, uni=True)
                         font_name = "DejaVu"
 
                     pdf.set_font(font_name, 'B', 16)
@@ -676,8 +777,10 @@ class SecurePassPro(ctk.CTk):
                     pdf.output(path)
                     if not self._verify_pdf(path): raise IOError(L["err_integrity"])
                 else:
-                    with open(path, "w", encoding="utf-8") as f:
-                        f.write(pwd)
+                    pwd_bytes = pwd.encode("utf-8")
+                    with open(path, "wb") as f:
+                        f.write(pwd_bytes)
+                    if not self._verify_text_file(path, pwd_bytes): raise IOError(L["err_integrity"])
                 self._play_sound("success")
             except Exception as e: 
                 messagebox.showerror("Error", L["err_save"].format(e))
@@ -686,7 +789,7 @@ class SecurePassPro(ctk.CTk):
         L = LANGUAGES[self.current_lang]
         path = filedialog.askopenfilename(
             filetypes=[
-                ("Supported Files", "*.key *.log *.txt"),
+                ("Supported Files", " ".join(f"*{ext}" for ext in TEXT_EXTENSIONS)),
                 ("Password File", "*.key"), 
                 ("Log File", "*.log"), 
                 ("Text File", "*.txt"), 
@@ -695,6 +798,9 @@ class SecurePassPro(ctk.CTk):
         )
         if path:
             try:
+                ext = os.path.splitext(path)[1].lower()
+                if ext not in TEXT_EXTENSIONS:
+                    raise ValueError(L["err_unsupported"].format(ext or "no extension"))
                 with open(path, "r", encoding="utf-8") as f:
                     content = f.read().strip()
                     self.entry_res.delete(0, "end")
@@ -714,7 +820,9 @@ class SecurePassPro(ctk.CTk):
         self._center_window(qr_win, 380, 480)
         self._apply_window_rounding(qr_win)
         
-        img = qrcode.make(pwd).resize((280, 280))
+        resampling_source = getattr(Image, "Resampling", Image)
+        resampling_filter = getattr(resampling_source, "LANCZOS", getattr(Image, "NEAREST", 0))
+        img = qrcode.make(pwd).resize((280, 280), resampling_filter)
         ctk_img = ctk.CTkImage(light_image=img, dark_image=img, size=(280, 280))
         
         f = ctk.CTkFrame(qr_win, fg_color="transparent")
@@ -723,7 +831,9 @@ class SecurePassPro(ctk.CTk):
         
         disp = ctk.CTkFrame(f, fg_color="white", corner_radius=rad, border_width=2, border_color="gray")
         disp.pack(pady=10)
-        ctk.CTkLabel(disp, image=ctk_img, text="").pack(padx=10, pady=10)
+        qr_label = ctk.CTkLabel(disp, image=ctk_img, text="")
+        qr_label.image = ctk_img
+        qr_label.pack(padx=10, pady=10)
         ctk.CTkButton(f, text="OK", command=qr_win.destroy, corner_radius=rad).pack(pady=10)
 
     def _show_history(self):
@@ -745,13 +855,30 @@ class SecurePassPro(ctk.CTk):
         if not self.history:
             txt.insert("1.0", L["hist_empty"])
         else:
-            txt.insert("1.0", "\n".join(reversed(self.history)))
+            history_snapshot = list(reversed(self.history))
+            txt.insert("1.0", "\n".join(history_snapshot))
         
         btn_f = ctk.CTkFrame(f, fg_color="transparent")
         btn_f.pack(fill="x")
-        ctk.CTkButton(btn_f, text=L["btn_clear_hist"], corner_radius=rad, fg_color="#d13438", 
-                      command=lambda: [self.history.clear(), txt.delete("1.0", "end"), txt.insert("1.0", L["hist_empty"])]).pack(side="left", padx=5)
+        ctk.CTkButton(
+            btn_f,
+            text=L["btn_clear_hist"],
+            corner_radius=rad,
+            fg_color="#d13438",
+            command=lambda textbox=txt: self._clear_history_textbox(textbox)
+        ).pack(side="left", padx=5)
         ctk.CTkButton(btn_f, text="OK", corner_radius=rad, command=h_win.destroy).pack(side="right", padx=5)
+
+    def _clear_history_textbox(self, textbox):
+        """
+        Clear password history window
+        Очистка окна истории паролей
+        Очищення вікна історії паролів
+        """
+        L = LANGUAGES[self.current_lang]
+        self.history.clear()
+        textbox.delete("1.0", "end")
+        textbox.insert("1.0", L["hist_empty"])
 
     def _show_about(self):
         L = LANGUAGES[self.current_lang]
