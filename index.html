@@ -6,7 +6,8 @@
     <meta name="description" content="Secure Pass Pro v3.9 — Профессиональный генератор паролей. Amoled UI, расчет энтропии, очистка истории и криптостойкость CSPRNG.">
     <title>Secure Pass Pro v3.9 | Профессиональная защита паролей</title>
     
-    <link rel="icon" type="image/png" href="https://github.com/Maximka1993271/Password-Generator-Python/blob/main/app_icon.png?raw=true">
+    <link rel="icon" type="image/x-icon" href="https://github.com/Maximka1993271/Password-Generator-Python/raw/main/icon.ico">
+    <link rel="apple-touch-icon" href="https://github.com/Maximka1993271/Password-Generator-Python/blob/main/app_icon.png?raw=true">
     
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
@@ -15,7 +16,10 @@
 
     <header>
         <nav>
-            <div class="logo">🛡️ Secure Pass Pro</div>
+            <div class="logo">
+                <img src="https://github.com/Maximka1993271/Password-Generator-Python/raw/main/icon.ico" alt="Logo" style="width: 24px; height: 24px; vertical-align: middle; margin-right: 8px;">
+                Secure Pass Pro
+            </div>
             <ul>
                 <li><a href="#v39-section">Возможности v3.9</a></li>
                 <li><a href="#security-audit">Аудит безопасности</a></li>
@@ -152,7 +156,7 @@
             <div style="background: #111; padding: 20px; border-radius: 10px; border: 1px solid #333;">
                 <p style="color: #888; font-family: monospace; font-size: 0.9em; margin-bottom: 10px;">// Команда сборки (PyInstaller)</p>
                 <code style="color: #00acc1; font-size: 0.8em; word-break: break-all;">
-                    pyinstaller --noconsole --onefile --clean --icon="app_icon.ico" --add-data "app_icon.ico;." --collect-all qrcode --collect-all customtkinter --hidden-import="PIL._tkinter_finder" --hidden-import="winsound" --name "SecurePassPro" Secure_Pass_Pro.pyw
+                    pyinstaller --noconfirm --onefile --windowed --clean --icon="icon.ico" --add-data "icon.ico;." --collect-all qrcode --collect-all customtkinter --hidden-import="PIL._tkinter_finder" --hidden-import="winsound" --name "SecurePassPro" Secure_Pass_Pro.pyw
                 </code>
             </div>
         </div>
