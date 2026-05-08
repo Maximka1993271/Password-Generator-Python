@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Secure Pass Pro v3.9 — Профессиональный генератор паролей. Контроль звука, фиксированный UI, расчет энтропии и криптостойкость CSPRNG.">
+    <meta name="description" content="Secure Pass Pro v3.9 — Профессиональный генератор паролей. Amoled UI, расчет энтропии, очистка истории и криптостойкость CSPRNG.">
     <title>Secure Pass Pro v3.9 | Профессиональная защита паролей</title>
     
     <link rel="icon" type="image/png" href="https://github.com/Maximka1993271/Password-Generator-Python/blob/main/app_icon.png?raw=true">
@@ -18,8 +18,8 @@
             <div class="logo">🛡️ Secure Pass Pro</div>
             <ul>
                 <li><a href="#v39-section">Возможности v3.9</a></li>
-                <li><a href="#tech-section">Цвета UX</a></li>
-                <li><a href="#v20-section">Архив v2.0.0</a></li>
+                <li><a href="#security-audit">Аудит безопасности</a></li>
+                <li><a href="#tech-specs">Тех-стек</a></li>
                 <li><a href="#download-center">Скачать</a></li>
                 <li><a href="https://github.com/Maximka1993271/Password-Generator-Python" target="_blank">GitHub</a></li>
             </ul>
@@ -30,7 +30,7 @@
         <div class="hero-content">
             <div class="version-badge">Latest Release v3.9 Stable</div>
             <h1>Безопасность без <br><span class="highlight">компромиссов</span></h1>
-            <p>Профессиональный инструмент на Python 3.14+, объединяющий библиотеку CustomTkinter для современного UI, интерактивный звук и криптостойкий движок secrets.</p>
+            <p>Профессиональный инструмент на Python 3.14+, объединяющий Amoled-дизайн, интерактивный звук и криптостойкий движок secrets для Windows 11 Pro.</p>
             <div class="hero-btns">
                 <a href="https://github.com/Maximka1993271/Password-Generator-Python/releases/download/SecurePassProv3.9/SecurePassPro.exe" class="btn-primary">Скачать v3.9 Stable</a>
                 <a href="#v39-section" class="btn-secondary">Что нового?</a>
@@ -42,81 +42,118 @@
     </section>
 
     <section id="v39-section" class="features-section">
-        <h2 class="section-title">Новое в <span class="highlight">v3.9</span></h2>
+        <h2 class="section-title">UX Revolution в <span class="highlight">v3.9</span></h2>
         <div class="features-grid grid-4">
             <div class="card">
-                <div class="card-icon">🔊</div>
-                <h3>Sound Control</h3>
-                <p>Интерактивный звуковой отклик (ВКЛ/ВЫКЛ) через Windows API для подтверждения действий.</p>
+                <div class="card-icon">🌑</div>
+                <h3>Amoled UI</h3>
+                <p>Глубокий черный интерфейс в стиле AdGuard, оптимизированный для OLED и High DPI экранов.</p>
             </div>
             <div class="card">
                 <div class="card-icon">📐</div>
-                <h3>Fixed Layout</h3>
-                <p>Геометрия окна оптимизирована. Масштабирование заблокировано для предотвращения искажения элементов.</p>
+                <h3>Dynamic Radius</h3>
+                <p>Настройка закругления углов элементов (0-25px) в реальном времени через слайдер.</p>
             </div>
             <div class="card">
-                <div class="card-icon">🎨</div>
-                <h3>Dynamic UI</h3>
-                <p>Настройка скругления углов элементов (0-25px) и поддержка тем оформления через CustomTkinter.</p>
+                <div class="card-icon">🧹</div>
+                <h3>Clear History</h3>
+                <p>Мгновенная очистка истории сессии и автоочистка буфера обмена через 60 секунд.</p>
             </div>
             <div class="card">
-                <div class="card-icon">🌍</div>
-                <h3>Multi-Language</h3>
-                <p>Полная локализация интерфейса на три языка: Русский, English, Українська.</p>
+                <div class="card-icon">🔊</div>
+                <h3>Sound Engine</h3>
+                <p>Интерактивный звуковой отклик через нативный Windows API для подтверждения действий.</p>
             </div>
         </div>
     </section>
 
-    <section id="tech-section" class="tech-stack features-section dark-bg">
+    <section id="security-audit" class="features-section dark-bg">
+        <h2 class="section-title">Аудит <span class="highlight">безопасности</span></h2>
+        <div class="features-grid grid-3">
+            <div class="card">
+                <div class="card-icon">🔢</div>
+                <h3>Энтропия</h3>
+                <p>Точный математический расчет сложности пароля в битах для оценки криптостойкости.</p>
+            </div>
+            <div class="card">
+                <div class="card-icon">⏳</div>
+                <h3>Time-to-Crack</h3>
+                <p>Оценка времени взлома методом Brute-force: от «мгновенно» до «столетий».</p>
+            </div>
+            <div class="card">
+                <div class="card-icon">⭐</div>
+                <h3>Visual Rating</h3>
+                <p>Пятизвездочный рейтинг надежности и 3-уровневая цветовая шкала (Red/Orange/Green).</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="tech-section" class="tech-stack features-section">
         <h2 class="section-title">Цветовая <span class="highlight">Дифференциация</span></h2>
-        <p style="text-align: center; margin-bottom: 40px; opacity: 0.8;">Color-Coded UX — интуитивное управление через цветовые акценты</p>
         <div class="tech-grid" style="display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; text-align: center;">
             <div class="tech-item" style="border-bottom: 3px solid #1f538d; background: rgba(31, 83, 141, 0.1);">
-                <h4>Синий</h4>
-                <p>Управление и генерация</p>
+                <h4>🔵 Синий</h4>
+                <p>Генерация пароля</p>
             </div>
             <div class="tech-item" style="border-bottom: 3px solid #2d7d32; background: rgba(45, 125, 50, 0.1);">
-                <h4>Зеленый</h4>
-                <p>Успех и копирование</p>
+                <h4>🟢 Зеленый</h4>
+                <p>Копирование в буфер</p>
             </div>
             <div class="tech-item" style="border-bottom: 3px solid #00acc1; background: rgba(0, 172, 193, 0.1);">
-                <h4>Бирюзовый</h4>
+                <h4>🔵 Бирюзовый</h4>
                 <p>Работа с файлами</p>
             </div>
             <div class="tech-item" style="border-bottom: 3px solid #5d3a9b; background: rgba(93, 58, 155, 0.1);">
-                <h4>Фиолетовый</h4>
-                <p>QR-коды</p>
+                <h4>🟣 Фиолетовый</h4>
+                <p>Создание QR-кода</p>
             </div>
             <div class="tech-item" style="border-bottom: 3px solid #ff9800; background: rgba(255, 152, 0, 0.1);">
-                <h4>Оранжевый</h4>
-                <p>Сервис и обновления</p>
+                <h4>🟠 Оранжевый</h4>
+                <p>Обновление системы</p>
             </div>
         </div>
     </section>
 
-    <section id="v20-section" class="features-section">
+    <section id="v20-section" class="features-section dark-bg">
         <h2 class="section-title">Архив: <span class="highlight">v2.0.0 Classic</span></h2>
         <div class="version-showcase">
             <div class="showcase-image">
                 <img src="https://github.com/Maximka1993271/Password-Generator-Python/raw/main/Secure_Pass_MainWindow.png" alt="Secure Pass Pro v2.0.0">
             </div>
-            
             <div class="features-grid grid-3">
                 <div class="card">
                     <div class="card-icon">🔨</div>
-                    <h3>Standard Base</h3>
-                    <p>Классический интерфейс на базе стандартной библиотеки Tkinter.</p>
+                    <h3>Tkinter Base</h3>
+                    <p>Классический интерфейс на базе стандартной библиотеки.</p>
                 </div>
                 <div class="card">
                     <div class="card-icon">💾</div>
                     <h3>Essentials</h3>
-                    <p>Базовый функционал генерации и ведение локальной истории сессий.</p>
+                    <p>Базовый функционал генерации и локальная история.</p>
                 </div>
                 <div class="card">
                     <div class="card-icon">🧩</div>
                     <h3>Lightweight</h3>
-                    <p>Минимальное потребление ресурсов системы и высокая скорость запуска.</p>
+                    <p>Минимальное потребление ОЗУ и высокая скорость запуска.</p>
                 </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="tech-specs" class="features-section">
+        <h2 class="section-title">Технические <span class="highlight">данные</span></h2>
+        <div style="max-width: 800px; margin: 0 auto; line-height: 1.8;">
+            <ul style="list-style: none; padding: 0; margin-bottom: 30px;">
+                <li><strong>Разработчик:</strong> Максим Мельников</li>
+                <li><strong>Версия:</strong> 3.9 Stable (08.05.2026)</li>
+                <li><strong>Ядро:</strong> Python 3.14.4 (CSPRNG Secrets)</li>
+                <li><strong>Сборка:</strong> Windows 11 Pro Optimized</li>
+            </ul>
+            <div style="background: #111; padding: 20px; border-radius: 10px; border: 1px solid #333;">
+                <p style="color: #888; font-family: monospace; font-size: 0.9em; margin-bottom: 10px;">// Команда сборки (PyInstaller)</p>
+                <code style="color: #00acc1; font-size: 0.8em; word-break: break-all;">
+                    pyinstaller --noconsole --onefile --clean --icon="app_icon.ico" --add-data "app_icon.ico;." --collect-all qrcode --collect-all customtkinter --hidden-import="PIL._tkinter_finder" --hidden-import="winsound" --name "SecurePassPro" Secure_Pass_Pro.pyw
+                </code>
             </div>
         </div>
     </section>
@@ -127,10 +164,9 @@
             <div class="download-card highlight-card">
                 <div class="card-icon">🏆</div>
                 <h3>Secure Pass Pro v3.9</h3>
-                <p><b>Рекомендуется.</b> Современный UI, настройка скругления, контроль звука и поддержка QR.</p>
+                <p><b>Рекомендуется.</b> Amoled UI, расчет энтропии, очистка истории и фикс Unicode PDF.</p>
                 <a href="https://github.com/Maximka1993271/Password-Generator-Python/releases/download/SecurePassProv3.9/SecurePassPro.exe" class="btn-primary full-width">Скачать v3.9 (.EXE)</a>
             </div>
-
             <div class="download-card">
                 <div class="card-icon">📁</div>
                 <h3>Secure Pass Pro v2.0.0</h3>
@@ -145,12 +181,12 @@
             <p>© 2026 Максим Мельников • MIT License</p>
             <div class="footer-tags" style="margin-top: 20px; display: flex; justify-content: center; gap: 15px; flex-wrap: wrap;">
                 <span class="badge">Python 3.14+</span>
-                <span class="badge">CustomTkinter</span>
-                <span class="badge">Windows 11 Optimized</span>
+                <span class="badge">Amoled UX</span>
                 <span class="badge">CSPRNG Secrets</span>
+                <span class="badge">Win 11 Optimized</span>
             </div>
             <p style="font-size: 0.85em; margin-top: 20px; opacity: 0.6; max-width: 700px; margin-left: auto; margin-right: auto;">
-                Локализация: English, Русский, Українська. Вся генерация происходит исключительно на вашем устройстве. Программа не имеет доступа к сети и гарантирует приватность.
+                Локализация: RU, EN, UA. Программа гарантирует полную приватность данных. Вся генерация происходит на стороне клиента без доступа к сети.
             </p>
         </div>
     </footer>
