@@ -36,7 +36,7 @@
 4. **Улучшенная светлая тема**: Нижняя панель управления теперь динамически меняет цвет, подстраиваясь под общую тему оформления.
 5. **История 2.0**: Расширенная история на 50 последних паролей с отметками времени.
 
-**[📥 Скачать v3.9 Stable (Windows Only)](https://github.com/Maximka1993271/Password-Generator-Python/releases/download/SecurePassProv3.9/SecurePassPro.exe)**
+**[📥 Скачать v3.9 Stable](https://github.com/Maximka1993271/Password-Generator-Python/releases/download/SecurePassProv3.9/SecurePassPro.exe)**
 
 ---
 
