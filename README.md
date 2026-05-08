@@ -53,6 +53,8 @@
 3. **Оптимізація Win 11**: Нативна підтримка `winsound` та коректний рендеринг High DPI.
 4. **Підтримка файлів**: Повна сумісність з розширеннями `.key`, `.log` та `.txt`.
 
+---
+
 **[📥 Download v3.9 Stable (Windows)](https://github.com/Maximka1993271/Password-Generator-Python/releases/download/SecurePassProv3.9/SecurePassPro.exe)**
 
 ---
@@ -86,9 +88,20 @@
 
 ## ⚙️ Tech Specs | Техническая информация | Технічна інформація
 
+### 🇺🇸 English
 - **Language**: Python 3.9+
 - **OS**: Windows 11 Pro (Optimized)
 - **Libraries**: `customtkinter`, `qrcode`, `pillow`
+
+### 🇷🇺 Русский
+- **Язык**: Python 3.9+
+- **ОС**: Windows 11 Pro (Оптимизировано)
+- **Библиотеки**: `customtkinter`, `qrcode`, `pillow`
+
+### 🇺🇦 Українська
+- **Мова**: Python 3.9+
+- **ОС**: Windows 11 Pro (Оптимізовано)
+- **Бібліотеки**: `customtkinter`, `qrcode`, `pillow`
 
 ```bash
 pip install qrcode[pil] pillow customtkinter
