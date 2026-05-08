@@ -256,8 +256,8 @@ class SecurePassPro(ctk.CTk):
         # RU: Запрет масштабирования окна | EN: Disable window resizing
         self.resizable(False, False)
 
-        # RU: Инициализация иконки | EN: Icon init
-        self._setup_icon()
+        # RU: Инициализация иконки для главного окна
+        self._setup_main_icon()
         
         # Variables
         self.upper_var = tk.BooleanVar(value=True)
@@ -273,34 +273,28 @@ class SecurePassPro(ctk.CTk):
         self._apply_lang("RU")
         self._center_main_window()
 
-    def _setup_icon(self):
-        """ RU: Установка иконки приложения | EN: Setup app icon """
-        # RU: Поддержка .ico для скомпилированного .exe | EN: .ico support for compiled .exe
+    def _get_icon_path(self):
+        """ RU: Поиск пути к icon.ico (в т.ч. в скомпилированном виде) """
         if hasattr(sys, '_MEIPASS'):
-            # Сначала ищем по имени из твоей команды (app_icon.ico)
-            icon_path = os.path.join(sys._MEIPASS, "app_icon.ico")
-            if not os.path.exists(icon_path):
-                # Если не нашли, пробуем стандартное icon.ico
-                icon_path = os.path.join(sys._MEIPASS, "icon.ico")
-        else:
-            # Для запуска из Python пробуем оба варианта
-            icon_path = "icon.ico" if os.path.exists("icon.ico") else "app_icon.ico"
+            return os.path.join(sys._MEIPASS, "icon.ico")
+        return "icon.ico"
 
+    def _set_window_icon(self, window):
+        """ RU: Применить иконку к конкретному окну """
+        icon_path = self._get_icon_path()
         if os.path.exists(icon_path):
             try:
                 if _IS_WINDOWS:
-                    self.iconbitmap(icon_path)
+                    window.iconbitmap(icon_path)
                 else:
                     self.icon_img = tk.PhotoImage(file=icon_path)
-                    self.iconphoto(True, self.icon_img)
+                    window.iconphoto(True, self.icon_img)
             except Exception:
                 pass
-        elif os.path.exists("icon.png"):
-            try:
-                self.icon_img = tk.PhotoImage(file="icon.png")
-                self.iconphoto(True, self.icon_img)
-            except Exception:
-                pass
+
+    def _setup_main_icon(self):
+        """ RU: Установка иконки главного окна """
+        self._set_window_icon(self)
 
     def _play_sound(self, sound_type: str = "click"):
         if not _IS_WINDOWS or not self.sound_enabled.get(): return
@@ -587,6 +581,7 @@ class SecurePassPro(ctk.CTk):
         rad = int(self.slider_radius.get())
         qr_win = ctk.CTkToplevel(self)
         qr_win.title(L["btn_qr"])
+        self._set_window_icon(qr_win) # Применяем иконку
         self._center_window(qr_win, 380, 480)
         img = qrcode.make(pwd).resize((280, 280))
         ctk_img = ctk.CTkImage(light_image=img, dark_image=img, size=(280, 280))
@@ -603,6 +598,7 @@ class SecurePassPro(ctk.CTk):
         rad = int(self.slider_radius.get())
         h_win = ctk.CTkToplevel(self)
         h_win.title(L["btn_hist"])
+        self._set_window_icon(h_win) # Применяем иконку
         self._center_window(h_win, 500, 550)
         f = ctk.CTkFrame(h_win, fg_color="transparent")
         f.pack(expand=True, fill="both", padx=20, pady=20)
@@ -618,6 +614,7 @@ class SecurePassPro(ctk.CTk):
         rad = int(self.slider_radius.get())
         about_win = ctk.CTkToplevel(self)
         about_win.title(L["btn_about"])
+        self._set_window_icon(about_win) # Применяем иконку
         self._center_window(about_win, 450, 320)
         a_frame = ctk.CTkFrame(about_win, corner_radius=rad)
         a_frame.pack(expand=True, fill="both", padx=20, pady=20)
