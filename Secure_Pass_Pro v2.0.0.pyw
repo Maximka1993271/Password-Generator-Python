@@ -1,5 +1,7 @@
 import tkinter as tk
 from tkinter import messagebox, filedialog
+import hashlib
+import logging
 import secrets
 import string
 import webbrowser
@@ -7,6 +9,7 @@ import os
 import sys
 import platform
 import math
+import random
 
 # =============================================================================
 # HIDE CONSOLE WINDOW / СКРЫТИЕ КОНСОЛЬНОГО ОКНА / ПРИХОВАННЯ КОНСОЛЬНОГО ВІКНА
@@ -28,8 +31,8 @@ if platform.system() == "Windows":
         ctypes.windll.user32.ShowWindow(
             ctypes.windll.kernel32.GetConsoleWindow(), 0  # 0 = SW_HIDE
         )
-    except Exception:
-        pass  # Non-critical — app still works if this fails / Некритично — приложение работает и без этого / Некритично — програма працює і без цього
+    except (AttributeError, OSError) as exc:
+        logging.debug("Console hide failed: %s", exc)
 
 # =============================================================================
 # DEPENDENCIES & PATHS / ЗАВИСИМОСТИ И ПУТИ / ЗАЛЕЖНОСТІ ТА ШЛЯХИ
@@ -41,26 +44,34 @@ def resource_path(relative_path):
     Получение пути к ресурсам — работает и в разработке, и в EXE-сборке.
     Отримання шляху до ресурсів — працює і в розробці, і в EXE-збірці.
 
-    FIX #13: was `except Exception` — narrowed to `except AttributeError`
+    FIX #13: broad resource-path fallback narrowed to `except AttributeError`
              because sys._MEIPASS only raises AttributeError when not bundled.
-    ИСПРАВЛЕНИЕ #13: был `except Exception` — сужен до `except AttributeError`,
+    ИСПРАВЛЕНИЕ #13: широкий fallback пути сужен до `except AttributeError`,
              т.к. sys._MEIPASS бросает только AttributeError вне PyInstaller.
-    ВИПРАВЛЕННЯ #13: був `except Exception` — звужено до `except AttributeError`,
+    ВИПРАВЛЕННЯ #13: широкий fallback шляху звужено до `except AttributeError`,
              бо sys._MEIPASS кидає лише AttributeError поза PyInstaller.
     """
     try:
         base_path = sys._MEIPASS
-    except AttributeError:      # ← FIX #13: was bare `except Exception`
-        base_path = os.path.abspath(".")
+    except AttributeError:      # ← FIX #13
+        base_path = os.path.dirname(os.path.abspath(__file__))
     return os.path.join(base_path, relative_path)
 
 
 try:
     import qrcode
     from PIL import ImageTk, Image
-except ImportError:
+except ImportError as exc:
     # Error message if libraries are missing / Ошибка при отсутствии библиотек / Помилка при відсутності бібліотек
-    print("Missing dependencies! Please run: pip install qrcode[pil] pillow")
+    _dep_root = tk.Tk()
+    _dep_root.withdraw()
+    try:
+        messagebox.showerror(
+            "Missing dependencies",
+            f"Please run: pip install qrcode[pil] pillow\n\n{exc}"
+        )
+    finally:
+        _dep_root.destroy()
     sys.exit(1)
 
 # High DPI support (Windows only) / Поддержка высокого DPI (только Windows) / Підтримка високого DPI (лише Windows)
@@ -417,6 +428,8 @@ class SecurePassApp:
         self.current_lang   = 'ru'
         self.last_save_path = None
         self.history        = []
+        self.clipboard_timer = None
+        self._secure_random = random.SystemRandom()
         self.current_theme  = 'system'
 
         # Resolve icon path once / Путь к иконке вычисляем один раз / Шлях до іконки обчислюємо один раз
@@ -463,7 +476,7 @@ class SecurePassApp:
                 winsound.MessageBeep(winsound.MB_OK)
             elif sound_type == "error":
                 winsound.MessageBeep(winsound.MB_ICONHAND)
-        except Exception:
+        except (ImportError, RuntimeError, OSError):
             pass  # Hardware may not support Beep / Железо может не поддерживать Beep / Залізо може не підтримувати Beep
 
     # =========================================================================
@@ -476,9 +489,9 @@ class SecurePassApp:
         Устанавливает иконку окна — подавляет только TclError и OSError.
         Встановлює іконку вікна — пригнічує лише TclError та OSError.
 
-        FIX #8: was bare `except: pass` — narrowed to specific exception types.
-        ИСПРАВЛЕНИЕ #8: был голый `except: pass` — сужен до конкретных типов.
-        ВИПРАВЛЕННЯ #8: був голий `except: pass` — звужено до конкретних типів.
+        FIX #8: broad icon fallback narrowed to specific exception types.
+        ИСПРАВЛЕНИЕ #8: широкий fallback иконки сужен до конкретных типов.
+        ВИПРАВЛЕННЯ #8: широкий fallback іконки звужено до конкретних типів.
         """
         if os.path.exists(self.icon_path):
             try:
@@ -778,9 +791,9 @@ class SecurePassApp:
         Применяет цветовую тему (light / dark / system).
         Застосовує кольорову тему (light / dark / system).
 
-        FIX #7: bare `except: pass` replaced with specific exception types.
-        ИСПРАВЛЕНИЕ #7: голый `except: pass` заменён на конкретные типы.
-        ВИПРАВЛЕННЯ #7: голий `except: pass` замінено на конкретні типи.
+        FIX #7: theme icon fallback uses specific exception types.
+        ИСПРАВЛЕНИЕ #7: fallback иконки темы использует конкретные типы.
+        ВИПРАВЛЕННЯ #7: fallback іконки теми використовує конкретні типи.
         """
         if mode == 'system':
             mode = 'light'
@@ -877,6 +890,10 @@ class SecurePassApp:
                 return
 
             pool = "".join(filtered)
+            if len(set(pool)) < 2:
+                self.play_sound("error")
+                messagebox.showerror(L['err'], L['choose_set'])
+                return
             pwd_list = []
 
             # Guarantee at least one char from each non-empty category / Гарантируем минимум из каждой / Гарантуємо мінімум з кожної
@@ -889,7 +906,7 @@ class SecurePassApp:
                 for _ in range(length):
                     pwd_list.append(secrets.choice(pool))
 
-            secrets.SystemRandom().shuffle(pwd_list)
+            self._secure_random.shuffle(pwd_list)
             password = "".join(pwd_list)
 
             # Store in history (cap at 5) / Сохраняем в историю (максимум 5) / Зберігаємо в історію (максимум 5)
@@ -995,6 +1012,29 @@ class SecurePassApp:
     # FILE OPERATIONS / ФАЙЛОВЫЕ ОПЕРАЦИИ / ФАЙЛОВІ ОПЕРАЦІЇ
     # =========================================================================
 
+    def _write_password_file(self, path, password):
+        """
+        Write password bytes and verify integrity with SHA-256.
+        Записывает пароль байтами и проверяет целостность через SHA-256.
+        Записує пароль байтами та перевіряє цілісність через SHA-256.
+        """
+        data = password.encode("utf-8")
+        with open(path, "wb") as f:
+            f.write(data)
+        expected_hash = hashlib.sha256(data).hexdigest()
+        with open(path, "rb") as f:
+            actual_hash = hashlib.sha256(f.read()).hexdigest()
+        if actual_hash != expected_hash:
+            raise OSError("File integrity check failed after write")
+
+    def _is_allowed_text_path(self, path):
+        """
+        Validate text password file path.
+        Проверяет путь текстового файла пароля.
+        Перевіряє шлях текстового файлу пароля.
+        """
+        return os.path.splitext(path)[1].lower() == ".txt"
+
     def save_password(self):
         """
         Quick save: overwrite last_save_path if exists, else open Save As dialog.
@@ -1010,8 +1050,7 @@ class SecurePassApp:
 
         if self.last_save_path and os.path.exists(os.path.dirname(self.last_save_path)):
             try:
-                with open(self.last_save_path, "w", encoding="utf-8") as f:
-                    f.write(p)
+                self._write_password_file(self.last_save_path, p)
                 self.play_sound("success")
                 # FIX #2: pass pre-built string, not a LANGUAGES key, as window title
                 # ИСПРАВЛЕНИЕ #2: передаём готовую строку, а не ключ LANGUAGES, как заголовок окна
@@ -1041,9 +1080,8 @@ class SecurePassApp:
         )
         if path:
             try:
+                self._write_password_file(path, p)
                 self.last_save_path = path
-                with open(path, "w", encoding="utf-8") as f:
-                    f.write(p)
                 self.play_sound("success")
                 self.show_info_msg(L['dlg_title_success'], L['success'], L['saved'])
             except OSError as e:
@@ -1067,6 +1105,10 @@ class SecurePassApp:
         )
         if path:
             try:
+                if not self._is_allowed_text_path(path):
+                    raise OSError("Unsupported file type")
+                if os.path.getsize(path) > 1024 * 1024:
+                    raise OSError("File is too large")
                 with open(path, "r", encoding="utf-8") as f:
                     content = f.read().strip()
                 if not content:
@@ -1088,18 +1130,37 @@ class SecurePassApp:
         Копирует пароль; автоочистка через 60 с.
         Копіює пароль; автоочищення через 60 с.
         """
-        p = self.result_var.get()
+        p = str(self.result_var.get())
         if p:
             L = LANGUAGES[self.current_lang]
             self.root.clipboard_clear()
             self.root.clipboard_append(p)
-            # Schedule clipboard wipe / Планируем очистку / Плануємо очищення
-            self.root.after(60_000, lambda: self.root.clipboard_clear() if self.root.winfo_exists() else None)
+            if self.clipboard_timer:
+                try:
+                    self.root.after_cancel(self.clipboard_timer)
+                except (tk.TclError, ValueError):
+                    pass
+            # Schedule guarded clipboard wipe / Планируем защищенную очистку / Плануємо захищене очищення
+            self.clipboard_timer = self.root.after(60_000, lambda value=p: self.clear_clipboard_if_current(value))
             self.play_sound("success")
             # FIX #2 & #3: use dedicated title key, not the content key as window title
             # ИСПРАВЛЕНИЕ #2 и #3: используем отдельный ключ заголовка, не ключ содержимого
             # ВИПРАВЛЕННЯ #2 та #3: використовуємо окремий ключ заголовка, не ключ вмісту
             self.show_info_msg(L['dlg_title_copied'], L['success'], L['pwd_done'])
+
+    def clear_clipboard_if_current(self, expected):
+        """
+        Clear clipboard only if it still contains copied password.
+        Очищает буфер только если там всё ещё скопированный пароль.
+        Очищає буфер лише якщо там досі скопійований пароль.
+        """
+        try:
+            if self.root.winfo_exists() and self.root.clipboard_get() == expected:
+                self.root.clipboard_clear()
+        except (tk.TclError, RuntimeError, AttributeError):
+            pass
+        finally:
+            self.clipboard_timer = None
 
     # =========================================================================
     # HISTORY / ИСТОРИЯ / ІСТОРІЯ
@@ -1128,7 +1189,8 @@ class SecurePassApp:
         if not self.history:
             tk.Label(win, text=L['history_empty'], bg=cur_bg, fg=cur_fg, font=("Arial", 10)).pack(expand=True)
         else:
-            for pwd in self.history:
+            history_snapshot = list(self.history)
+            for pwd in history_snapshot:
                 btn = tk.Button(
                     win, text=pwd, font=("Consolas", 10), relief='flat',
                     bg=cur_bg, fg=btn_fg, activebackground=btn_abg,
@@ -1180,7 +1242,9 @@ class SecurePassApp:
             qr.add_data(pwd)
             qr.make(fit=True)
             img    = qr.make_image(fill_color=qr_fg, back_color=qr_bg)
-            img_tk = ImageTk.PhotoImage(img.resize((220, 220), Image.LANCZOS))
+            resampling_source = getattr(Image, "Resampling", Image)
+            resampling_filter = getattr(resampling_source, "LANCZOS", getattr(Image, "NEAREST", 0))
+            img_tk = ImageTk.PhotoImage(img.resize((220, 220), resampling_filter))
 
             tk.Label(win, text=L['qr_scan'], bg=cur_bg, fg=qr_fg).pack(pady=(10, 0))
             lbl = tk.Label(win, image=img_tk, bg=cur_bg)
@@ -1188,7 +1252,7 @@ class SecurePassApp:
             lbl.pack(pady=10)
             tk.Button(win, text="OK", command=win.destroy, width=10, relief='flat',
                       bg=self.author_label.cget("bg"), fg=qr_fg).pack(pady=5)
-        except Exception as e:
+        except (OSError, ValueError, tk.TclError) as e:
             messagebox.showerror(L['err'], str(e))
             win.destroy()
 
