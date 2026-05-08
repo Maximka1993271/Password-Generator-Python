@@ -61,7 +61,7 @@
 
 ---
 
-**[📥 Download v3.9 Stable (Windows)](https://github.com/Maximka1993271/Password-Generator-Python/releases/download/SecurePassProv3.9/SecurePassPro.exe)**
+**[📥 Download v3.9 Stable (Windows)](https://github.com/Maximka1993271/Password-Generator-Python/releases/download/SecurePassProv3.9/SecurePass_v39.exe)**
 
 ---
 
