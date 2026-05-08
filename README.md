@@ -1,39 +1,66 @@
 # 🛡️ Secure Pass Pro v3.9
 
-**🔐 Профессиональный генератор криптостойких паролей для Windows 11 Pro**
+**🔐 Secure password generator with a multilingual Python GUI for Windows**
 
-Современный инструмент на Python 3.14+, объединяющий глубокую кастомизацию интерфейса, интерактивный звук и криптостойкий движок для обеспечения вашей безопасности.
+Secure Pass Pro is a modern desktop password generator built with Python and CustomTkinter.  
+It combines cryptographically secure password generation, multilingual interface, QR-code export, privacy controls, and a polished dark UI.
 
 ![v3.9 Preview](https://github.com/Maximka1993271/Password-Generator-Python/raw/main/Secure_Pass_MainWindow39.png)
 
 ---
 
-## ✨ Основные возможности v3.9
+## ✨ Main Features v3.9
 
-- **Криптостойкость**: Использование модуля `secrets` (CSPRNG) для генерации паролей, устойчивых к предсказанию.
-- **Amoled Dark Theme**: Глубокий черный интерфейс, оптимизированный для OLED-экранов и High DPI мониторов.
-- **Аудит безопасности**: 
-  - Точный расчет **энтропии** пароля в битах.
-  - Оценка времени взлома (от «мгновенно» до «столетий»).
-  - Пятизвездочный визуальный индикатор надежности.
-- **Приватность и контроль**:
-  - **Очистка истории**: Кнопка мгновенного удаления логов сгенерированных паролей.
-  - **Автоочистка буфера**: Безопасное удаление пароля из памяти через 60 секунд.
-  - **Unicode PDF Fix**: Исправлен экспорт отчетов — теперь кириллица в PDF отображается корректно.
-- **Dynamic UI**: Слайдер регулировки закругления углов (0–25px) всех элементов в реальном времени.
-- **QR-код**: Быстрая передача пароля на смартфон через генерацию изображения.
+- **Cryptographically secure generation**  
+  Uses Python `secrets` module and system CSPRNG for unpredictable password generation.
+
+- **Multilingual interface**  
+  Instant switching between **RU**, **EN**, and **UA** interface languages.
+
+- **Password strength audit**
+  - Entropy-based strength evaluation.
+  - Estimated crack-time category.
+  - Five-star visual strength indicator.
+
+- **Privacy and safety**
+  - Clipboard auto-cleanup after 60 seconds.
+  - Local password history with one-click clearing.
+  - Text export integrity check via **SHA-256**.
+  - Protection against too-small character pools.
+
+- **Modern dark GUI**
+  - AMOLED-style dark interface.
+  - High-DPI friendly layout.
+  - Adjustable corner radius for UI elements in real time.
+
+- **Export and sharing**
+  - Save passwords as `.txt`, `.log`, `.key`, or `.pdf`.
+  - Unicode PDF export support.
+  - QR-code generation for quick transfer to mobile devices.
 
 ---
 
-## 🚀 Что нового в финальной версии 3.9
+## 🚀 What’s New in v3.9
 
-1. **Рефакторинг интерфейса**: Дизайн стал более сбалансированным. Кнопки управления логически сгруппированы в боковом меню с цветовой кодировкой.
-2. **Sound Engine Integration**: Интерактивное звуковое сопровождение действий через нативный Windows API (`winsound`) с возможностью отключения на панели.
-3. **Triple Localization**: Мгновенное переключение между RU, EN и UA языками интерфейса.
-4. **Умная фильтрация**: Исключение похожих символов (`i, l, 1, o, 0`) и неоднозначных знаков для удобства чтения.
-5. **Расширенный экспорт**: Стабильная поддержка сохранения паролей в форматах `.txt`, `.log`, `.key` и `.pdf`.
+1. **Redesigned interface**  
+   Balanced layout with a dedicated side menu and color-coded action buttons.
 
-**[📥 Скачать v3.9 Stable (.exe)](https://github.com/Maximka1993271/Password-Generator-Python/releases/download/SecurePassProv3.9/SecurePassPro.exe)**
+2. **Improved security logic**  
+   Added entropy-based strength calculation, SHA-256 read-back verification for text exports, and safer clipboard cleanup.
+
+3. **Triple localization**  
+   Full interface support for Russian, English, and Ukrainian.
+
+4. **Smart character filtering**  
+   Exclude similar characters like `i`, `l`, `1`, `o`, `0`, and unclear punctuation symbols.
+
+5. **Sound feedback**  
+   Optional Windows sound notifications powered by the native `winsound` API.
+
+6. **Extended export support**  
+   Stable saving to `.txt`, `.log`, `.key`, and `.pdf` formats.
+
+**[📥 Download Secure Pass Pro v3.9 (.exe)](https://github.com/Maximka1993271/Password-Generator-Python/releases/download/SecurePassProv3.9/SecurePassPro.exe)**
 
 ---
 
@@ -41,21 +68,27 @@
 
 ![v2.0.0 Preview](https://github.com/Maximka1993271/Password-Generator-Python/raw/main/Secure_Pass_MainWindow.png)
 
-Классическая ветка проекта для пользователей, предпочитающих минималистичный интерфейс на стандартной библиотеке Tkinter.
-- **Стабильность**: Проверенный временем движок для любых версий Windows.
-- **Базовый функционал**: Генерация, история и основные темы оформления.
+Classic branch for users who prefer a minimal Tkinter-based interface.
 
-**[📥 Скачать v2.0.0 Classic](https://github.com/Maximka1993271/Password-Generator-Python/releases/download/SecurePassProv2.0.0/SecurePassPro.exe)**
+- **Stable classic UI** for older Windows systems.
+- **Core features**: password generation, history, themes, and basic controls.
+
+**[📥 Download v2.0.0 Classic](https://github.com/Maximka1993271/Password-Generator-Python/releases/download/SecurePassProv2.0.0/SecurePassPro.exe)**
 
 ---
 
-## ⚙️ Информация для разработчиков
+## ⚙️ Developer Information
 
-### Стек технологий
-- **Язык**: Python 3.14.4 (совместимо с 3.9+).
-- **Библиотеки**: `customtkinter`, `Pillow`, `qrcode`, `secrets`.
+### Technology Stack
 
-### Команда для сборки в один файл
-Для создания исполняемого файла (`.exe`) используйте следующую команду:
+- **Language**: Python 3.9+
+- **GUI**: `customtkinter`
+- **Libraries**: `Pillow`, `qrcode`, `fpdf`
+- **Security**: `secrets`, `hashlib`, `random.SystemRandom`
+
+### Build Command
+
+To build a standalone Windows executable:
+
 ```bash
 pyinstaller --noconsole --onefile --clean --icon="app_icon.ico" --add-data "app_icon.ico;." --collect-all qrcode --collect-all customtkinter --hidden-import="PIL._tkinter_finder" --hidden-import="winsound" --name "SecurePassPro" Secure_Pass_Pro.pyw
