@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Secure Pass Pro v3.9 — Профессиональный генератор паролей. QR-коды, асинхронный звук, расчет энтропии и автоматическая очистка памяти.">
-    <title>Secure Pass Pro v3.9 | Профессиональный генератор паролей</title>
+    <meta name="description" content="Secure Pass Pro v3.9 — Профессиональный генератор паролей. Контроль звука, фиксированный UI, расчет энтропии и криптостойкость CSPRNG.">
+    <title>Secure Pass Pro v3.9 | Профессиональная защита паролей</title>
     
     <link rel="icon" type="image/png" href="https://github.com/Maximka1993271/Password-Generator-Python/blob/main/app_icon.png?raw=true">
     
@@ -18,8 +18,9 @@
             <div class="logo">🛡️ Secure Pass Pro</div>
             <ul>
                 <li><a href="#v39-section">Возможности v3.9</a></li>
+                <li><a href="#tech-section">Цвета UX</a></li>
                 <li><a href="#v20-section">Архив v2.0.0</a></li>
-                <li><a href="#download-center">Загрузки</a></li>
+                <li><a href="#download-center">Скачать</a></li>
                 <li><a href="https://github.com/Maximka1993271/Password-Generator-Python" target="_blank">GitHub</a></li>
             </ul>
         </nav>
@@ -29,10 +30,10 @@
         <div class="hero-content">
             <div class="version-badge">Latest Release v3.9 Stable</div>
             <h1>Безопасность без <br><span class="highlight">компромиссов</span></h1>
-            <p>Кроссплатформенный инструмент на базе Python 3.9+, использующий криптографически стойкие алгоритмы (secrets) и современный интерфейс CustomTkinter.</p>
+            <p>Профессиональный инструмент на Python 3.14+, объединяющий криптостойкие алгоритмы (secrets), интерактивный звук и стабильный Amoled-интерфейс.</p>
             <div class="hero-btns">
                 <a href="https://github.com/Maximka1993271/Password-Generator-Python/releases/download/SecurePassProv3.9/SecurePassPro.exe" class="btn-primary">Скачать v3.9 Stable</a>
-                <a href="#v39-section" class="btn-secondary">Узнать больше</a>
+                <a href="#v39-section" class="btn-secondary">Что нового?</a>
             </div>
         </div>
         <div class="hero-image">
@@ -44,52 +45,57 @@
         <h2 class="section-title">Новое в <span class="highlight">v3.9</span></h2>
         <div class="features-grid grid-4">
             <div class="card">
-                <div class="card-icon">🔒</div>
-                <h3>Zero-Footprint</h3>
-                <p>Автоматическая очистка истории и буфера обмена при выходе для максимальной приватности.</p>
+                <div class="card-icon">🔊</div>
+                <h3>Sound Control</h3>
+                <p>Добавлена кнопка переключения звука (ВКЛ/ВЫКЛ). Интерактивный отклик через нативный Windows API.</p>
             </div>
             <div class="card">
-                <div class="card-icon">⚡</div>
-                <h3>Async Engine</h3>
-                <p>Асинхронное воспроизведение системных звуков и мгновенный отклик интерфейса.</p>
+                <div class="card-icon">📐</div>
+                <h3>Fixed Layout</h3>
+                <p>Размер окна зафиксирован для идеального отображения. Масштабирование отключено для стабильности UI.</p>
             </div>
             <div class="card">
-                <div class="card-icon">📱</div>
-                <h3>QR Sync</h3>
-                <p>Быстрая передача пароля на смартфон через динамически генерируемый QR-код.</p>
+                <div class="card-icon">🎨</div>
+                <h3>Amoled UI</h3>
+                <p>Динамическая настройка скругления углов (0-25px) и глубокая черная тема для OLED-экранов.</p>
             </div>
             <div class="card">
-                <div class="card-icon">🌐</div>
-                <h3>Multi-Lang</h3>
-                <p>Полная поддержка интерфейса на русском, украинском и английском языках.</p>
+                <div class="card-icon">📊</div>
+                <h3>Entropy Engine</h3>
+                <p>Точный расчет бит сложности и оценка времени взлома от «мгновенно» до «столетий».</p>
             </div>
         </div>
     </section>
 
-    <section class="tech-stack features-section dark-bg">
-        <h2 class="section-title">Ядро <span class="highlight">Системы</span></h2>
-        <div class="tech-grid" style="display: flex; justify-content: center; gap: 50px; flex-wrap: wrap; text-align: center;">
-            <div class="tech-item">
-                <h4>Secrets (CSPRNG)</h4>
-                <p>Криптографическая случайность</p>
+    <section id="tech-section" class="tech-stack features-section dark-bg">
+        <h2 class="section-title">Цветовая <span class="highlight">Дифференциация</span></h2>
+        <p style="text-align: center; margin-bottom: 40px; opacity: 0.8;">Color-Coded UX — управление на уровне интуиции</p>
+        <div class="tech-grid" style="display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; text-align: center;">
+            <div class="tech-item" style="border-bottom: 3px solid #1f538d; background: rgba(31, 83, 141, 0.1);">
+                <h4>Синий</h4>
+                <p>Генерация</p>
             </div>
-            <div class="tech-item">
-                <h4>Entropy Calc</h4>
-                <p>Логарифмический анализ сложности</p>
+            <div class="tech-item" style="border-bottom: 3px solid #2d7d32; background: rgba(45, 125, 50, 0.1);">
+                <h4>Зеленый</h4>
+                <p>Копирование</p>
             </div>
-            <div class="tech-item">
-                <h4>Type Safety</h4>
-                <p>Чистый код на Python 3.9+</p>
+            <div class="tech-item" style="border-bottom: 3px solid #00acc1; background: rgba(0, 172, 193, 0.1);">
+                <h4>Бирюзовый</h4>
+                <p>Файлы (.key/.log)</p>
             </div>
-            <div class="tech-item">
-                <h4>CustomTkinter</h4>
-                <p>Amoled-friendly интерфейс</p>
+            <div class="tech-item" style="border-bottom: 3px solid #5d3a9b; background: rgba(93, 58, 155, 0.1);">
+                <h4>Фиолетовый</h4>
+                <p>QR-код</p>
+            </div>
+            <div class="tech-item" style="border-bottom: 3px solid #ff9800; background: rgba(255, 152, 0, 0.1);">
+                <h4>Оранжевый</h4>
+                <p>Обновления</p>
             </div>
         </div>
     </section>
 
     <section id="v20-section" class="features-section">
-        <h2 class="section-title">Версия <span class="highlight">v2.0.0 Classic</span></h2>
+        <h2 class="section-title">Архив: <span class="highlight">v2.0.0 Classic</span></h2>
         <div class="version-showcase">
             <div class="showcase-image">
                 <img src="https://github.com/Maximka1993271/Password-Generator-Python/raw/main/Secure_Pass_MainWindow.png" alt="Secure Pass Pro v2.0.0">
@@ -99,17 +105,17 @@
                 <div class="card">
                     <div class="card-icon">🔨</div>
                     <h3>Stable Base</h3>
-                    <p>Проверенный временем движок генерации и базовая локализация.</p>
+                    <p>Проверенный временем движок на базе стандартного Tkinter.</p>
                 </div>
                 <div class="card">
                     <div class="card-icon">💾</div>
-                    <h3>TXT Export</h3>
-                    <p>Удобное сохранение результатов в файлы форматов .txt, .log и .key.</p>
+                    <h3>Essentials</h3>
+                    <p>История сессий, базовая фильтрация и поддержка тем оформления.</p>
                 </div>
                 <div class="card">
                     <div class="card-icon">🧩</div>
-                    <h3>Lightweight</h3>
-                    <p>Минимальное потребление ресурсов и работа на Windows 7/8/10.</p>
+                    <h3>Legacy Support</h3>
+                    <p>Минимальное потребление ресурсов и работа на любых версиях ОС.</p>
                 </div>
             </div>
         </div>
@@ -121,25 +127,29 @@
             <div class="download-card highlight-card">
                 <div class="card-icon">🏆</div>
                 <h3>Secure Pass Pro v3.9</h3>
-                <p>Рекомендуемая версия. Максимальная защита, QR-коды и настройка радиуса углов UI.</p>
-                <a href="https://github.com/Maximka1993271/Password-Generator-Python/releases/download/SecurePassProv3.9/SecurePassPro.exe" class="btn-primary full-width">Загрузить v3.9 (.EXE)</a>
+                <p><b>Рекомендуется.</b> Самый современный UI, контроль звука и максимальная криптостойкость.</p>
+                <a href="https://github.com/Maximka1993271/Password-Generator-Python/releases/download/SecurePassProv3.9/SecurePassPro.exe" class="btn-primary full-width">Скачать v3.9 (.EXE)</a>
             </div>
 
             <div class="download-card">
                 <div class="card-icon">📁</div>
                 <h3>Secure Pass Pro v2.0.0</h3>
-                <p>Версия Classic. Подходит для систем с ограниченными ресурсами.</p>
-                <a href="https://github.com/Maximka1993271/Password-Generator-Python/releases/download/SecurePassProv2.0.0/SecurePassPro.exe" class="btn-secondary full-width">Загрузить v2.0.0 (.EXE)</a>
+                <p>Классическая ветка. Для любителей минимализма и старой школы.</p>
+                <a href="https://github.com/Maximka1993271/Password-Generator-Python/releases/download/SecurePassProv2.0.0/SecurePassPro.exe" class="btn-secondary full-width">Скачать v2.0.0 (.EXE)</a>
             </div>
         </div>
     </section>
 
     <footer>
         <div class="footer-content" style="text-align: center; padding: 60px 0;">
-            <p>© 2026 Разработал Максим Мельников • MIT License</p>
-            <p style="font-size: 0.85em; margin-top: 15px; opacity: 0.6; max-width: 600px; margin-left: auto; margin-right: auto;">
-                Инструмент разработан с соблюдением стандартов криптографической безопасности. 
-                Открытый исходный код доступен для аудита на GitHub.
+            <p>© 2026 Максим Мельников • MIT License</p>
+            <div class="footer-tags" style="margin-top: 20px; display: flex; justify-content: center; gap: 15px; flex-wrap: wrap;">
+                <span class="badge">Python 3.14+</span>
+                <span class="badge">Windows 11 Optimized</span>
+                <span class="badge">CSPRNG Secrets</span>
+            </div>
+            <p style="font-size: 0.85em; margin-top: 20px; opacity: 0.6; max-width: 700px; margin-left: auto; margin-right: auto;">
+                Локализация: English, Русский, Українська. Вся обработка паролей происходит локально. Программа не собирает и не передает данные.
             </p>
         </div>
     </footer>
