@@ -277,9 +277,14 @@ class SecurePassPro(ctk.CTk):
         """ RU: Установка иконки приложения | EN: Setup app icon """
         # RU: Поддержка .ico для скомпилированного .exe | EN: .ico support for compiled .exe
         if hasattr(sys, '_MEIPASS'):
+            # Сначала ищем по имени из твоей команды (app_icon.ico)
             icon_path = os.path.join(sys._MEIPASS, "app_icon.ico")
+            if not os.path.exists(icon_path):
+                # Если не нашли, пробуем стандартное icon.ico
+                icon_path = os.path.join(sys._MEIPASS, "icon.ico")
         else:
-            icon_path = "app_icon.ico"
+            # Для запуска из Python пробуем оба варианта
+            icon_path = "icon.ico" if os.path.exists("icon.ico") else "app_icon.ico"
 
         if os.path.exists(icon_path):
             try:
@@ -542,7 +547,12 @@ class SecurePassPro(ctk.CTk):
         if not pwd: return
         path = filedialog.asksaveasfilename(
             defaultextension=".txt",
-            filetypes=[("Password File", "*.key"), ("Log File", "*.log"), ("Text File", "*.txt"), ("All Files", "*.*")]
+            filetypes=[
+                ("Password File", "*.key"), 
+                ("Log File", "*.log"), 
+                ("Text File", "*.txt"), 
+                ("All Files", "*.*")
+            ]
         )
         if path:
             try:
@@ -553,7 +563,13 @@ class SecurePassPro(ctk.CTk):
     def _open(self):
         L = LANGUAGES[self.current_lang]
         path = filedialog.askopenfilename(
-            filetypes=[("Password File", "*.key"), ("Log File", "*.log"), ("Text File", "*.txt"), ("All Files", "*.*")]
+            filetypes=[
+                ("Supported Files", "*.key *.log *.txt"),
+                ("Password File", "*.key"), 
+                ("Log File", "*.log"), 
+                ("Text File", "*.txt"), 
+                ("All Files", "*.*")
+            ]
         )
         if path:
             try:
