@@ -1,15 +1,13 @@
 """
 SecurePassPro v3.9 — Cryptographically secure password generator
-Криптографически стойкий генератор паролей /
-Криптографічно стійкий генератор паролів
+EN: Cryptographically secure password generator
+RU: Криптографически стойкий генератор паролей
+UA: Криптографічно стійкий генератор паролів
 
-Requires / Требует / Вимагає:
-    pip install qrcode[pil] pillow customtkinter
-    Python >= 3.9
+Author / Автор: Maxim Melnikov
 """
 
 from __future__ import annotations
-
 import math
 import platform
 import secrets
@@ -17,657 +15,411 @@ import string
 import sys
 import threading
 import webbrowser
+import datetime
 import tkinter as tk
 from tkinter import filedialog, messagebox
 from typing import Optional, List, Dict, Callable
-
 import customtkinter as ctk
 
+# EN: Check Windows for winsound | RU: Проверка Windows для winsound | UA: Перевірка Windows для winsound
+_IS_WINDOWS = platform.system() == "Windows"
+if _IS_WINDOWS:
+    import winsound
+
+# =============================================================================
+# DEPENDENCIES & VERSION CHECK
+# =============================================================================
 if sys.version_info < (3, 9):
     _ver_root = tk.Tk()
     _ver_root.withdraw()
-    messagebox.showerror(
-        "Critical Error / Критическая ошибка / Критична помилка",
-        "Python 3.9+ required! / Требуется Python 3.9+! / Потрібен Python 3.9+!",
-    )
+    messagebox.showerror("Error", "Python 3.9+ required!")
     sys.exit(1)
 
-
-__all__ = ["SecurePassPro"]
-
-# =============================================================================
-# PLATFORM CACHE
-# =============================================================================
-_IS_WINDOWS: bool = platform.system() == "Windows"
-
-# =============================================================================
-# SOUND ENGINE
-# =============================================================================
-def _beep(freq: int, ms: int) -> None:
-    if _IS_WINDOWS:
-        try:
-            import winsound
-            winsound.Beep(freq, ms)
-        except (tk.TclError, RuntimeError):
-            pass
-
-def _beep_async(*pairs: tuple) -> None:
-    def _run() -> None:
-        for freq, ms in pairs:
-            _beep(int(freq), int(ms))
-    threading.Thread(target=_run, daemon=True).start()
-
-def sound_generate() -> None: _beep_async((800, 50), (1200, 50))
-def sound_copy()     -> None: _beep_async((1500, 100),)
-def sound_action()   -> None: _beep_async((1000, 60),)
-def sound_error()    -> None: _beep_async((400, 150), (300, 150))
-
-# =============================================================================
-# DEPENDENCIES CHECK
-# =============================================================================
 try:
     import qrcode
     from PIL import Image
 except ImportError:
     _err_root = tk.Tk()
     _err_root.withdraw()
-    messagebox.showerror(
-        "Критическая ошибка",
-        "Отсутствуют необходимые библиотеки!\n\n"
-        "pip install qrcode[pil] pillow customtkinter",
-    )
+    messagebox.showerror("Error", "Required: pip install qrcode[pil] pillow customtkinter")
     sys.exit(1)
 
-def _get_resample() -> int:
-    try:
-        return Image.Resampling.LANCZOS   # Pillow >= 9.1
-    except AttributeError:
-        return Image.LANCZOS              # Pillow 8.x fallback
-
-RESAMPLE: int = _get_resample()
+# =============================================================================
+# CONSTANTS & ASSETS
+# =============================================================================
+HISTORY_MAX = 50
+AMBIGUOUS_CHARS = "il1Lo0O"
+UNAMBIG_CHARS = "{}[]()/\\'\"`~,;:.<>"
+UPD_URL = "https://github.com/Maximka1993271/Password-Generator-Python/releases"
 
 # =============================================================================
 # TOOLTIP CLASS
 # =============================================================================
 class ToolTip:
-    def __init__(self, widget: tk.Widget, text: str) -> None:
+    """
+    EN: Dynamic tooltip for UI elements
+    RU: Динамические всплывающие подсказки
+    UA: Динамічні спливаючі підказки
+    """
+    def __init__(self, widget):
         self.widget = widget
-        self.text   = text
-        self.tip_window: Optional[tk.Toplevel] = None
+        self.text = ""
+        self.tip_window = None
+        self.widget.bind("<Enter>", self.show_tip)
+        self.widget.bind("<Leave>", self.hide_tip)
 
-    def show_tip(self) -> None:
+    def set_text(self, text):
+        self.text = text
+
+    def show_tip(self, event=None):
         if self.tip_window or not self.text:
             return
         x = self.widget.winfo_rootx() + 25
-        y = self.widget.winfo_rooty() + 35
+        y = self.widget.winfo_rooty() + self.widget.winfo_height() + 5
         self.tip_window = tw = tk.Toplevel(self.widget)
         tw.wm_overrideredirect(True)
         tw.wm_geometry(f"+{x}+{y}")
-        tk.Label(
-            tw, text=self.text, justify="left",
-            background="#ffffe0", relief="solid",
-            borderwidth=1, font=("Tahoma", 9),
-        ).pack(ipadx=1)
+        label = tk.Label(tw, text=self.text, justify='left',
+                         background="#ffffe0", relief='solid', borderwidth=1,
+                         font=("tahoma", "9", "normal"))
+        label.pack(ipadx=1)
 
-    def hide_tip(self) -> None:
+    def hide_tip(self, event=None):
         tw = self.tip_window
         self.tip_window = None
         if tw:
             tw.destroy()
 
 # =============================================================================
-# CONSTANTS
-# =============================================================================
-HISTORY_MAX     = 50
-FILE_READ_LIMIT = 1024
-UPD_URL         = "https://github.com/Maximka1993271/Password-Generator-Python/releases/download/SecurePassProv3.9/SecurePassPro.exe"
-AMBIGUOUS_CHARS = "il1Lo0O"
-UNAMBIG_CHARS   = "{}[]()/\\'\"`~,;:.<>"
-
-_SYSRNG = secrets.SystemRandom()
-
-# =============================================================================
 # LANGUAGE DEFINITIONS
 # =============================================================================
 LANGUAGES: Dict[str, Dict[str, str]] = {
     "RU": {
-        "win_title":  "Secure Pass Pro v3.9",
-        "title":      "Настройки генерации",
-        "len":        "Длина пароля",
-        "author":      "Автор: Максим Мельников",
-        "upper":      "Заглавные буквы",
-        "lower":      "Строчные буквы",
-        "digits":     "Цифры",
-        "symb":       "Спецсимволы",
-        "ambig":      "Исключить похожие (i, l, 1, L, o, 0, O)",
-        "unambig":    "Исключить неоднозначные ({} [] () / \ ' \" ` ~ , ; : . < >)",
-        "at_least":   "Минимум 1 из каждой категории",
-        "hide":       "Скрывать символы",
-        "btn_gen":    "СГЕНЕРИРОВАТЬ",
-        "btn_copy":   "КОПИРОВАТЬ ПАРОЛЬ",
-        "btn_save":   "СОХРАНИТЬ В ФАЙЛ",
-        "btn_open":   "ОТКРЫТЬ ФАЙЛ",
-        "btn_qr":     "QR-КОД ПАРОЛЯ",
-        "btn_hist":   "ИСТОРИЯ",
-        "btn_upd":    "ОБНОВИТЬ ПРОГРАММУ",
-        "strength":   "Сложность",
-        "radius":     "Закругление углов",
-        "sys":        "Системная",
-        "dark":        "Тёмная",
-        "light":      "Светлая",
-        "copied":     "Скопировано!",
-        "bits":       "бит",
-        "qr_title":   "QR-код пароля",
-        "hist_title": "История",
-        "t0":  "Мгновенно", "t1": "Секунды", "t2": "Минуты", "t3": "Часы", "t4": "Дни",
-        "t5":  "Недели", "t6": "Месяцы", "t7": "Годы", "t8": "Десятилетия", "t9": "Столетия", "t10": "Тысячелетия",
-        "tt_gen":     "Создать новый случайный пароль",
-        "tt_copy":    "Копировать и очистить через 60с",
-        "tt_save":    "Сохранить пароль в текстовый файл",
-        "tt_open":    "Загрузить пароль из файла",
-        "tt_qr":      "Создать QR-код для сканирования",
-        "tt_hist":    "Посмотреть последние пароли",
-        "tt_upd":     "Открыть страницу релизов",
-        "err_no_pool": "Выберите хотя бы один тип символов!",
-        "clipboard_note": "Внимание: на Linux/macOS автоочистка буфера ограничена возможностями Tk.",
+        "win_title": "Secure Pass Pro v3.9",
+        "proton_title": "Secure Pass Pro",
+        "menu_title": "Меню",
+        "len": "Длина",
+        "author": "Автор: Максим Мельников",
+        "upper": "Заглавные буквы",
+        "lower": "Строчные буквы",
+        "digits": "Цифры",
+        "symb": "Спецсимволы",
+        "ambig": "Исключить похожие (i, l, 1...)",
+        "unambig": "Исключить не однозначные",
+        "at_least": "Минимум 1 из каждой категории",
+        "hide": "Скрывать символы",
+        "btn_gen": "Сгенерировать",
+        "btn_copy": "Копировать пароль",
+        "btn_save": "Сохранить в файл",
+        "btn_open": "Открыть файл",
+        "btn_qr": "QR-код пароль",
+        "btn_hist": "История",
+        "btn_upd": "Обновить программу",
+        "btn_about": "О программе",
+        "btn_theme": "Цвет программы",
+        "radius": "Закругление углов",
+        "theme_sys": "Системная", "theme_dark": "Тёмная", "theme_light": "Светлая",
+        "about_text": "Secure Pass Pro v3.9\n\nПрофессиональный инструмент для генерации паролей.\nИспользует криптографически стойкие алгоритмы.",
+        "copied": "Скопировано! (60с)",
+        "strength": "Стойкость: ~{0} вариантов",
+        "crack_time": "{0}",
+        "time_sec": "Несколько секунд на взлом",
+        "time_day": "Дни на взлом",
+        "time_year": "Года на взлом",
+        "time_cent": "Столетия на взлом",
+        "st_low": "Слабый пароль", "st_mid": "Средний пароль", "st_high": "Надежный пароль",
+        "tt_gen": "Создать новый случайный пароль",
+        "tt_copy": "Копировать в буфер (очистка через 60 сек)",
+        "tt_save": "Сохранить текущий пароль в файл",
+        "tt_open": "Открыть пароль из файла .key, .log или .txt",
+        "tt_qr": "Создать QR-код для быстрого сканирования",
+        "tt_hist": "Показать последние 50 паролей",
+        "tt_upd": "Проверить наличие новой версии на GitHub",
+        "tt_about": "Информация о разработчике и программе",
+        "err_cat": "Выберите хотя бы одну категорию!",
+        "err_save": "Ошибка сохранения: {0}",
+        "err_open": "Не удалось прочитать файл: {0}",
+        "hist_empty": "История пуста..."
     },
     "EN": {
-        "win_title":  "Secure Pass Pro v3.9",
-        "title":      "Generation Settings",
-        "len":        "Password Length",
-        "author":      "Author: Maxim Melnikov",
-        "upper":      "Uppercase Letters",
-        "lower":      "Lowercase Letters",
-        "digits":     "Digits",
-        "symb":       "Special Symbols",
-        "ambig":      "Exclude ambiguous (i, l, 1, L, o, 0, O)",
-        "unambig":    "Exclude symbols ({} [] () / \ ' \" ` ~ , ; : . < >)",
-        "at_least":   "At least one from each category",
-        "hide":       "Hide symbols",
-        "btn_gen":    "GENERATE",
-        "btn_copy":   "COPY PASSWORD",
-        "btn_save":   "SAVE TO FILE",
-        "btn_open":   "OPEN FILE",
-        "btn_qr":     "QR-CODE",
-        "btn_hist":   "HISTORY",
-        "btn_upd":    "UPDATE PROGRAM",
-        "strength":   "Strength",
-        "radius":     "Corner Radius",
-        "sys":        "System",
-        "dark":        "Dark",
-        "light":      "Light",
-        "copied":     "Copied!",
-        "bits":       "bits",
-        "qr_title":   "Password QR-Code",
-        "hist_title": "History",
-        "t0":  "Instantly", "t1": "Seconds", "t2": "Minutes", "t3": "Hours", "t4": "Days",
-        "t5":  "Weeks", "t6": "Months", "t7": "Years", "t8": "Decades", "t9": "Centuries", "t10": "Millennia",
-        "tt_gen":     "Create a new random password",
-        "tt_copy":    "Copy and clear clipboard in 60s",
-        "tt_save":    "Save password to a text file",
-        "tt_open":    "Load password from file",
-        "tt_qr":      "Generate QR-code for scanning",
-        "tt_hist":    "View recent passwords",
-        "tt_upd":     "Open releases page",
-        "err_no_pool": "Select at least one character type!",
-        "clipboard_note": "Note: on Linux/macOS clipboard auto-clear is limited by Tk.",
+        "win_title": "Secure Pass Pro v3.9",
+        "proton_title": "Secure Pass Pro",
+        "menu_title": "Menu",
+        "len": "Length",
+        "author": "Author: Maxim Melnikov",
+        "upper": "Uppercase",
+        "lower": "Lowercase",
+        "digits": "Digits",
+        "symb": "Special symbols",
+        "ambig": "Exclude ambiguous (i, l, 1...)",
+        "unambig": "Exclude non-obvious",
+        "at_least": "Min 1 from each category",
+        "hide": "Hide symbols",
+        "btn_gen": "Generate",
+        "btn_copy": "Copy password",
+        "btn_save": "Save to file",
+        "btn_open": "Open file",
+        "btn_qr": "Password QR-code",
+        "btn_hist": "History",
+        "btn_upd": "Update program",
+        "btn_about": "About",
+        "btn_theme": "App color",
+        "radius": "Corner radius",
+        "theme_sys": "System", "theme_dark": "Dark", "theme_light": "Light",
+        "about_text": "Secure Pass Pro v3.9\n\nProfessional password generation tool.\nUses cryptographically secure algorithms.",
+        "copied": "Copied! (60s)",
+        "strength": "Strength: ~{0} combos",
+        "crack_time": "{0}",
+        "time_sec": "A few seconds to crack",
+        "time_day": "Days to crack",
+        "time_year": "Years to crack",
+        "time_cent": "Centuries to crack",
+        "st_low": "Weak password", "st_mid": "Medium password", "st_high": "Strong password",
+        "tt_gen": "Create a new random password",
+        "tt_copy": "Copy to clipboard (clears in 60 sec)",
+        "tt_save": "Save current password to file",
+        "tt_open": "Open password from .key, .log or .txt file",
+        "tt_qr": "Create a QR code for quick scanning",
+        "tt_hist": "Show last 50 generated passwords",
+        "tt_upd": "Check for new version on GitHub",
+        "tt_about": "Developer and program info",
+        "err_cat": "Select at least one category!",
+        "err_save": "Save failed: {0}",
+        "err_open": "Could not read file: {0}",
+        "hist_empty": "History is empty..."
     },
     "UA": {
-        "win_title":  "Secure Pass Pro v3.9",
-        "title":      "Налаштування генерації",
-        "len":        "Довжина пароля",
-        "author":      "Автор: Максим Мельников",
-        "upper":      "Великі літери",
-        "lower":      "Малі літери",
-        "digits":     "Цифри",
-        "symb":       "Спецсимволи",
-        "ambig":      "Виключити схожі (i, l, 1, L, o, 0, O)",
-        "unambig":    "Виключити неоднозначні ({} [] () / \ ' \" ` ~ , ; : . < >)",
-        "at_least":   "Мінімум 1 з кожної категорії",
-        "hide":       "Приховати символи",
-        "btn_gen":    "ЗГЕНЕРУВАТИ",
-        "btn_copy":   "КОПІЮВАТИ ПАРОЛЬ",
-        "btn_save":   "ЗБЕРЕГТИ У ФАЙЛ",
-        "btn_open":   "ВІДКРИТИ ФАЙЛ",
-        "btn_qr":     "QR-КОД ПАРОЛЯ",
-        "btn_hist":   "ІСТОРІЯ",
-        "btn_upd":    "ОНОВИТИ ПРОГРАМУ",
-        "strength":   "Складність",
-        "radius":     "Закруглення кутів",
-        "sys":        "Системна",
-        "dark":        "Темна",
-        "light":      "Світла",
-        "copied":     "Скопійовано!",
-        "bits":       "біт",
-        "qr_title":   "QR-код пароля",
-        "hist_title": "Історія",
-        "t0":  "Миттєво", "t1": "Секунди", "t2": "Хвилини", "t3": "Години", "t4": "Дні",
-        "t5":  "Тижні", "t6": "Місяці", "t7": "Роки", "t8": "Десятиліття", "t9": "Століття", "t10": "Тисячоліття",
-        "tt_gen":     "Створити новий випадковий пароль",
-        "tt_copy":    "Копіювати та очистити за 60с",
-        "tt_save":    "Зберегти пароль у текстовий файл",
-        "tt_open":    "Завантажити пароль з файлу",
-        "tt_qr":      "Створити QR-код для сканировання",
-        "tt_hist":    "Переглянути останні паролі",
-        "tt_upd":     "Відкрити сторінку релізів",
-        "err_no_pool": "Оберіть хоча б один тип символів!",
-        "clipboard_note": "Увага: на Linux/macOS автоочищення буфера обмежено можливостями Tk.",
-    },
+        "win_title": "Secure Pass Pro v3.9",
+        "proton_title": "Secure Pass Pro",
+        "menu_title": "Меню",
+        "len": "Довжина",
+        "author": "Автор: Максим Мельников",
+        "upper": "Великі літери",
+        "lower": "Малі літери",
+        "digits": "Цифри",
+        "symb": "Спецсимволи",
+        "ambig": "Виключити схожі (i, l, 1...)",
+        "unambig": "Виключити не однозначні",
+        "at_least": "Мінімум 1 з категорії",
+        "hide": "Приховати символи",
+        "btn_gen": "Згенерувати",
+        "btn_copy": "Копіювати пароль",
+        "btn_save": "Зберегти у файл",
+        "btn_open": "Відкрити файл",
+        "btn_qr": "QR-код пароль",
+        "btn_hist": "Історія",
+        "btn_upd": "Оновити программу",
+        "btn_about": "Про програму",
+        "btn_theme": "Колір програми",
+        "radius": "Закруглення кутів",
+        "theme_sys": "Системна", "theme_dark": "Темна", "theme_light": "Світла",
+        "about_text": "Secure Pass Pro v3.9\n\nПрофесійний інструмент для генерації паролів.\nВикористовує криптографічно стійкі алгоритми.",
+        "copied": "Скопійовано! (60с)",
+        "strength": "Стійкість: ~{0} варіантів",
+        "crack_time": "{0}",
+        "time_sec": "Кілька секунд на злам",
+        "time_day": "Дні на злам",
+        "time_year": "Роки на злам",
+        "time_cent": "Століття на злам",
+        "st_low": "Слабкий пароль", "st_mid": "Середній пароль", "st_high": "Надійний пароль",
+        "tt_gen": "Створити новий випадковий пароль",
+        "tt_copy": "Копіювати в буфер (очищення через 60 сек)",
+        "tt_save": "Зберегти поточний пароль у файл",
+        "tt_open": "Відкрити пароль з файлу .key, .log або .txt",
+        "tt_qr": "Створити QR-код для швидкого сканування",
+        "tt_hist": "Показати останні 50 паролів",
+        "tt_upd": "Перевірити наявність нової версії на GitHub",
+        "tt_about": "Інформація про розробника та программу",
+        "err_cat": "Виберіть хоча б одну категорію!",
+        "err_save": "Помилка збереження: {0}",
+        "err_open": "Не вдалося прочитати файл: {0}",
+        "hist_empty": "Історія порожня..."
+    }
 }
 
 # =============================================================================
-# ENTROPY HELPERS
-# =============================================================================
-_ENTROPY_THRESHOLDS: List[tuple] = [
-    (20, "t0"), (30, "t1"), (40, "t2"), (50, "t3"), (60, "t4"),
-    (70, "t5"), (80, "t6"), (90, "t7"), (100, "t8"), (120, "t9")
-]
-_ENTROPY_MAX_KEY = "t10"
-
-def _entropy_to_time_key(entropy: float) -> str:
-    for threshold, key in _ENTROPY_THRESHOLDS:
-        if entropy < threshold: return key
-    return _ENTROPY_MAX_KEY
-
-def _entropy_to_color(entropy: float) -> str:
-    if entropy < 50: return "#FF4B4B"
-    if entropy < 80: return "#FFD700"
-    return "#28A745"
-
-# =============================================================================
-# MAIN APPLICATION
+# MAIN APP CLASS
 # =============================================================================
 class SecurePassPro(ctk.CTk):
-    def __init__(self) -> None:
+    def __init__(self):
         super().__init__()
-        self.current_lang:  str = "RU"
-        self.current_theme: str = "System"
-        self.history:        List[str] = []
-        self._radius_widgets: List[tk.Widget] = []
-        self.tooltips:        Dict[str, ToolTip] = {}
+        self.current_lang = "RU"
+        self.history = []
+        self._radius_widgets = []
+        self._clipboard_timer = None
+        self._tooltips = {}
+        
+        # Window settings
+        self.title("Secure Pass Pro v3.9")
+        self.geometry("850x760")
+        self.minsize(800, 750)
+        
+        # Variables
+        self.upper_var = tk.BooleanVar(value=True)
+        self.lower_var = tk.BooleanVar(value=True)
+        self.digits_var = tk.BooleanVar(value=True)
+        self.symb_var = tk.BooleanVar(value=True)
+        self.ambig_var = tk.BooleanVar(value=False)
+        self.unambig_var = tk.BooleanVar(value=False)
+        self.at_least_var = tk.BooleanVar(value=True)
+        self.hide_var = tk.BooleanVar(value=False)
 
-        self.history_window: Optional[ctk.CTkToplevel] = None
-        self.hist_txt:       Optional[ctk.CTkTextbox]  = None
-        self.qr_window:      Optional[ctk.CTkToplevel] = None
-        self.qr_label:       Optional[ctk.CTkLabel]    = None
-        self._qr_ctk_image:  Optional[ctk.CTkImage]    = None
-
-        self._last_copied_pwd: str = ""
-        self._clipboard_job:   Optional[str] = None
-        self._clear_job:       Optional[str] = None
-
-        self.geometry("420x980")
-        self.minsize(420, 760)
-        self.resizable(False, False)
-        self._setup_vars()
         self._setup_ui()
         self._apply_lang("RU")
-        ctk.set_appearance_mode("System")
+        self._center_main_window()
 
-        # Безопасное закрытие приложения
-        self.protocol("WM_DELETE_WINDOW", self._on_close)
+    def _play_sound(self, sound_type: str = "click"):
+        if not _IS_WINDOWS: return
+        try:
+            sounds = {
+                "click": winsound.MB_ICONASTERISK,
+                "success": winsound.MB_OK,
+                "copy": winsound.MB_ICONEXCLAMATION,
+                "error": winsound.MB_ICONHAND
+            }
+            winsound.MessageBeep(sounds.get(sound_type, winsound.MB_OK))
+        except: pass
 
-    def _center_window(self, win: ctk.CTkToplevel) -> None:
-        win.update_idletasks()
-        w, h = win.winfo_width(), win.winfo_height()
-        mx, my = self.winfo_x(), self.winfo_y()
-        mw, mh = self.winfo_width(), self.winfo_height()
-        x = mx + (mw // 2) - (w // 2)
-        y = my + (mh // 2) - (h // 2)
-        win.geometry(f"+{x}+{y}")
+    def _center_main_window(self):
+        self.update_idletasks()
+        x = (self.winfo_screenwidth() // 2) - (850 // 2)
+        y = (self.winfo_screenheight() // 2) - (760 // 2)
+        self.geometry(f"+{x}+{y}")
 
-    def _setup_vars(self) -> None:
-        self.upper_var           = tk.BooleanVar(value=True)
-        self.lower_var           = tk.BooleanVar(value=True)
-        self.digits_var          = tk.BooleanVar(value=True)
-        self.symb_var            = tk.BooleanVar(value=True)
-        self.exclude_ambig_var   = tk.BooleanVar(value=False)
-        self.exclude_unambig_var = tk.BooleanVar(value=False)
-        self.at_least_one_var    = tk.BooleanVar(value=True)
-        self.hide_var            = tk.BooleanVar(value=False)
+    def _center_window(self, window, width, height):
+        window.update_idletasks()
+        x = self.winfo_x() + (self.winfo_width() // 2) - (width // 2)
+        y = self.winfo_y() + (self.winfo_height() // 2) - (height // 2)
+        window.geometry(f"{width}x{height}+{x}+{y}")
+        window.transient(self)
+        window.grab_set()
 
-    def _setup_ui(self) -> None:
-        self._build_header()
-        self._build_options()
-        self._build_strength()
-        self._build_buttons()
-        self._build_footer()
+    def _setup_ui(self):
+        self.grid_columnconfigure(0, weight=1)
+        self.grid_columnconfigure(1, weight=0)
+        self.grid_rowconfigure(0, weight=1)
 
-    def _build_header(self) -> None:
-        self.lbl_title = ctk.CTkLabel(self, text="", font=("Segoe UI", 22, "bold"))
-        self.lbl_title.pack(pady=(15, 0))
-        self.lbl_author = ctk.CTkLabel(self, text="", font=("Segoe UI", 12, "italic"), text_color="gray")
-        self.lbl_author.pack()
+        # --- LEFT PANEL ---
+        self.left_panel = ctk.CTkFrame(self, fg_color="transparent")
+        self.left_panel.grid(row=0, column=0, sticky="nsew", padx=20, pady=(10, 0))
 
-    def _build_options(self) -> None:
-        self.opt_frame = ctk.CTkFrame(self)
-        self.opt_frame.pack(pady=10, padx=20, fill="x")
-        self._radius_widgets.append(self.opt_frame)
+        self.lbl_title = ctk.CTkLabel(self.left_panel, text="Secure Pass Pro v3.9", font=("Segoe UI", 20, "bold"))
+        self.lbl_title.pack(pady=(5, 0))
+        
+        self.lbl_author = ctk.CTkLabel(self.left_panel, text="", font=("Segoe UI", 14, "italic"), text_color="gray")
+        self.lbl_author.pack(pady=(0, 10))
 
-        self.lbl_len = ctk.CTkLabel(self.opt_frame, text="", font=("Segoe UI", 14, "bold"))
-        self.lbl_len.pack(pady=(10, 0))
-        self.slider = ctk.CTkSlider(self.opt_frame, from_=4, to=64, command=self._on_slider_move)
-        self.slider.set(20)
-        self.slider.pack(pady=10, padx=20)
+        self.lbl_len = ctk.CTkLabel(self.left_panel, text="", font=("Segoe UI", 16, "bold"))
+        self.lbl_len.pack()
+        self.slider_len = ctk.CTkSlider(self.left_panel, from_=4, to=64, width=400, command=self._update_len_label)
+        self.slider_len.set(20)
+        self.slider_len.pack(pady=5)
 
-        self.cb_upper    = self._create_cb(self.upper_var)
-        self.cb_lower    = self._create_cb(self.lower_var)
-        self.cb_digits   = self._create_cb(self.digits_var)
-        self.cb_symb     = self._create_cb(self.symb_var)
-        self.cb_ambig    = self._create_cb(self.exclude_ambig_var)
-        self.cb_unambig  = self._create_cb(self.exclude_unambig_var)
-        self.cb_at_least = self._create_cb(self.at_least_one_var)
-        self.cb_hide     = self._create_cb(self.hide_var, command=self._toggle_visibility)
+        self.cb_frame = ctk.CTkFrame(self.left_panel, fg_color="transparent")
+        self.cb_frame.pack(pady=5)
+        
+        self.cb_upper = ctk.CTkCheckBox(self.cb_frame, text="", variable=self.upper_var)
+        self.cb_upper.grid(row=0, column=0, padx=20, pady=2, sticky="w")
+        self.cb_lower = ctk.CTkCheckBox(self.cb_frame, text="", variable=self.lower_var)
+        self.cb_lower.grid(row=0, column=1, padx=20, pady=2, sticky="w")
+        self.cb_digits = ctk.CTkCheckBox(self.cb_frame, text="", variable=self.digits_var)
+        self.cb_digits.grid(row=1, column=0, padx=20, pady=2, sticky="w")
+        self.cb_symb = ctk.CTkCheckBox(self.cb_frame, text="", variable=self.symb_var)
+        self.cb_symb.grid(row=1, column=1, padx=20, pady=2, sticky="w")
+        
+        self.cb_ambig = ctk.CTkCheckBox(self.cb_frame, text="", variable=self.ambig_var)
+        self.cb_ambig.grid(row=2, column=0, columnspan=2, padx=20, pady=2, sticky="w")
+        self.cb_unambig = ctk.CTkCheckBox(self.cb_frame, text="", variable=self.unambig_var)
+        self.cb_unambig.grid(row=3, column=0, columnspan=2, padx=20, pady=2, sticky="w")
+        
+        self.cb_at_least = ctk.CTkCheckBox(self.cb_frame, text="", variable=self.at_least_var)
+        self.cb_at_least.grid(row=4, column=0, columnspan=2, padx=20, pady=2, sticky="w")
+        self.cb_hide = ctk.CTkCheckBox(self.cb_frame, text="", variable=self.hide_var, command=self._toggle_hide)
+        self.cb_hide.grid(row=5, column=0, columnspan=2, padx=20, pady=2, sticky="w")
 
-    def _build_strength(self) -> None:
-        self.entry_res = ctk.CTkEntry(self, height=45, font=("Consolas", 18), justify="center")
-        self.entry_res.pack(pady=10, padx=20, fill="x")
-        self.entry_res.bind("<KeyRelease>", lambda _e: self._refresh_strength())
+        self.entry_res = ctk.CTkEntry(self.left_panel, height=50, font=("Consolas", 22), justify="center")
+        self.entry_res.pack(pady=10, padx=40, fill="x")
         self._radius_widgets.append(self.entry_res)
 
-        self.strength_bar = ctk.CTkProgressBar(self, height=10)
+        self.strength_bar = ctk.CTkProgressBar(self.left_panel, width=400, height=8)
         self.strength_bar.set(0)
-        self.strength_bar.pack(pady=5, padx=40, fill="x")
-
-        self.lbl_time_to_crack = ctk.CTkLabel(self, text="", font=("Segoe UI", 12, "bold"))
-        self.lbl_time_to_crack.pack()
-        self.lbl_strength = ctk.CTkLabel(self, text="", font=("Segoe UI", 10))
-        self.lbl_strength.pack()
-
-    def _build_buttons(self) -> None:
-        self.btn_gen  = self._create_btn(self._generate,      "btn_gen",  "#1f538d", "tt_gen",  bold=True)
-        self.btn_copy = self._create_btn(self._copy,          "btn_copy", "#28a745", "tt_copy")
-        self.btn_save = self._create_btn(self._save,          "btn_save", "#17a2b8", "tt_save")
-        self.btn_open = self._create_btn(self._open,          "btn_open", "#17a2b8", "tt_open")
-        self.btn_qr   = self._create_btn(self._show_qr,       "btn_qr",   "#6f42c1", "tt_qr")
-        self.btn_hist = self._create_btn(self._show_history,  "btn_hist", "#6c757d", "tt_hist")
-        self.btn_upd  = self._create_btn(self._update_app,    "btn_upd",  "#f39c12", "tt_upd")
-
-    def _build_footer(self) -> None:
-        self.lbl_radius = ctk.CTkLabel(self, text="", font=("Segoe UI", 10))
-        self.lbl_radius.pack(pady=(5, 0))
-        self.slider_radius = ctk.CTkSlider(self, from_=0, to=25, height=14, command=self._change_radius)
-        self.slider_radius.set(10)
-        self.slider_radius.pack(pady=5, padx=60, fill="x")
-
-        self.lbl_stars = ctk.CTkLabel(self, text="★★★★★", font=("Segoe UI", 20), text_color="#FFD700")
-        self.lbl_stars.pack(side="bottom", pady=(0, 10))
-
-        self.sw_frame = ctk.CTkFrame(self, fg_color="transparent")
-        self.sw_frame.pack(side="bottom", fill="x", padx=20, pady=5)
-        self.lang_sw = ctk.CTkSegmentedButton(self.sw_frame, values=["RU", "EN", "UA"], command=self._on_lang_change)
-        self.lang_sw.pack(side="left")
+        self.strength_bar.pack(pady=(5, 5))
         
-        # Инициализация переключателя тем с локализованными значениями через _apply_lang
-        self.theme_sw = ctk.CTkSegmentedButton(self.sw_frame, command=self._on_theme_change)
-        self.theme_sw.pack(side="right")
+        self.lbl_stars_top = ctk.CTkLabel(self.left_panel, text="", font=("Segoe UI", 24), text_color="#FFD700")
+        self.lbl_stars_top.pack()
 
-    def _create_cb(self, var: tk.BooleanVar, command: Optional[Callable[[], None]] = None) -> ctk.CTkCheckBox:
-        cb = ctk.CTkCheckBox(
-            self.opt_frame, text="", variable=var, font=("Segoe UI", 12),
-            command=lambda: (command() if command else None, self._refresh_strength()),
-        )
-        cb.pack(anchor="w", padx=35, pady=2)
-        return cb
+        self.lbl_strength_text = ctk.CTkLabel(self.left_panel, text="", font=("Segoe UI", 14, "bold"))
+        self.lbl_strength_text.pack()
 
-    def _create_btn(self, cmd: Callable[[], None], key: str, color: str, tt_key: str, bold: bool = False) -> ctk.CTkButton:
+        self.lbl_strength = ctk.CTkLabel(self.left_panel, text="", font=("Segoe UI", 13))
+        self.lbl_strength.pack()
+        self.lbl_crack = ctk.CTkLabel(self.left_panel, text="", font=("Segoe UI", 13, "bold"), wraplength=500)
+        self.lbl_crack.pack(pady=(0, 5))
+
+        # --- RIGHT PANEL ---
+        self.right_panel = ctk.CTkFrame(self, width=250)
+        self.right_panel.grid(row=0, column=1, sticky="nsew", padx=(0, 20), pady=20)
+        self.right_panel.grid_propagate(False)
+        self._radius_widgets.append(self.right_panel)
+
+        self.lbl_menu = ctk.CTkLabel(self.right_panel, text="", font=("Segoe UI", 18, "bold"))
+        self.lbl_menu.pack(pady=15)
+
+        self.btn_gen = self._create_menu_btn(self.right_panel, "btn_gen", "tt_gen", self._generate, "#0067c0")
+        self.btn_copy = self._create_menu_btn(self.right_panel, "btn_copy", "tt_copy", self._copy, "#107c10")
+        self.btn_save = self._create_menu_btn(self.right_panel, "btn_save", "tt_save", self._save, "#0078d4")
+        self.btn_open = self._create_menu_btn(self.right_panel, "btn_open", "tt_open", self._open, "#0078d4")
+        self.btn_qr = self._create_menu_btn(self.right_panel, "btn_qr", "tt_qr", self._show_qr, "#8764b8")
+        self.btn_hist = self._create_menu_btn(self.right_panel, "btn_hist", "tt_hist", self._show_history, "#4b4b4b")
+        self.btn_upd = self._create_menu_btn(self.right_panel, "btn_upd", "tt_upd", lambda: [self._play_sound("click"), webbrowser.open(UPD_URL)], "#ca5010")
+        self.btn_about = self._create_menu_btn(self.right_panel, "btn_about", "tt_about", self._show_about, "#4b4b4b")
+
+        # --- BOTTOM PANEL ---
+        # RU: Динамический цвет фона для нижней панели | UA: Динамічний колір фону для нижньої панелі
+        self.bottom_frame = ctk.CTkFrame(self, fg_color=("#e0e0e0", "#1e1e1e"), corner_radius=15)
+        self.bottom_frame.grid(row=1, column=0, columnspan=2, sticky="ew", padx=20, pady=(0, 15))
+        
+        self.lbl_radius = ctk.CTkLabel(self.bottom_frame, text="", text_color=("black", "white"), height=20)
+        self.lbl_radius.pack(pady=(5, 0))
+        self.slider_radius = ctk.CTkSlider(self.bottom_frame, from_=0, to=25, width=400, command=self._change_radius)
+        self.slider_radius.set(10)
+        self.slider_radius.pack(pady=2)
+
+        self.ctrl_line = ctk.CTkFrame(self.bottom_frame, fg_color="transparent")
+        self.ctrl_line.pack(fill="x", padx=20, pady=5)
+
+        self.lang_sw = ctk.CTkSegmentedButton(self.ctrl_line, values=["RU", "EN", "UA"], command=self._apply_lang)
+        self.lang_sw.set("RU")
+        self.lang_sw.pack(side="left")
+
+        self.btn_theme = ctk.CTkOptionMenu(self.ctrl_line, values=[], command=self._change_theme, width=250)
+        self.btn_theme.pack(side="right")
+
+        self.lbl_app_rating = ctk.CTkLabel(self.bottom_frame, text="★★★★★", font=("Segoe UI", 24), text_color="#FFD700", height=25)
+        self.lbl_app_rating.pack(pady=(0, 5))
+
+    def _create_menu_btn(self, parent, lang_key, tt_key, cmd, color):
         btn = ctk.CTkButton(
-            self, text="", command=cmd, fg_color=color, height=35,
-            font=("Segoe UI", 13 if bold else 12, "bold" if bold else "normal"),
+            parent, text="", 
+            command=lambda: [self._play_sound("click"), cmd()], 
+            fg_color=color, height=45, font=("Segoe UI Variable", 13, "bold")
         )
-        btn.pack(pady=3, padx=40, fill="x")
-        # Сохраняем ключи в объекте кнопки для доступа при смене языка
-        btn.lang_key = key
+        btn.pack(pady=5, padx=15, fill="x")
+        btn.lang_key = lang_key
         btn.tt_key = tt_key
         self._radius_widgets.append(btn)
-        tip = ToolTip(btn, "")
-        self.tooltips[key] = tip
-        btn.bind("<Enter>", lambda _e: tip.show_tip())
-        btn.bind("<Leave>", lambda _e: tip.hide_tip())
+        self._tooltips[lang_key] = ToolTip(btn)
         return btn
 
-    def _build_pools(self) -> tuple[list[str], str]:
-        exclude = set(AMBIGUOUS_CHARS) if self.exclude_ambig_var.get() else set()
-        if self.exclude_unambig_var.get():
-            exclude.update(UNAMBIG_CHARS)
-
-        def _pool(var: tk.BooleanVar, src: str) -> str:
-            if not var.get(): return ""
-            return "".join(c for c in src if c not in exclude)
-
-        pools = [
-            _pool(self.upper_var,  string.ascii_uppercase),
-            _pool(self.lower_var,  string.ascii_lowercase),
-            _pool(self.digits_var, string.digits),
-            _pool(self.symb_var,   string.punctuation),
-        ]
-        return pools, "".join(pools)
-
-    def _generate(self) -> None:
-        L = LANGUAGES[self.current_lang]
-        pools, full_pool = self._build_pools()
-
-        if not full_pool:
-            sound_error()
-            messagebox.showwarning(self.title(), L["err_no_pool"])
-            return
-
-        length = int(self.slider.get())
-        mandatory = []
-        if self.at_least_one_var.get():
-            mandatory = [secrets.choice(p) for p in pools if p]
-
-        if len(mandatory) > length:
-            mandatory = _SYSRNG.sample(mandatory, length)
-
-        remainder = [secrets.choice(full_pool) for _ in range(length - len(mandatory))]
-        pwd_list = mandatory + remainder
-        _SYSRNG.shuffle(pwd_list)
-        
-        pwd = "".join(pwd_list)
-        self.entry_res.delete(0, "end")
-        self.entry_res.insert(0, pwd)
-        self.history.insert(0, pwd)
-        if len(self.history) > HISTORY_MAX: self.history.pop()
-        
-        self._refresh_strength()
-        sound_generate()
-        
-        # Обновляем QR-код если окно открыто
-        if self.qr_window and self.qr_window.winfo_exists():
-            self._show_qr()
-
-    def _save(self) -> None:
-        pwd = self.entry_res.get()
-        if not pwd:
-            sound_error()
-            return
-        path = filedialog.asksaveasfilename(
-            defaultextension=".txt",
-            filetypes=[
-                ("Text Files", "*.txt"),
-                ("Log Files",  "*.log"),
-                ("Key Files",  "*.key"),
-                ("All Files",  "*.*"),
-            ],
-        )
-        if path:
-            try:
-                with open(path, "w", encoding="utf-8") as f:
-                    f.write(pwd)
-                sound_action()
-            except OSError:
-                sound_error()
-
-    def _open(self) -> None:
-        path = filedialog.askopenfilename(filetypes=[("Text Files", "*.txt"), ("All Files", "*.*")])
-        if path:
-            try:
-                with open(path, "r", encoding="utf-8") as f:
-                    # Читаем только первую строку
-                    raw_data = f.read(FILE_READ_LIMIT)
-                    lines = raw_data.splitlines()
-
-                    if not lines:
-                        sound_error()
-                        return
-
-                    content = lines[0].strip()
-
-                    self.entry_res.delete(0, "end")
-                    self.entry_res.insert(0, content)
-                    self._refresh_strength()
-                    sound_action()
-
-            except OSError:
-                sound_error()
-
-    def _copy(self) -> None:
-        pwd = self.entry_res.get()
-        if not pwd:
-            sound_error()
-            return
-        
-        self.clipboard_clear()
-        self.clipboard_append(pwd)
-        self._last_copied_pwd = pwd
-        
-        L = LANGUAGES[self.current_lang]
-        self.btn_copy.configure(text=L["copied"])
-        sound_copy()
-        
-        # Управление задачами (Jobs)
-        if self._clipboard_job: self.after_cancel(self._clipboard_job)
-        self._clipboard_job = self.after(2000, self._reset_copy_btn)
-        
-        if self._clear_job: self.after_cancel(self._clear_job)
-        self._clear_job = self.after(60000, self._clear_clipboard_secure)
-
-    def _reset_copy_btn(self) -> None:
-        self.btn_copy.configure(text=LANGUAGES[self.current_lang]["btn_copy"])
-
-    def _clear_clipboard_secure(self) -> None:
-        try:
-            if self.clipboard_get() == self._last_copied_pwd:
-                self.clipboard_clear()
-                self.clipboard_append(" ") 
-                self.update() # Flush для Windows
-                self.clipboard_clear()
-        except Exception:
-            pass
-
-    def _refresh_strength(self) -> None:
-        pwd = self.entry_res.get()
-        L = LANGUAGES[self.current_lang]
-        if not pwd:
-            self.strength_bar.set(0)
-            self.lbl_time_to_crack.configure(text="")
-            self.lbl_strength.configure(text="")
-            return
-
-        # Учитываем исключенные символы в размере алфавита
-        exclude = set(AMBIGUOUS_CHARS) if self.exclude_ambig_var.get() else set()
-        unambig_active = self.exclude_unambig_var.get()
-
-        def _get_size(src: str, is_symb: bool = False) -> int:
-            current_exclude = exclude.copy()
-            if is_symb and unambig_active:
-                current_exclude.update(UNAMBIG_CHARS)
-            return len([c for c in src if c not in current_exclude])
-
-        charset_size = 0
-        if any(c in string.ascii_uppercase for c in pwd): charset_size += _get_size(string.ascii_uppercase)
-        if any(c in string.ascii_lowercase for c in pwd): charset_size += _get_size(string.ascii_lowercase)
-        if any(c in string.digits for c in pwd): charset_size += _get_size(string.digits)
-        if any(c in string.punctuation for c in pwd): charset_size += _get_size(string.punctuation, True)
-
-        # Логарифм от 1.1 чтобы избежать 0 для любых символов
-        entropy = len(pwd) * math.log2(max(charset_size, 1.1))
-        
-        self.strength_bar.set(min(entropy / 128, 1.0))
-        self.strength_bar.configure(progress_color=_entropy_to_color(entropy))
-        
-        time_key = _entropy_to_time_key(entropy)
-        self.lbl_time_to_crack.configure(text=f"{L['strength']}: {L[time_key]}")
-        self.lbl_strength.configure(text=f"{int(entropy)} {L['bits']}")
-
-    def _show_qr(self) -> None:
-        pwd = self.entry_res.get()
-        if not pwd:
-            sound_error()
-            return
-        
-        L = LANGUAGES[self.current_lang]
-        if self.qr_window is None or not self.qr_window.winfo_exists():
-            self.qr_window = ctk.CTkToplevel(self)
-            self.qr_window.title(L["qr_title"])
-            self.qr_window.geometry("300x350")
-            self.qr_window.resizable(False, False)
-            self.qr_window.attributes("-topmost", True)
-            self.qr_window.transient(self)
-            self.qr_label = ctk.CTkLabel(self.qr_window, text="")
-            self.qr_label.pack(expand=True)
-            self._center_window(self.qr_window)
-        else:
-            self.qr_window.lift()
-            self.qr_window.focus()
-
-        qr_img = qrcode.make(pwd).resize((250, 250), RESAMPLE)
-        self._qr_ctk_image = ctk.CTkImage(light_image=qr_img, dark_image=qr_img, size=(250, 250))
-        self.qr_label.configure(image=self._qr_ctk_image)
-        sound_action()
-
-    def _show_history(self) -> None:
-        L = LANGUAGES[self.current_lang]
-        if self.history_window is None or not self.history_window.winfo_exists():
-            self.history_window = ctk.CTkToplevel(self)
-            self.history_window.title(L["hist_title"])
-            self.history_window.geometry("350x450")
-            self.history_window.attributes("-topmost", True)
-            self.history_window.transient(self)
-            self.hist_txt = ctk.CTkTextbox(self.history_window, font=("Consolas", 12))
-            self.hist_txt.pack(fill="both", expand=True, padx=10, pady=10)
-            self._center_window(self.history_window)
-        else:
-            self.history_window.lift()
-            self.history_window.focus()
-        
-        if self.hist_txt:
-            self.hist_txt.delete("0.0", "end")
-            self.hist_txt.insert("0.0", "\n".join(self.history))
-            sound_action()
-
-    def _update_app(self) -> None:
-        webbrowser.open(UPD_URL)
-
-    def _on_slider_move(self, value: float) -> None:
-        L = LANGUAGES[self.current_lang]
-        self.lbl_len.configure(text=f"{L['len']}: {int(value)}")
-        self._refresh_strength()
-
-    def _change_radius(self, val: float) -> None:
-        L = LANGUAGES[self.current_lang]
-        for w in self._radius_widgets:
-            try:
-                w.configure(corner_radius=int(val))
-            except (tk.TclError, AttributeError):
-                pass
-        self.lbl_radius.configure(text=f"{L['radius']}: {int(val)}")
-
-    def _toggle_visibility(self) -> None:
-        self.entry_res.configure(show="*" if self.hide_var.get() else "")
-
-    def _on_lang_change(self, lang: str) -> None:
-        self._apply_lang(lang)
-
-    def _apply_lang(self, lang: str) -> None:
+    def _apply_lang(self, lang):
         self.current_lang = lang
         L = LANGUAGES[lang]
         
-        self.title(L["win_title"])
-        self.lbl_title.configure(text=L["title"])
         self.lbl_author.configure(text=L["author"])
-        self.lbl_len.configure(text=f"{L['len']}: {int(self.slider.get())}")
+        self.lbl_menu.configure(text=L["menu_title"])
+        self.lbl_title.configure(text=L["proton_title"])
+        self._update_len_label(self.slider_len.get())
+        
         self.cb_upper.configure(text=L["upper"])
         self.cb_lower.configure(text=L["lower"])
         self.cb_digits.configure(text=L["digits"])
@@ -677,49 +429,186 @@ class SecurePassPro(ctk.CTk):
         self.cb_at_least.configure(text=L["at_least"])
         self.cb_hide.configure(text=L["hide"])
         
-        # Использование безопасных атрибутов кнопок
-        for btn in [self.btn_gen, self.btn_copy, self.btn_save, self.btn_open, self.btn_qr, self.btn_hist, self.btn_upd]:
+        menu_btns = [self.btn_gen, self.btn_copy, self.btn_save, self.btn_open, self.btn_qr, self.btn_hist, self.btn_upd, self.btn_about]
+        for btn in menu_btns:
             btn.configure(text=L[btn.lang_key])
-            if btn.lang_key in self.tooltips:
-                self.tooltips[btn.lang_key].text = L[btn.tt_key]
-
-        self.lbl_radius.configure(text=f"{L['radius']}: {int(self.slider_radius.get())}")
+            if btn.lang_key in self._tooltips:
+                self._tooltips[btn.lang_key].set_text(L[btn.tt_key])
         
-        # Обновление сегментированной кнопки тем
-        themes = [L["sys"], L["dark"], L["light"]]
-        self.theme_sw.configure(values=themes)
-        
-        rev_mapping = {"System": L["sys"], "Dark": L["dark"], "Light": L["light"]}
-        self.theme_sw.set(rev_mapping.get(self.current_theme, L["sys"]))
-        
-        # Обновление заголовок открытых окон
-        if self.history_window and self.history_window.winfo_exists():
-            self.history_window.title(L["hist_title"])
-        if self.qr_window and self.qr_window.winfo_exists():
-            self.qr_window.title(L["qr_title"])
+        self.btn_theme.configure(values=[L["theme_sys"], L["theme_dark"], L["theme_light"]])
+        self.btn_theme.set(L["btn_theme"])
+        self._change_radius(self.slider_radius.get())
+        self.title(L["win_title"])
 
-        self._refresh_strength()
-
-    def _on_theme_change(self, theme_localized: str) -> None:
+    def _generate(self):
         L = LANGUAGES[self.current_lang]
-        mapping = {L["sys"]: "System", L["dark"]: "Dark", L["light"]: "Light"}
-        mode = mapping.get(theme_localized, "System")
-        self.current_theme = mode # Сохраняем состояние
-        ctk.set_appearance_mode(mode)
+        exclude = set(AMBIGUOUS_CHARS if self.ambig_var.get() else "")
+        if self.unambig_var.get():
+            exclude.update(set(UNAMBIG_CHARS))
+        
+        def get_chars(src, var):
+            if not var.get(): return ""
+            return "".join(c for c in src if c not in exclude)
 
-    def _on_close(self) -> None:
-        try:
-            # Минимизируем хранение данных в памяти
-            self.entry_res.delete(0, "end")
-            self.history.clear()
+        p_upper = get_chars(string.ascii_uppercase, self.upper_var)
+        p_lower = get_chars(string.ascii_lowercase, self.lower_var)
+        p_digits = get_chars(string.digits, self.digits_var)
+        p_symb = get_chars(string.punctuation, self.symb_var)
+        
+        full_pool = p_upper + p_lower + p_digits + p_symb
+        if not full_pool:
+            self._play_sound("error")
+            messagebox.showwarning("Error", L["err_cat"])
+            return
 
-            # Очистка буфера обмена
-            self.clipboard_clear()
+        self._play_sound("success")
+        length = int(self.slider_len.get())
+        result = []
+        
+        if self.at_least_var.get():
+            for p in [p_upper, p_lower, p_digits, p_symb]:
+                if p: result.append(secrets.choice(p))
+        
+        while len(result) < length:
+            result.append(secrets.choice(full_pool))
+            
+        secrets.SystemRandom().shuffle(result)
+        pwd = "".join(result[:length])
+        
+        self.entry_res.delete(0, "end")
+        self.entry_res.insert(0, pwd)
+        
+        pool_size = len(full_pool)
+        combinations = f"{pool_size**length:.1e}"
+        self.lbl_strength.configure(text=L["strength"].format(combinations))
+        
+        if length <= 6: crack_phrase, color, progress, stars = L["time_sec"], "#FF4C4C", 0.25, "★☆☆☆☆"
+        elif length <= 10: crack_phrase, color, progress, stars = L["time_day"], "#FFA500", 0.5, "★★★☆☆"
+        elif length <= 14: crack_phrase, color, progress, stars = L["time_year"], "#FFFF00", 0.75, "★★★★☆"
+        else: crack_phrase, color, progress, stars = L["time_cent"], "#2ECC71", 1.0, "★★★★★"
 
-        except (tk.TclError, RuntimeError):
-            pass
+        self.strength_bar.configure(progress_color=color)
+        self.strength_bar.set(progress)
+        self.lbl_stars_top.configure(text=stars, text_color=color)
+        
+        st_text = L["st_low"] if progress <= 0.25 else (L["st_mid"] if progress <= 0.75 else L["st_high"])
+        self.lbl_strength_text.configure(text=st_text, text_color=color)
+        self.lbl_crack.configure(text=L["crack_time"].format(crack_phrase), text_color=color)
 
-        self.destroy()
+        now = datetime.datetime.now().strftime("%H:%M:%S")
+        self.history.append(f"[{now}] {pwd}")
+        if len(self.history) > HISTORY_MAX: self.history.pop(0)
+
+    def _copy(self):
+        pwd = self.entry_res.get()
+        if not pwd: return
+        L = LANGUAGES[self.current_lang]
+        self._play_sound("copy")
+        self.clipboard_clear()
+        self.clipboard_append(pwd)
+        
+        if self._clipboard_timer: self.after_cancel(self._clipboard_timer)
+        self._clipboard_timer = self.after(60000, lambda: [self.clipboard_clear(), self.clipboard_append(" ")])
+        
+        old_text = L["btn_copy"]
+        self.btn_copy.configure(text=L["copied"])
+        self.after(2000, lambda: self.btn_copy.configure(text=old_text))
+
+    def _save(self):
+        L = LANGUAGES[self.current_lang]
+        pwd = self.entry_res.get()
+        if not pwd: return
+        path = filedialog.asksaveasfilename(
+            defaultextension=".txt",
+            filetypes=[("Password File", "*.key"), ("Log File", "*.log"), ("Text File", "*.txt"), ("All Files", "*.*")]
+        )
+        if path:
+            try:
+                with open(path, "w", encoding="utf-8") as f: f.write(pwd)
+                self._play_sound("success")
+            except Exception as e:
+                messagebox.showerror("Error", L["err_save"].format(e))
+
+    def _open(self):
+        L = LANGUAGES[self.current_lang]
+        path = filedialog.askopenfilename(
+            filetypes=[("Password File", "*.key"), ("Log File", "*.log"), ("Text File", "*.txt"), ("All Files", "*.*")]
+        )
+        if path:
+            try:
+                with open(path, "r", encoding="utf-8") as f:
+                    content = f.read().strip()
+                    self.entry_res.delete(0, "end")
+                    self.entry_res.insert(0, content)
+                self._play_sound("success")
+            except Exception as e:
+                messagebox.showerror("Error", L["err_open"].format(e))
+
+    def _show_qr(self):
+        pwd = self.entry_res.get()
+        if not pwd: return
+        L = LANGUAGES[self.current_lang]
+        rad = int(self.slider_radius.get())
+        qr_win = ctk.CTkToplevel(self)
+        qr_win.title(L["btn_qr"])
+        self._center_window(qr_win, 380, 480)
+        img = qrcode.make(pwd).resize((280, 280))
+        ctk_img = ctk.CTkImage(light_image=img, dark_image=img, size=(280, 280))
+        f = ctk.CTkFrame(qr_win, fg_color="transparent")
+        f.pack(expand=True, fill="both", padx=20, pady=20)
+        ctk.CTkLabel(f, text=L["btn_qr"], font=("Segoe UI", 18, "bold")).pack()
+        disp = ctk.CTkFrame(f, fg_color="white", corner_radius=rad, border_width=2, border_color="gray")
+        disp.pack(pady=10)
+        ctk.CTkLabel(disp, image=ctk_img, text="").pack(padx=10, pady=10)
+        ctk.CTkButton(f, text="OK", command=qr_win.destroy, corner_radius=rad).pack(pady=10)
+
+    def _show_history(self):
+        L = LANGUAGES[self.current_lang]
+        rad = int(self.slider_radius.get())
+        h_win = ctk.CTkToplevel(self)
+        h_win.title(L["btn_hist"])
+        self._center_window(h_win, 500, 550)
+        f = ctk.CTkFrame(h_win, fg_color="transparent")
+        f.pack(expand=True, fill="both", padx=20, pady=20)
+        ctk.CTkLabel(f, text=L["btn_hist"], font=("Segoe UI", 20, "bold")).pack(pady=10)
+        txt = ctk.CTkTextbox(f, font=("Consolas", 14), corner_radius=rad)
+        txt.pack(fill="both", expand=True)
+        txt.insert("0.0", "\n".join(self.history) if self.history else L["hist_empty"])
+        txt.configure(state="disabled")
+        ctk.CTkButton(f, text="OK", command=h_win.destroy, corner_radius=rad).pack(pady=15)
+
+    def _show_about(self):
+        L = LANGUAGES[self.current_lang]
+        rad = int(self.slider_radius.get())
+        about_win = ctk.CTkToplevel(self)
+        about_win.title(L["btn_about"])
+        self._center_window(about_win, 450, 320)
+        a_frame = ctk.CTkFrame(about_win, corner_radius=rad)
+        a_frame.pack(expand=True, fill="both", padx=20, pady=20)
+        ctk.CTkLabel(a_frame, text="Secure Pass Pro v3.9", font=("Segoe UI", 22, "bold")).pack(pady=10)
+        ctk.CTkLabel(a_frame, text=L["about_text"], justify="center").pack(pady=10)
+        ctk.CTkLabel(a_frame, text="2026 © Maxim Melnikov", font=("Segoe UI", 11), text_color="gray").pack(side="bottom", pady=10)
+        ctk.CTkButton(a_frame, text="OK", command=about_win.destroy, corner_radius=rad).pack()
+
+    def _change_theme(self, choice):
+        L = LANGUAGES[self.current_lang]
+        if choice == L["theme_sys"]: ctk.set_appearance_mode("System")
+        elif choice == L["theme_dark"]: ctk.set_appearance_mode("Dark")
+        elif choice == L["theme_light"]: ctk.set_appearance_mode("Light")
+
+    def _change_radius(self, val):
+        L = LANGUAGES[self.current_lang]
+        for w in self._radius_widgets:
+            try: w.configure(corner_radius=int(val))
+            except: pass
+        self.lbl_radius.configure(text=f"{L['radius']}: {int(val)}")
+
+    def _update_len_label(self, val):
+        L = LANGUAGES[self.current_lang]
+        self.lbl_len.configure(text=f"{L['len']}: {int(val)}")
+
+    def _toggle_hide(self):
+        self.entry_res.configure(show="*" if self.hide_var.get() else "")
 
 if __name__ == "__main__":
     app = SecurePassPro()
