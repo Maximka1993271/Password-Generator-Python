@@ -13,6 +13,7 @@ import platform
 import secrets
 import string
 import sys
+import os
 import threading
 import webbrowser
 import datetime
@@ -37,7 +38,7 @@ if sys.version_info < (3, 9):
 
 try:
     import qrcode
-    from PIL import Image
+    from PIL import Image, ImageTk
 except ImportError:
     _err_root = tk.Tk()
     _err_root.withdraw()
@@ -56,11 +57,6 @@ UPD_URL = "https://github.com/Maximka1993271/Password-Generator-Python/releases"
 # TOOLTIP CLASS
 # =============================================================================
 class ToolTip:
-    """
-    EN: Dynamic tooltip for UI elements
-    RU: Динамические всплывающие подсказки
-    UA: Динамічні спливаючі підказки
-    """
     def __init__(self, widget):
         self.widget = widget
         self.text = ""
@@ -118,6 +114,7 @@ LANGUAGES: Dict[str, Dict[str, str]] = {
         "btn_about": "О программе",
         "btn_theme": "Цвет программы",
         "radius": "Закругление углов",
+        "sound_on": "Звук: ВКЛ", "sound_off": "Звук: ВЫКЛ",
         "theme_sys": "Системная", "theme_dark": "Тёмная", "theme_light": "Светлая",
         "about_text": "Secure Pass Pro v3.9\n\nПрофессиональный инструмент для генерации паролей.\nИспользует криптографически стойкие алгоритмы.",
         "copied": "Скопировано! (60с)",
@@ -165,6 +162,7 @@ LANGUAGES: Dict[str, Dict[str, str]] = {
         "btn_about": "About",
         "btn_theme": "App color",
         "radius": "Corner radius",
+        "sound_on": "Sound: ON", "sound_off": "Sound: OFF",
         "theme_sys": "System", "theme_dark": "Dark", "theme_light": "Light",
         "about_text": "Secure Pass Pro v3.9\n\nProfessional password generation tool.\nUses cryptographically secure algorithms.",
         "copied": "Copied! (60s)",
@@ -212,6 +210,7 @@ LANGUAGES: Dict[str, Dict[str, str]] = {
         "btn_about": "Про програму",
         "btn_theme": "Колір програми",
         "radius": "Закруглення кутів",
+        "sound_on": "Звук: ВКЛ", "sound_off": "Звук: ВИКЛ",
         "theme_sys": "Системна", "theme_dark": "Темна", "theme_light": "Світла",
         "about_text": "Secure Pass Pro v3.9\n\nПрофесійний інструмент для генерації паролів.\nВикористовує криптографічно стійкі алгоритми.",
         "copied": "Скопійовано! (60с)",
@@ -248,11 +247,17 @@ class SecurePassPro(ctk.CTk):
         self._radius_widgets = []
         self._clipboard_timer = None
         self._tooltips = {}
+        self.sound_enabled = tk.BooleanVar(value=True)
         
         # Window settings
         self.title("Secure Pass Pro v3.9")
-        self.geometry("850x760")
-        self.minsize(800, 750)
+        self.geometry("850x780")
+        
+        # RU: Запрет масштабирования окна | EN: Disable window resizing
+        self.resizable(False, False)
+
+        # RU: Инициализация иконки | EN: Icon init
+        self._setup_icon()
         
         # Variables
         self.upper_var = tk.BooleanVar(value=True)
@@ -268,8 +273,32 @@ class SecurePassPro(ctk.CTk):
         self._apply_lang("RU")
         self._center_main_window()
 
+    def _setup_icon(self):
+        """ RU: Установка иконки приложения | EN: Setup app icon """
+        # RU: Поддержка .ico для скомпилированного .exe | EN: .ico support for compiled .exe
+        if hasattr(sys, '_MEIPASS'):
+            icon_path = os.path.join(sys._MEIPASS, "app_icon.ico")
+        else:
+            icon_path = "app_icon.ico"
+
+        if os.path.exists(icon_path):
+            try:
+                if _IS_WINDOWS:
+                    self.iconbitmap(icon_path)
+                else:
+                    self.icon_img = tk.PhotoImage(file=icon_path)
+                    self.iconphoto(True, self.icon_img)
+            except Exception:
+                pass
+        elif os.path.exists("icon.png"):
+            try:
+                self.icon_img = tk.PhotoImage(file="icon.png")
+                self.iconphoto(True, self.icon_img)
+            except Exception:
+                pass
+
     def _play_sound(self, sound_type: str = "click"):
-        if not _IS_WINDOWS: return
+        if not _IS_WINDOWS or not self.sound_enabled.get(): return
         try:
             sounds = {
                 "click": winsound.MB_ICONASTERISK,
@@ -283,7 +312,7 @@ class SecurePassPro(ctk.CTk):
     def _center_main_window(self):
         self.update_idletasks()
         x = (self.winfo_screenwidth() // 2) - (850 // 2)
-        y = (self.winfo_screenheight() // 2) - (760 // 2)
+        y = (self.winfo_screenheight() // 2) - (780 // 2)
         self.geometry(f"+{x}+{y}")
 
     def _center_window(self, window, width, height):
@@ -375,7 +404,6 @@ class SecurePassPro(ctk.CTk):
         self.btn_about = self._create_menu_btn(self.right_panel, "btn_about", "tt_about", self._show_about, "#4b4b4b")
 
         # --- BOTTOM PANEL ---
-        # RU: Динамический цвет фона для нижней панели | UA: Динамічний колір фону для нижньої панелі
         self.bottom_frame = ctk.CTkFrame(self, fg_color=("#e0e0e0", "#1e1e1e"), corner_radius=15)
         self.bottom_frame.grid(row=1, column=0, columnspan=2, sticky="ew", padx=20, pady=(0, 15))
         
@@ -392,7 +420,11 @@ class SecurePassPro(ctk.CTk):
         self.lang_sw.set("RU")
         self.lang_sw.pack(side="left")
 
-        self.btn_theme = ctk.CTkOptionMenu(self.ctrl_line, values=[], command=self._change_theme, width=250)
+        # RU: Кнопка переключения звука | EN: Sound toggle button
+        self.btn_sound = ctk.CTkButton(self.ctrl_line, text="", width=120, command=self._toggle_sound, fg_color="#4b4b4b")
+        self.btn_sound.pack(side="left", padx=10)
+
+        self.btn_theme = ctk.CTkOptionMenu(self.ctrl_line, values=[], command=self._change_theme, width=200)
         self.btn_theme.pack(side="right")
 
         self.lbl_app_rating = ctk.CTkLabel(self.bottom_frame, text="★★★★★", font=("Segoe UI", 24), text_color="#FFD700", height=25)
@@ -414,12 +446,11 @@ class SecurePassPro(ctk.CTk):
     def _apply_lang(self, lang):
         self.current_lang = lang
         L = LANGUAGES[lang]
-        
         self.lbl_author.configure(text=L["author"])
         self.lbl_menu.configure(text=L["menu_title"])
         self.lbl_title.configure(text=L["proton_title"])
         self._update_len_label(self.slider_len.get())
-        
+        self._update_sound_btn_text()
         self.cb_upper.configure(text=L["upper"])
         self.cb_lower.configure(text=L["lower"])
         self.cb_digits.configure(text=L["digits"])
@@ -428,73 +459,66 @@ class SecurePassPro(ctk.CTk):
         self.cb_unambig.configure(text=L["unambig"])
         self.cb_at_least.configure(text=L["at_least"])
         self.cb_hide.configure(text=L["hide"])
-        
         menu_btns = [self.btn_gen, self.btn_copy, self.btn_save, self.btn_open, self.btn_qr, self.btn_hist, self.btn_upd, self.btn_about]
         for btn in menu_btns:
             btn.configure(text=L[btn.lang_key])
             if btn.lang_key in self._tooltips:
                 self._tooltips[btn.lang_key].set_text(L[btn.tt_key])
-        
         self.btn_theme.configure(values=[L["theme_sys"], L["theme_dark"], L["theme_light"]])
         self.btn_theme.set(L["btn_theme"])
         self._change_radius(self.slider_radius.get())
         self.title(L["win_title"])
 
+    def _toggle_sound(self):
+        self.sound_enabled.set(not self.sound_enabled.get())
+        self._update_sound_btn_text()
+        self._play_sound("click")
+
+    def _update_sound_btn_text(self):
+        L = LANGUAGES[self.current_lang]
+        txt = L["sound_on"] if self.sound_enabled.get() else L["sound_off"]
+        self.btn_sound.configure(text=txt)
+
     def _generate(self):
         L = LANGUAGES[self.current_lang]
         exclude = set(AMBIGUOUS_CHARS if self.ambig_var.get() else "")
-        if self.unambig_var.get():
-            exclude.update(set(UNAMBIG_CHARS))
-        
+        if self.unambig_var.get(): exclude.update(set(UNAMBIG_CHARS))
         def get_chars(src, var):
             if not var.get(): return ""
             return "".join(c for c in src if c not in exclude)
-
         p_upper = get_chars(string.ascii_uppercase, self.upper_var)
         p_lower = get_chars(string.ascii_lowercase, self.lower_var)
         p_digits = get_chars(string.digits, self.digits_var)
         p_symb = get_chars(string.punctuation, self.symb_var)
-        
         full_pool = p_upper + p_lower + p_digits + p_symb
         if not full_pool:
             self._play_sound("error")
             messagebox.showwarning("Error", L["err_cat"])
             return
-
         self._play_sound("success")
         length = int(self.slider_len.get())
         result = []
-        
         if self.at_least_var.get():
             for p in [p_upper, p_lower, p_digits, p_symb]:
                 if p: result.append(secrets.choice(p))
-        
-        while len(result) < length:
-            result.append(secrets.choice(full_pool))
-            
+        while len(result) < length: result.append(secrets.choice(full_pool))
         secrets.SystemRandom().shuffle(result)
         pwd = "".join(result[:length])
-        
         self.entry_res.delete(0, "end")
         self.entry_res.insert(0, pwd)
-        
         pool_size = len(full_pool)
         combinations = f"{pool_size**length:.1e}"
         self.lbl_strength.configure(text=L["strength"].format(combinations))
-        
         if length <= 6: crack_phrase, color, progress, stars = L["time_sec"], "#FF4C4C", 0.25, "★☆☆☆☆"
         elif length <= 10: crack_phrase, color, progress, stars = L["time_day"], "#FFA500", 0.5, "★★★☆☆"
         elif length <= 14: crack_phrase, color, progress, stars = L["time_year"], "#FFFF00", 0.75, "★★★★☆"
         else: crack_phrase, color, progress, stars = L["time_cent"], "#2ECC71", 1.0, "★★★★★"
-
         self.strength_bar.configure(progress_color=color)
         self.strength_bar.set(progress)
         self.lbl_stars_top.configure(text=stars, text_color=color)
-        
         st_text = L["st_low"] if progress <= 0.25 else (L["st_mid"] if progress <= 0.75 else L["st_high"])
         self.lbl_strength_text.configure(text=st_text, text_color=color)
         self.lbl_crack.configure(text=L["crack_time"].format(crack_phrase), text_color=color)
-
         now = datetime.datetime.now().strftime("%H:%M:%S")
         self.history.append(f"[{now}] {pwd}")
         if len(self.history) > HISTORY_MAX: self.history.pop(0)
@@ -506,10 +530,8 @@ class SecurePassPro(ctk.CTk):
         self._play_sound("copy")
         self.clipboard_clear()
         self.clipboard_append(pwd)
-        
         if self._clipboard_timer: self.after_cancel(self._clipboard_timer)
         self._clipboard_timer = self.after(60000, lambda: [self.clipboard_clear(), self.clipboard_append(" ")])
-        
         old_text = L["btn_copy"]
         self.btn_copy.configure(text=L["copied"])
         self.after(2000, lambda: self.btn_copy.configure(text=old_text))
@@ -526,8 +548,7 @@ class SecurePassPro(ctk.CTk):
             try:
                 with open(path, "w", encoding="utf-8") as f: f.write(pwd)
                 self._play_sound("success")
-            except Exception as e:
-                messagebox.showerror("Error", L["err_save"].format(e))
+            except Exception as e: messagebox.showerror("Error", L["err_save"].format(e))
 
     def _open(self):
         L = LANGUAGES[self.current_lang]
@@ -541,8 +562,7 @@ class SecurePassPro(ctk.CTk):
                     self.entry_res.delete(0, "end")
                     self.entry_res.insert(0, content)
                 self._play_sound("success")
-            except Exception as e:
-                messagebox.showerror("Error", L["err_open"].format(e))
+            except Exception as e: messagebox.showerror("Error", L["err_open"].format(e))
 
     def _show_qr(self):
         pwd = self.entry_res.get()
