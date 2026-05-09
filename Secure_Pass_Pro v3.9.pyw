@@ -417,21 +417,26 @@ class SecurePassPro(ctk.CTk):
         self.cb_frame.pack(pady=5)
         
         self.cb_upper = ctk.CTkCheckBox(self.cb_frame, text="", variable=self.upper_var)
-        self.cb_upper.grid(row=0, column=0, padx=20, pady=2, sticky="w")
+        self.cb_upper.grid(row=0, column=1, padx=(70, 20), pady=2, sticky="w")
+
         self.cb_lower = ctk.CTkCheckBox(self.cb_frame, text="", variable=self.lower_var)
-        self.cb_lower.grid(row=0, column=1, padx=20, pady=2, sticky="w")
+        self.cb_lower.grid(row=0, column=0, padx=(20, 70), pady=2, sticky="w")
+
         self.cb_digits = ctk.CTkCheckBox(self.cb_frame, text="", variable=self.digits_var)
-        self.cb_digits.grid(row=1, column=0, padx=20, pady=2, sticky="w")
+        self.cb_digits.grid(row=1, column=1, padx=(70, 20), pady=2, sticky="w")
+
         self.cb_symb = ctk.CTkCheckBox(self.cb_frame, text="", variable=self.symb_var)
-        self.cb_symb.grid(row=1, column=1, padx=20, pady=2, sticky="w")
-        
+        self.cb_symb.grid(row=1, column=0, padx=(20, 70), pady=2, sticky="w")
+
         self.cb_ambig = ctk.CTkCheckBox(self.cb_frame, text="", variable=self.ambig_var)
-        self.cb_ambig.grid(row=2, column=0, columnspan=2, padx=20, pady=2, sticky="w")
+        self.cb_ambig.grid(row=2, column=0, columnspan=2, padx=20, pady=(8, 2), sticky="w")
+
         self.cb_unambig = ctk.CTkCheckBox(self.cb_frame, text="", variable=self.unambig_var)
         self.cb_unambig.grid(row=3, column=0, columnspan=2, padx=20, pady=2, sticky="w")
-        
+
         self.cb_at_least = ctk.CTkCheckBox(self.cb_frame, text="", variable=self.at_least_var)
-        self.cb_at_least.grid(row=4, column=0, columnspan=2, padx=20, pady=2, sticky="w")
+        self.cb_at_least.grid(row=4, column=0, columnspan=2, padx=20, pady=(8, 2), sticky="w")
+
         self.cb_hide = ctk.CTkCheckBox(self.cb_frame, text="", variable=self.hide_var, command=self._toggle_hide)
         self.cb_hide.grid(row=5, column=0, columnspan=2, padx=20, pady=2, sticky="w")
 
