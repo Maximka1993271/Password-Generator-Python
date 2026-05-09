@@ -11,11 +11,9 @@ It combines cryptographically secure password generation, multilingual interface
 
 ## ✨ Main Features v3.9
 
-- **Cryptographically secure generation**  
-  Uses Python `secrets` module and system CSPRNG for unpredictable password generation.
+- **Cryptographically secure generation** Uses Python `secrets` module and system CSPRNG for unpredictable password generation.
 
-- **Multilingual interface**  
-  Instant switching between **RU**, **EN**, and **UA** interface languages.
+- **Multilingual interface** Instant switching between **RU**, **EN**, and **UA** interface languages.
 
 - **Password strength audit**
   - Entropy-based strength evaluation.
@@ -29,36 +27,30 @@ It combines cryptographically secure password generation, multilingual interface
   - Protection against too-small character pools.
 
 - **Modern dark GUI**
-  - AMOLED-style dark interface.
+  - AMOLED-style dark interface with **new Neon-Glow action buttons**.
   - High-DPI friendly layout.
   - Adjustable corner radius for UI elements in real time.
 
 - **Export and sharing**
-  - Save passwords as `.txt`, `.log`, `.key`, or `.pdf`.
-  - Unicode PDF export support.
+  - Save and **Open** passwords as `.txt`, `.log`, `.key`, or **`.pdf`**.
+  - Unicode PDF export support with built-in viewer compatibility.
   - QR-code generation for quick transfer to mobile devices.
 
 ---
 
 ## 🚀 What’s New in v3.9
 
-1. **Redesigned interface**  
-   Balanced layout with a dedicated side menu and color-coded action buttons.
+1. **Neon UI Revolution** Redesigned interface featuring a dedicated side menu with vibrant neon-style color-coded buttons.
 
-2. **Improved security logic**  
-   Added entropy-based strength calculation, SHA-256 read-back verification for text exports, and safer clipboard cleanup.
+2. **Advanced PDF Support** Added the ability to not only export but also **Open and View PDF reports** directly within the application.
 
-3. **Triple localization**  
-   Full interface support for Russian, English, and Ukrainian.
+3. **Professional Sound Engine** Replaced standard Windows "Beeps" with a high-quality **Mechanical Mouse Click** sound for tactile audio feedback.
 
-4. **Smart character filtering**  
-   Exclude similar characters like `i`, `l`, `1`, `o`, `0`, and unclear punctuation symbols.
+4. **Improved security logic** Added entropy-based strength calculation, SHA-256 read-back verification for text exports, and safer clipboard cleanup.
 
-5. **Sound feedback**  
-   Optional Windows sound notifications powered by the native `winsound` API.
+5. **Triple localization** Full interface support for Russian, English, and Ukrainian.
 
-6. **Extended export support**  
-   Stable saving to `.txt`, `.log`, `.key`, and `.pdf` formats.
+6. **Smart character filtering** Exclude similar characters like `i`, `l`, `1`, `o`, `0`, and unclear punctuation symbols.
 
 **[📥 Download Secure Pass Pro v3.9 (.exe)](https://github.com/Maximka1993271/Password-Generator-Python/releases/download/SecurePassProv3.9/SecurePassPro.exe)**
 
@@ -81,14 +73,15 @@ Classic branch for users who prefer a minimal Tkinter-based interface.
 
 ### Technology Stack
 
-- **Language**: Python 3.9+
+- **Language**: Python 3.9+ (Tested on 3.14)
 - **GUI**: `customtkinter`
+- **Audio**: `Windows Multimedia API (winmm)`
 - **Libraries**: `Pillow`, `qrcode`, `fpdf`
 - **Security**: `secrets`, `hashlib`, `random.SystemRandom`
 
 ### Build Command
 
-To build a standalone Windows executable:
+To build a standalone Windows executable with all assets:
 
 ```bash
-pyinstaller --noconsole --onefile --clean --icon="app_icon.ico" --add-data "app_icon.ico;." --collect-all qrcode --collect-all customtkinter --hidden-import="PIL._tkinter_finder" --hidden-import="winsound" --name "SecurePassPro" Secure_Pass_Pro.pyw
+pyinstaller --noconfirm --onefile --windowed --clean --icon="icon.ico" --add-data "icon.ico;." --add-data "Computer Mouse Click.mp3;." --collect-all qrcode --collect-all customtkinter --hidden-import="PIL._tkinter_finder" --name "SecurePassPro" Secure_Pass_Pro.pyw
