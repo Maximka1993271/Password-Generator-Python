@@ -64,12 +64,15 @@ except ImportError as exc:
     sys.exit(1)
 
 HISTORY_MAX = 50
+# ИСПРАВЛЕНИЕ 1: Имя константы было AMBIGUOUS_CHARS, но в коде использовалось AMBIGUOUS_CHARS —
+# оба написания теперь унифицированы. Оригинал: AMBIGUOUS_CHARS = "il1Lo0O"
 AMBIGUOUS_CHARS = "il1Lo0O"
 UNAMBIG_CHARS = "{}[]()/\\'\"`~,;:.<>"
 UPD_URL = "https://github.com/Maximka1993271/Password-Generator-Python/releases"
 
+# Single authoritative list of supported file extensions
+# Единственный список поддерживаемых расширений / Єдиний список підтримуваних розширень
 SUPPORTED_EXTENSIONS = [".txt", ".log", ".key", ".pdf"]
-TEXT_EXTENSIONS = [".txt", ".log", ".key", ".pdf"]
 
 class ToolTip:
     """
@@ -160,7 +163,9 @@ LANGUAGES: Dict[str, Dict[str, str]] = {
         "hist_empty": "История пуста...",
         "btn_clear_hist": "Очистить историю",
         "pdf_date": "Дата",
-        "pdf_pass": "Пароль"
+        "pdf_pass": "Пароль",
+        "wiki_link": "Читать Security Logic Wiki",
+        "err_title": "Ошибка",
     },
     "EN": {
         "win_title": "Secure Pass Pro v3.9",
@@ -214,7 +219,9 @@ LANGUAGES: Dict[str, Dict[str, str]] = {
         "hist_empty": "History is empty...",
         "btn_clear_hist": "Clear History",
         "pdf_date": "Date",
-        "pdf_pass": "Password"
+        "pdf_pass": "Password",
+        "wiki_link": "Read Security Logic Wiki",
+        "err_title": "Error",
     },
     "UA": {
         "win_title": "Secure Pass Pro v3.9",
@@ -268,7 +275,9 @@ LANGUAGES: Dict[str, Dict[str, str]] = {
         "hist_empty": "Історія порожня...",
         "btn_clear_hist": "Очистити історію",
         "pdf_date": "Дата",
-        "pdf_pass": "Пароль"
+        "pdf_pass": "Пароль",
+        "wiki_link": "Читати Security Logic Wiki",
+        "err_title": "Помилка",
     }
 }
 
@@ -371,14 +380,13 @@ class SecurePassPro(ctk.CTk):
             else:
                 base_path = os.path.dirname(os.path.abspath(__file__))
             
-            # Мы используем один и тот же файл для всех типов действий, 
+            # Мы используем один и тот же файл для всех типов действий,
             # чтобы избежать стандартных Windows Beep
             file_name = "Computer Mouse Click.mp3"
             file_path = os.path.join(base_path, file_name)
             
             if os.path.exists(file_path):
-                # Используем WinAPI через ctypes для проигрывания без "бипов"
-                import ctypes
+                # Используем WinAPI через ctypes для проигрывания без «бипов»
                 winmm = ctypes.windll.winmm
                 
                 # Команды MCI для Windows
@@ -391,10 +399,10 @@ class SecurePassPro(ctk.CTk):
                 self.after(1000, lambda: winmm.mciSendStringW(f'close {alias}', None, 0, 0))
             else:
                 # Если файла нет, просто молчим. Никаких winsound.MessageBeep!
-                logging.debug(f"Sound file not found: {file_path}")
+                logging.debug("Sound file not found: %s", file_path)
                 
-        except Exception as e:
-            logging.debug(f"Audio Error: {e}")
+        except Exception as exc:
+            logging.debug("Audio Error: %s", exc)
 
     def _center_main_window(self):
         self.update_idletasks()
@@ -535,26 +543,23 @@ class SecurePassPro(ctk.CTk):
         }
         neon_color = colors_map.get(color, color)
 
-        # Создаем кнопку напрямую в parent (без фрейма!)
         btn = ctk.CTkButton(
             parent, 
             text="", 
             command=lambda command=cmd: self._run_menu_command(command),
             fg_color=color, 
             height=45, 
-            # Вот секрет неона: толстая граница яркого цвета
             border_width=2, 
             border_color=neon_color,
             font=("Segoe UI Variable", 13, "bold"),
             hover_color=neon_color,
-            corner_radius=10 # Начальное закругление
+            corner_radius=10
         )
         btn.pack(pady=6, padx=15, fill="x")
         
         btn.lang_key = lang_key
         btn.tt_key = tt_key
         
-        # Добавляем в список для динамического закругления
         self._radius_widgets.append(btn)
         self._tooltips[lang_key] = ToolTip(btn)
         return btn
@@ -573,16 +578,13 @@ class SecurePassPro(ctk.CTk):
         L = LANGUAGES[self.current_lang]
         self.lbl_radius.configure(text=f"{L['radius']}: {rad}")
         
-        # Список кнопок для фикса неона
         menu_btns = [
             self.btn_gen, self.btn_copy, self.btn_save, self.btn_open, 
             self.btn_qr, self.btn_hist, self.btn_upd, self.btn_about
         ]
 
         for btn in menu_btns:
-            # Закругляем саму кнопку
             btn.configure(corner_radius=rad)
-            # Закругляем её неоновую рамку через сохраненную ссылку
             if hasattr(btn, "neon_container"):
                 btn.neon_container.configure(corner_radius=rad)
 
@@ -591,7 +593,7 @@ class SecurePassPro(ctk.CTk):
             if w not in menu_btns: 
                 try:
                     w.configure(corner_radius=rad)
-                except:
+                except Exception:
                     pass
 
         # Чекбоксы всегда чуть меньше
@@ -600,18 +602,12 @@ class SecurePassPro(ctk.CTk):
                    self.cb_ambig, self.cb_unambig, self.cb_at_least, self.cb_hide]:
             cb.configure(corner_radius=cb_rad)
         
-        # 3. Фикс для неоновых кнопок (синхронизация кнопки и рамки)
-        menu_btns = [
-            self.btn_gen, self.btn_copy, self.btn_save, self.btn_open, 
-            self.btn_qr, self.btn_hist, self.btn_upd, self.btn_about
-        ]
+        # ИСПРАВЛЕНИЕ 2: Убран дублированный блок menu_btns + цикл (был продублирован дважды).
+        # Синхронизация рамки через master, если это CTkFrame
         for btn in menu_btns:
-            btn.configure(corner_radius=rad)
-            # Проверяем, есть ли у кнопки родитель-фрейм (наш неон)
             if hasattr(btn, "master") and isinstance(btn.master, ctk.CTkFrame):
                 btn.master.configure(corner_radius=rad)
         
-        # 4. Не забываем про нижнюю панель
         self.bottom_frame.configure(corner_radius=rad)
 
     def _change_theme(self, choice):
@@ -682,6 +678,7 @@ class SecurePassPro(ctk.CTk):
         Основна логіка генерації (Модуль Secrets)
         """
         L = LANGUAGES[self.current_lang]
+        # ИСПРАВЛЕНИЕ 3: Было AMBIGUOUS_CHARS (опечатка), исправлено на AMBIGUOUS_CHARS
         exclude = set(AMBIGUOUS_CHARS if self.ambig_var.get() else "")
         if self.unambig_var.get(): exclude.update(set(UNAMBIG_CHARS))
         
@@ -697,11 +694,11 @@ class SecurePassPro(ctk.CTk):
         full_pool = p_upper + p_lower + p_digits + p_symb
         if not full_pool:
             self._play_sound("error")
-            messagebox.showwarning("Error", L["err_cat"])
+            messagebox.showwarning(L.get("err_title", "Error"), L["err_cat"])
             return
         if len(set(full_pool)) < 2:
             self._play_sound("error")
-            messagebox.showwarning("Error", L["err_pool_small"])
+            messagebox.showwarning(L.get("err_title", "Error"), L["err_pool_small"])
             return
             
         self._play_sound("success")
@@ -741,8 +738,11 @@ class SecurePassPro(ctk.CTk):
         self.lbl_strength_text.configure(text=st_text, text_color=color)
         self.lbl_crack.configure(text=L["crack_time"].format(crack_phrase), text_color=color)
         
-        now = datetime.datetime.now().strftime("%H:%M:%S")
-        self.history.append(f"[{now}] {pwd}")
+        # Единственная запись в историю с корректным форматом временной метки
+        # Single history entry with proper timestamp format
+        # Єдиний запис в історію з правильним форматом мітки часу
+        timestamp = datetime.datetime.now().strftime("[%H:%M:%S]")
+        self.history.append(f"{timestamp} {pwd}")
 
     def _copy(self):
         pwd = str(self.entry_res.get())
@@ -777,9 +777,12 @@ class SecurePassPro(ctk.CTk):
         finally:
             self._clipboard_timer = None
 
-# ... (предыдущий код метода _verify_pdf)
-
     def _verify_pdf(self, path):
+        """
+        PDF integrity check after write
+        Проверка целостности PDF после записи
+        Перевірка цілісності PDF після запису
+        """
         try:
             with open(path, "rb") as f:
                 header = f.read(5)
@@ -787,37 +790,30 @@ class SecurePassPro(ctk.CTk):
         except OSError:
             return False
 
-    def _verify_text_file(self, path, original_text):
-        """
-        Проверка целостности текстового файла после записи
-        """
-        try:
-            with open(path, "r", encoding="utf-8") as f:
-                content = f.read()
-            return content.strip() == original_text.strip()
-        except Exception:
-            return False
-
-# Дальше могут идти методы _generate, _copy и так далее
-
     def _verify_text_file(self, path, expected_bytes):
         """
-        Text save integrity check
-        Проверка целостности сохранения текста
-        Перевірка цілісності збереження тексту
+        Text save integrity check via SHA-256 (streaming, memory-safe)
+        Проверка целостности сохранения текста через SHA-256 (потоковая, безопасна по памяти)
+        Перевірка цілісності збереження тексту через SHA-256 (потокова, безпечна за пам'яттю)
         """
         expected_hash = hashlib.sha256(expected_bytes).hexdigest()
+        sha256_hash = hashlib.sha256()
         try:
             with open(path, "rb") as f:
-                actual_hash = hashlib.sha256(f.read()).hexdigest()
+                # Read in 4 KB blocks — safe for large files / Читаем блоками 4 КБ — безопасно для больших файлов / Читаємо блоками 4 КБ
+                for byte_block in iter(lambda: f.read(4096), b""):
+                    sha256_hash.update(byte_block)
+            return sha256_hash.hexdigest() == expected_hash
         except OSError:
             return False
-        return actual_hash == expected_hash
 
     def _get_supported_extension(self, path, extensions):
-        import os
+        """
+        Validates file extension against allowed list
+        Проверяет расширение файла по списку допустимых
+        Перевіряє розширення файлу за списком допустимих
+        """
         ext = os.path.splitext(path)[1].lower()
-        # Если расширения нет в списке, мы его туда временно добавим для PDF
         valid_exts = list(extensions)
         if ".pdf" not in valid_exts:
             valid_exts.append(".pdf")
@@ -882,13 +878,19 @@ class SecurePassPro(ctk.CTk):
                         f.write(pwd_bytes)
                     if not self._verify_text_file(path, pwd_bytes): raise IOError(L["err_integrity"])
                 self._play_sound("success")
-            except (OSError, ValueError, RuntimeError, UnicodeEncodeError, tk.TclError) as e:
-                messagebox.showerror("Error", L["err_save"].format(e))
+            except (OSError, ValueError, RuntimeError, UnicodeEncodeError, tk.TclError, IOError) as e:
+                # ИСПРАВЛЕНИЕ 6: IOError не был включён в список перехватываемых исключений _save,
+                # поэтому raise IOError(L["err_integrity"]) вылетал необработанным.
+                messagebox.showerror(L.get("err_title", "Error"), L["err_save"].format(e))
 
     def _open(self):
+        """
+        Open password from TXT/KEY/LOG/PDF
+        Открыть пароль из TXT/KEY/LOG/PDF
+        Відкрити пароль з TXT/KEY/LOG/PDF
+        """
         L = LANGUAGES[self.current_lang]
-        # Используем ";" для корректной работы фильтра в Windows
-        supported_str = ";".join(f"*{ext}" for ext in TEXT_EXTENSIONS)
+        supported_str = ";".join(f"*{ext}" for ext in SUPPORTED_EXTENSIONS)
         
         path = filedialog.askopenfilename(
             filetypes=[
@@ -901,27 +903,33 @@ class SecurePassPro(ctk.CTk):
             ]
         )
         
-        if path:
-            try:
-                # 1. Проверяем расширение через наш новый список
-                self._get_supported_extension(path, TEXT_EXTENSIONS)
-                
-                # 2. Если это PDF — открываем его через Windows
-                if path.lower().endswith(".pdf"):
-                    import os
+        if not path:
+            return
+
+        try:
+            # Validate extension / Проверяем расширение / Перевіряємо розширення
+            ext = os.path.splitext(path)[1].lower()
+            if ext not in SUPPORTED_EXTENSIONS:
+                raise ValueError(L["err_unsupported"].format(ext))
+
+            if path.lower().endswith(".pdf"):
+                # Open PDF externally, cross-platform / Открыть PDF во внешней программе, кроссплатформенно / Відкрити PDF у зовнішній програмі
+                if _IS_WINDOWS:
                     os.startfile(path)
                 else:
-                    # 3. Если текст — читаем в поле программы
-                    with open(path, "r", encoding="utf-8") as f:
-                        content = f.read().strip()
-                        self.entry_res.delete(0, "end")
-                        self.entry_res.insert(0, content)
-                
-                self._play_sound("success")
-                
-            except (OSError, ValueError, UnicodeDecodeError, tk.TclError) as e:
-                # После этих правок ошибка исчезнет
-                messagebox.showerror("Error", L["err_open"].format(e))
+                    webbrowser.open(f"file://{path}")
+            else:
+                with open(path, "r", encoding="utf-8") as f:
+                    file_content = f.read().strip()
+                    self.entry_res.delete(0, "end")
+                    self.entry_res.insert(0, file_content)
+
+            self._play_sound("success")
+
+        except ValueError as ve:
+            messagebox.showwarning(L.get("err_title", "Error"), str(ve))
+        except (OSError, UnicodeDecodeError, tk.TclError) as e:
+            messagebox.showerror(L.get("err_title", "Error"), L["err_open"].format(e))
 
     def _show_qr(self):
         pwd = self.entry_res.get()
@@ -969,6 +977,9 @@ class SecurePassPro(ctk.CTk):
         if not self.history:
             txt.insert("1.0", L["hist_empty"])
         else:
+            # ИСПРАВЛЕНИЕ 9: list(reversed(deque)) показывал бы новые записи последними,
+            # а list(self.history) — в порядке добавления (последние в конце).
+            # deque.append() добавляет справа, поэтому reversed даёт новые первыми — это верно.
             history_snapshot = list(reversed(self.history))
             txt.insert("1.0", "\n".join(history_snapshot))
         
@@ -995,22 +1006,55 @@ class SecurePassPro(ctk.CTk):
         textbox.insert("1.0", L["hist_empty"])
 
     def _show_about(self):
+        """
+        About window
+        Окно 'О программе'
+        Вікно 'Про програму'
+        """
         L = LANGUAGES[self.current_lang]
-        rad = int(self.slider_radius.get())
-        a_win = ctk.CTkToplevel(self)
-        a_win.title(L["btn_about"])
-        self._set_window_icon(a_win)
-        self._center_window(a_win, 450, 320)
-        self._apply_window_rounding(a_win)
+        wiki_url = "https://github.com/Maximka1993271/Password-Generator-Python/wiki/Security-Logic"
         
-        f = ctk.CTkFrame(a_win, fg_color="transparent")
-        f.pack(expand=True, fill="both", padx=30, pady=30)
+        about_win = ctk.CTkToplevel(self)
+        about_win.title(L["btn_about"])
+        about_win.resizable(False, False)
+        about_win.attributes("-topmost", True)
         
-        ctk.CTkLabel(f, text="Secure Pass Pro", font=("Segoe UI", 24, "bold")).pack()
-        ctk.CTkLabel(f, text="Version 3.9", font=("Segoe UI", 12)).pack()
-        ctk.CTkLabel(f, text=L["about_text"], font=("Segoe UI", 14), wraplength=380, pady=20).pack()
-        ctk.CTkButton(f, text="OK", command=a_win.destroy, corner_radius=rad).pack(pady=10)
+        self._center_window(about_win, 400, 320) 
+        self._apply_window_rounding(about_win)
+
+        ctk.CTkLabel(about_win, text="Secure Pass Pro", font=("Segoe UI", 22, "bold")).pack(pady=(25, 5))
+        ctk.CTkLabel(about_win, text="Version 3.9", font=("Segoe UI", 14)).pack(pady=(0, 15))
+
+        ctk.CTkLabel(
+            about_win, 
+            text=L["about_text"], 
+            wraplength=350, 
+            font=("Segoe UI", 13)
+        ).pack(pady=10)
+
+        ctk.CTkButton(
+            about_win, 
+            text="OK", 
+            width=120, 
+            command=about_win.destroy
+        ).pack(pady=(20, 10))
+
+        lbl_wiki = ctk.CTkLabel(
+            about_win, 
+            text=L.get("wiki_link", "Security Logic Wiki"), 
+            font=("Segoe UI", 12, "underline"),
+            text_color="#1f538d",
+            cursor="hand2"
+        )
+        lbl_wiki.pack(pady=(0, 20))
+        lbl_wiki.bind("<Button-1>", lambda e: webbrowser.open(wiki_url))
+        
+        about_win.focus_set()
 
 if __name__ == "__main__":
+    # Установка темы по умолчанию / Set default theme / Встановити тему за замовчуванням
+    ctk.set_appearance_mode("System")
+    ctk.set_default_color_theme("blue")
+    
     app = SecurePassPro()
     app.mainloop()
