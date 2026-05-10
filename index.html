@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Secure Pass Pro v3.9 — Профессиональный генератор паролей. Amoled UI с неоновой подсветкой, расчет энтропии, просмотр PDF и криптостойкость.">
+    <meta name="description" content="Secure Pass Pro v3.9 — Профессиональный генератор паролей. Amoled UI с неоновой подсветкой, расчет энтропии, просмотр PDF и криптостойкость. Цветная пульсация пароля: красный (слабый), оранжевый (средний), зелёный (надёжный).">
     <title>Secure Pass Pro v3.9 | Профессиональная защита паролей</title>
     
     <link rel="icon" type="image/png" href="https://github.com/Maximka1993271/Password-Generator-Python/blob/main/app_icon.png?raw=true">
@@ -21,6 +21,7 @@
                 <li><a href="#v39-section">Возможности v3.9</a></li>
                 <li><a href="#settings-section">Настройки</a></li>
                 <li><a href="#pdf-section">PDF Кириллица</a></li>
+                <li><a href="#animation-section">Анимации</a></li>
                 <li><a href="#security-audit">Аудит безопасности</a></li>
                 <li><a href="#tech-specs">Тех-стек</a></li>
                 <li><a href="#download-center">Скачать</a></li>
@@ -112,7 +113,34 @@
         </div>
     </section>
 
-    <section id="security-audit" class="features-section dark-bg">
+    <!-- НОВАЯ СЕКЦИЯ: Цветная пульсация пароля -->
+    <section id="animation-section" class="features-section dark-bg">
+        <h2 class="section-title">Цветная <span class="highlight">Пульсация</span> пароля</h2>
+        <div class="features-grid">
+            <div class="card">
+                <div class="card-icon">🔴</div>
+                <h3>Слабый пароль</h3>
+                <p>При генерации слабого пароля (до 40 бит) поле пароля вспыхивает <strong class="red-text">КРАСНЫМ</strong> неоном, предупреждая о низкой криптостойкости.</p>
+            </div>
+            <div class="card">
+                <div class="card-icon">🟠</div>
+                <h3>Средний пароль</h3>
+                <p>Средний уровень сложности (40-79 бит) сопровождается <strong class="orange-text">ОРАНЖЕВОЙ</strong> вспышкой — рекомендовано увеличить длину.</p>
+            </div>
+            <div class="card">
+                <div class="card-icon">🟢</div>
+                <h3>Надёжный пароль</h3>
+                <p>Надёжный пароль (80+ бит) дарит <strong class="green-text">ЗЕЛЁНУЮ</strong> неоновую пульсацию, сигнализируя о высочайшем уровне защиты.</p>
+            </div>
+            <div class="card">
+                <div class="card-icon">✨</div>
+                <h3>Анимация 0.3 сек</h3>
+                <p>Плавная пульсация длительностью 0.3 секунды создаёт приятный визуальный отклик и усиливает ощущение качества.</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="security-audit" class="features-section">
         <h2 class="section-title">Аудит <span class="highlight">безопасности</span></h2>
         <div class="features-grid">
             <div class="card">
@@ -133,7 +161,7 @@
         </div>
     </section>
 
-    <section id="tech-section" class="tech-stack features-section">
+    <section id="tech-section" class="tech-stack features-section dark-bg">
         <h2 class="section-title">Цветовая <span class="highlight">Дифференциация</span></h2>
         <div class="tech-grid">
             <div class="tech-item">
@@ -156,10 +184,22 @@
                 <h4>🟢 Зеленый (Neon)</h4>
                 <p>Кнопка Настройки</p>
             </div>
+            <div class="tech-item">
+                <h4>🔴 Красный (Neon)</h4>
+                <p>Слабый пароль 🔴</p>
+            </div>
+            <div class="tech-item">
+                <h4>🟠 Оранжевый (Neon)</h4>
+                <p>Средний пароль 🟠</p>
+            </div>
+            <div class="tech-item">
+                <h4>🟢 Зеленый (Neon)</h4>
+                <p>Надёжный пароль 🟢</p>
+            </div>
         </div>
     </section>
 
-    <section id="tech-specs" class="features-section dark-bg">
+    <section id="tech-specs" class="features-section">
         <h2 class="section-title">Технические <span class="highlight">данные</span></h2>
         <div class="tech-specs-container">
             <ul class="tech-list">
@@ -167,6 +207,7 @@
                 <li><strong>Версия:</strong> 3.9 Stable (10.05.2026)</li>
                 <li><strong>Ядро:</strong> Python 3.14.4 (CSPRNG Secrets)</li>
                 <li><strong>Аудио:</strong> WinMM API (Custom Click)</li>
+                <li><strong>Анимация:</strong> Цветная пульсация (красный/оранжевый/зелёный)</li>
                 <li><strong>Шрифт PDF:</strong> DejaVuSans.ttf (Полная поддержка кириллицы)</li>
                 <li><strong>Сборка:</strong> Windows 11 Pro Optimized</li>
             </ul>
@@ -179,13 +220,13 @@
         </div>
     </section>
 
-    <section id="download-center" class="download-section">
+    <section id="download-center" class="download-section dark-bg">
         <h2 class="section-title">Центр загрузок</h2>
         <div class="download-grid">
             <div class="download-card highlight-card">
                 <div class="card-icon">🏆</div>
                 <h3>Secure Pass Pro v3.9</h3>
-                <p><b>Рекомендуется.</b> Neon UI, поддержка PDF с кириллицей (DejaVuSans), новый звук клика и высокая криптостойкость.</p>
+                <p><b>Рекомендуется.</b> Neon UI, поддержка PDF с кириллицей (DejaVuSans), новый звук клика, цветная пульсация пароля и высокая криптостойкость.</p>
                 <a href="https://github.com/Maximka1993271/Password-Generator-Python/releases/download/SecurePassProv3.9/SecurePassPro.exe" class="btn-primary full-width">Скачать v3.9 (.EXE)</a>
             </div>
             <div class="download-card">
@@ -209,12 +250,15 @@
                 <span class="badge">Corner Radius Control</span>
                 <span class="badge">DejaVuSans PDF</span>
                 <span class="badge">Cyrillic Support</span>
+                <span class="badge">Color Pulsation</span>
+                <span class="badge">Red/Orange/Green Glow</span>
             </div>
             <p class="footer-description">
                 Локализация: RU, EN, UA. Программа гарантирует полную приватность данных. Генерация происходит локально, 
                 поддержка PDF и звукового сопровождения интегрирована нативно. В версии 3.9 добавлена централизованная панель 
                 настроек с управлением языком, темой, звуком и закруглением углов. PDF-экспорт использует шрифт DejaVuSans.ttf 
-                для корректного отображения кириллицы.
+                для корректного отображения кириллицы. <strong>Новинка: цветная неоновая пульсация</strong> — красный (слабый), 
+                оранжевый (средний), зелёный (надёжный) пароль.
             </p>
         </div>
     </footer>

@@ -604,3 +604,8 @@ footer {
 ::-webkit-scrollbar-thumb:hover {
     background: var(--accent-color);
 }
+
+/* Цвета для текста в секции анимаций */
+.red-text { color: #FF4444; }
+.orange-text { color: #FFA500; }
+.green-text { color: #2ECC71; }
