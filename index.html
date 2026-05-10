@@ -39,7 +39,7 @@
             </div>
         </div>
         <div class="hero-image">
-            <img src="https://github.com/Maximka1993271/Password-Generator-Python/raw/main/Secure_Pass_MainWindow39.png" alt="Secure Pass Pro v3.9 UI">
+            <img src="https://github.com/Maximka1993271/Password-Generator-Python/raw/main/Secure_Pass_MainWindow39.jpg" alt="Secure Pass Pro v3.9 UI">
         </div>
     </section>
 
@@ -95,7 +95,23 @@
         </div>
     </section>
 
-    <section id="security-audit" class="features-section">
+    <section id="pdf-section" class="features-section">
+        <h2 class="section-title">Полная поддержка <span class="highlight">Кириллицы в PDF</span></h2>
+        <div class="features-grid grid-2" style="max-width: 600px; margin: 0 auto;">
+            <div class="card">
+                <div class="card-icon">🖋️</div>
+                <h3>DejaVuSans.ttf</h3>
+                <p>Встроенный шрифт DejaVuSans обеспечивает корректное отображение русских и украинских символов в экспортируемых PDF-файлах.</p>
+            </div>
+            <div class="card">
+                <div class="card-icon">✅</div>
+                <h3>Unicode совместимость</h3>
+                <p>Полная поддержка UTF-8 при экспорте документов. Кириллица отображается без иероглифов.</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="security-audit" class="features-section dark-bg">
         <h2 class="section-title">Аудит <span class="highlight">безопасности</span></h2>
         <div class="features-grid grid-3">
             <div class="card">
@@ -116,7 +132,7 @@
         </div>
     </section>
 
-    <section id="tech-section" class="tech-stack features-section dark-bg">
+    <section id="tech-section" class="tech-stack features-section">
         <h2 class="section-title">Цветовая <span class="highlight">Дифференциация</span></h2>
         <div class="tech-grid" style="display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; text-align: center;">
             <div class="tech-item" style="border-bottom: 3px solid #1f538d; background: rgba(31, 83, 141, 0.1);">
@@ -142,20 +158,21 @@
         </div>
     </section>
 
-    <section id="tech-specs" class="features-section">
+    <section id="tech-specs" class="features-section dark-bg">
         <h2 class="section-title">Технические <span class="highlight">данные</span></h2>
         <div style="max-width: 800px; margin: 0 auto; line-height: 1.8;">
             <ul style="list-style: none; padding: 0; margin-bottom: 30px;">
-                <li><strong>Разработчик:</strong> Максим Мельников</li>
-                <li><strong>Версия:</strong> 3.9 Stable (09.05.2026)</li>
+                <li><strong>Разработчик:</strong> Максим Мельников (Maxim Melnikov)</li>
+                <li><strong>Версия:</strong> 3.9 Stable (10.05.2026)</li>
                 <li><strong>Ядро:</strong> Python 3.14.4 (CSPRNG Secrets)</li>
                 <li><strong>Аудио:</strong> WinMM API (Custom Click)</li>
+                <li><strong>Шрифт PDF:</strong> DejaVuSans.ttf (Полная поддержка кириллицы)</li>
                 <li><strong>Сборка:</strong> Windows 11 Pro Optimized</li>
             </ul>
             <div style="background: #111; padding: 20px; border-radius: 10px; border: 1px solid #333;">
                 <p style="color: #888; font-family: monospace; font-size: 0.9em; margin-bottom: 10px;">// Команда сборки v3.9 (Full Package)</p>
                 <code style="color: #00acc1; font-size: 0.8em; word-break: break-all;">
-                    pyinstaller --noconfirm --onefile --windowed --clean --icon="icon.ico" --add-data "icon.ico;." --add-data "Computer Mouse Click.mp3;." --collect-all qrcode --collect-all customtkinter --hidden-import="PIL._tkinter_finder" --name "SecurePassPro" Secure_Pass_Pro.pyw
+                    pyinstaller --noconfirm --onefile --windowed --clean --icon="icon.ico" --add-data "icon.ico;." --add-data "Computer Mouse Click.mp3;." --add-data "DejaVuSans.ttf;." --collect-all qrcode --collect-all customtkinter --hidden-import="PIL._tkinter_finder" --name "SecurePassPro" Secure_Pass_Pro.pyw
                 </code>
             </div>
         </div>
@@ -167,7 +184,7 @@
             <div class="download-card highlight-card">
                 <div class="card-icon">🏆</div>
                 <h3>Secure Pass Pro v3.9</h3>
-                <p><b>Рекомендуется.</b> Neon UI, поддержка PDF, новый звук клика и высокая криптостойкость.</p>
+                <p><b>Рекомендуется.</b> Neon UI, поддержка PDF с кириллицей (DejaVuSans), новый звук клика и высокая криптостойкость.</p>
                 <a href="https://github.com/Maximka1993271/Password-Generator-Python/releases/download/SecurePassProv3.9/SecurePassPro.exe" class="btn-primary full-width">Скачать v3.9 (.EXE)</a>
             </div>
             <div class="download-card">
@@ -189,11 +206,14 @@
                 <span class="badge">Win 11 Optimized</span>
                 <span class="badge">Triple Localization</span>
                 <span class="badge">Corner Radius Control</span>
+                <span class="badge">DejaVuSans PDF</span>
+                <span class="badge">Cyrillic Support</span>
             </div>
             <p style="font-size: 0.85em; margin-top: 20px; opacity: 0.6; max-width: 700px; margin-left: auto; margin-right: auto;">
                 Локализация: RU, EN, UA. Программа гарантирует полную приватность данных. Генерация происходит локально, 
                 поддержка PDF и звукового сопровождения интегрирована нативно. В версии 3.9 добавлена централизованная панель 
-                настроек с управлением языком, темой, звуком и закруглением углов.
+                настроек с управлением языком, темой, звуком и закруглением углов. PDF-экспорт использует шрифт DejaVuSans.ttf 
+                для корректного отображения кириллицы.
             </p>
         </div>
     </footer>
