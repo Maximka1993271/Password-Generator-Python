@@ -5,7 +5,7 @@
 Secure Pass Pro is a modern desktop password generator built with Python and CustomTkinter.
 It combines cryptographically secure password generation, multilingual interface, QR-code export, privacy controls, and a polished dark UI.
 
-![v3.9 Preview](https://github.com/Maximka1993271/Password-Generator-Python/raw/main/Secure_Pass_MainWindow39.png)
+![v3.9 Preview](https://github.com/Maximka1993271/Password-Generator-Python/raw/main/Secure_Pass_MainWindow39.jpg)
 
 ---
 
