@@ -121,7 +121,7 @@ A new slider allows you to customize the roundness of all UI elements from **0 t
 
 To build a standalone Windows executable:
 
-```bash
+bash
 pyinstaller --noconfirm --onefile --windowed --clean --icon="icon.ico" --add-data "icon.ico;." --add-data "Computer Mouse Click.mp3;." --add-data "DejaVuSans.ttf;." --collect-all qrcode --collect-all customtkinter --hidden-import="PIL._tkinter_finder" --name "SecurePassPro" Secure_Pass_Pro.pyw
 
 
