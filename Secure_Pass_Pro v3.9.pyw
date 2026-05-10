@@ -335,6 +335,9 @@ class SecurePassPro(ctk.CTk):
         self.lang_buttons = {}
         self.theme_buttons = {}
         
+        # Анимация пульсации
+        self._pulse_animation_id = None
+        
         # Оптимизация
         ctk.set_widget_scaling(1.0)
         ctk.set_window_scaling(1.0)
@@ -361,6 +364,68 @@ class SecurePassPro(ctk.CTk):
         # Загружаем настройки после создания UI
         self.after(50, self._load_all_settings)
         self.after(50, self._load_radius_settings)
+
+    def _animate_password_field(self, strength_type="medium"):
+        """
+        Анимация неоновой пульсации поля пароля (0.3 секунды)
+        strength_type: "weak" (красный), "medium" (оранжевый), "strong" (зеленый)
+        """
+        # Сохраняем исходные цвета
+        original_bg = self.entry_res.cget("fg_color")
+        original_border = self.entry_res.cget("border_color")
+        
+        # Выбор цветов в зависимости от сложности пароля
+        if strength_type == "weak":
+            # Слабый пароль - красный
+            neon_colors = [
+                "#FF4444",  # ярко-красный
+                "#FF6666",  # светлее
+                "#FF8888",  # еще светлее
+                "#FF6666",  # обратно
+                "#FF4444",  # возврат
+            ]
+        elif strength_type == "strong":
+            # Надежный пароль - зеленый
+            neon_colors = [
+                "#2ECC71",  # ярко-зеленый
+                "#55DD88",  # светлее
+                "#88EEAA",  # еще светлее
+                "#55DD88",  # обратно
+                "#2ECC71",  # возврат
+            ]
+        else:
+            # Средний пароль - оранжевый/желтый
+            neon_colors = [
+                "#FFA500",  # оранжевый
+                "#FFBB33",  # светлее
+                "#FFCC66",  # еще светлее
+                "#FFBB33",  # обратно
+                "#FFA500",  # возврат
+            ]
+        
+        def pulse_step(step=0):
+            if step < len(neon_colors):
+                try:
+                    self.entry_res.configure(
+                        border_color=neon_colors[step],
+                        border_width=3
+                    )
+                    self._pulse_animation_id = self.after(60, lambda: pulse_step(step + 1))
+                except:
+                    pass
+            else:
+                # Возвращаем исходные настройки
+                try:
+                    self.entry_res.configure(
+                        border_color=original_border if original_border else "#2b2b2b",
+                        border_width=2
+                    )
+                except:
+                    pass
+                self._pulse_animation_id = None
+        
+        # Запускаем анимацию
+        pulse_step()
 
     def _load_radius_settings(self):
         """Load saved corner radius from config file"""
@@ -615,6 +680,7 @@ class SecurePassPro(ctk.CTk):
         self.cb_hide = ctk.CTkCheckBox(self.cb_frame, text="", variable=self.hide_var, command=self._toggle_hide)
         self.cb_hide.grid(row=5, column=0, columnspan=2, padx=20, pady=2, sticky="w")
 
+        # Поле пароля - сохраняем ссылку для анимации
         self.entry_res = ctk.CTkEntry(self.left_panel, height=50, font=("Consolas", 22), justify="center")
         self.entry_res.pack(pady=10, padx=40, fill="x")
         self._radius_widgets.append(self.entry_res)
@@ -1047,25 +1113,32 @@ class SecurePassPro(ctk.CTk):
             stars_color = "#FF4C4C"
             st_text = L["st_low"]
             crack_phrase = L["time_sec"]
+            strength_type = "weak"  # для анимации
         elif entropy_bits < 60:
             stars_display = "★★★☆☆"
             stars_color = "#FFA500"
             st_text = L["st_mid"]
             crack_phrase = L["time_day"]
+            strength_type = "medium"  # для анимации
         elif entropy_bits < 80:
             stars_display = "★★★★☆"
             stars_color = "#FFD700"
             st_text = L["st_mid"]
             crack_phrase = L["time_year"]
+            strength_type = "medium"  # для анимации
         else:
             stars_display = "★★★★★"
             stars_color = "#2ECC71"
             st_text = L["st_high"]
             crack_phrase = L["time_cent"]
+            strength_type = "strong"  # для анимации
         
         self.lbl_stars_top.configure(text=stars_display, text_color=stars_color)
         self.lbl_strength_text.configure(text=st_text, text_color=stars_color)
         self.lbl_crack.configure(text=L["crack_time"].format(crack_phrase), text_color=stars_color)
+        
+        # Запускаем цветную неоновую пульсацию поля пароля
+        self._animate_password_field(strength_type)
         
         timestamp = datetime.datetime.now().strftime("[%H:%M:%S]")
         self.history.append(f"{timestamp} {pwd}")
