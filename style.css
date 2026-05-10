@@ -1,6 +1,5 @@
 /* SECURE PASS PRO - PREMIUM STYLESHEET 
    Версия: 3.9 Stable (Amoled Optimized)
-   Исправления: Центровка загрузок, фикс накладывания блоков, адаптивность фото.
 */
 
 :root {
@@ -23,7 +22,6 @@
     --transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Базовые настройки страницы */
 * { 
     margin: 0; 
     padding: 0; 
@@ -38,7 +36,7 @@ body {
     overflow-x: hidden;
 }
 
-/* --- НАВИГАЦИЯ (Header) --- */
+/* --- НАВИГАЦИЯ --- */
 header {
     padding: 18px 10%;
     position: fixed;
@@ -62,11 +60,6 @@ nav {
     font-size: 1.3rem; 
     font-weight: 800; 
     color: #fff; 
-    text-decoration: none; 
-}
-
-.logo span { 
-    color: var(--accent-color); 
 }
 
 nav ul { 
@@ -85,7 +78,13 @@ nav ul li a:hover {
     color: var(--accent-color); 
 }
 
-/* --- ГЛАВНЫЙ БЛОК (Hero) --- */
+nav ul li a.active {
+    color: var(--accent-color);
+    border-bottom: 2px solid var(--accent-color);
+    padding-bottom: 5px;
+}
+
+/* --- ГЛАВНЫЙ БЛОК --- */
 .hero {
     min-height: 100vh;
     display: flex;
@@ -144,7 +143,7 @@ nav ul li a:hover {
     border: 1px solid var(--border-color);
 }
 
-/* Кнопки */
+/* --- КНОПКИ --- */
 .hero-btns {
     display: flex;
     gap: 15px;
@@ -213,7 +212,7 @@ nav ul li a:hover {
     border-radius: 3px;
 }
 
-/* --- СЕКЦИИ КАРТОЧЕК (Features / UX) --- */
+/* --- СЕКЦИИ КАРТОЧЕК --- */
 .features-section {
     padding: 80px 10%;
     text-align: center;
@@ -236,7 +235,7 @@ nav ul li a:hover {
     max-width: 1300px;
 }
 
-/* Карточки */
+/* КАРТОЧКИ */
 .card {
     background: var(--card-bg);
     padding: 35px 25px;
@@ -273,7 +272,7 @@ nav ul li a:hover {
     line-height: 1.5;
 }
 
-/* --- ЦВЕТОВАЯ ДИФФЕРЕНЦИАЦИЯ (Tech Grid) --- */
+/* --- ЦВЕТОВАЯ ДИФФЕРЕНЦИАЦИЯ --- */
 .tech-stack {
     padding: 80px 10%;
 }
@@ -366,7 +365,7 @@ nav ul li a:hover {
     line-height: 1.5;
 }
 
-/* --- ЦЕНТР ЗАГРУЗОК (Download Center) --- */
+/* --- ЦЕНТР ЗАГРУЗОК --- */
 .download-section {
     padding: 100px 10%;
     text-align: center;
@@ -420,19 +419,15 @@ nav ul li a:hover {
     color: var(--text-secondary);
     margin-bottom: 25px;
     font-size: 0.9rem;
-    text-align: center;
 }
 
-/* --- ПОДВАЛ (Footer) --- */
+/* --- ПОДВАЛ --- */
 footer {
     padding: 60px 10% 40px;
-    margin-top: 0;
     text-align: center;
     color: #555;
     font-size: 0.85rem;
     border-top: 1px solid #111;
-    position: relative;
-    z-index: 10;
 }
 
 .footer-content {
@@ -465,7 +460,7 @@ footer {
     line-height: 1.6;
 }
 
-/* --- АДАПТИВНОСТЬ (Mobile & Tablet) --- */
+/* --- АДАПТИВНОСТЬ --- */
 @media (max-width: 1100px) {
     .hero { 
         flex-direction: column; 
@@ -551,27 +546,13 @@ footer {
         min-width: 130px;
     }
     
-    .tech-item h4 {
-        font-size: 0.9rem;
-    }
-    
     .tech-list li strong {
-        min-width: 120px;
         display: block;
         margin-bottom: 5px;
     }
     
     .command-code {
         font-size: 0.65rem;
-    }
-    
-    .footer-tags {
-        gap: 8px;
-    }
-    
-    .badge {
-        font-size: 0.6rem;
-        padding: 4px 10px;
     }
 }
 
@@ -589,20 +570,12 @@ footer {
         font-size: 1.5rem; 
     }
     
-    .card h3 {
-        font-size: 1.2rem;
-    }
-    
-    .download-card {
-        padding: 25px 20px;
-    }
-    
     .tech-item {
         min-width: 100%;
     }
 }
 
-/* --- АНИМАЦИИ ПРИ ПРОКРУТКЕ (опционально) --- */
+/* --- АНИМАЦИИ --- */
 @keyframes fadeInUp {
     from {
         opacity: 0;
@@ -614,15 +587,7 @@ footer {
     }
 }
 
-.card, .download-card, .tech-item {
-    animation: fadeInUp 0.6s ease forwards;
-}
-
-.card:nth-child(2) { animation-delay: 0.1s; }
-.card:nth-child(3) { animation-delay: 0.2s; }
-.card:nth-child(4) { animation-delay: 0.3s; }
-
-/* --- СКРОЛЛБАР (Amoled Style) --- */
+/* --- СКРОЛЛБАР --- */
 ::-webkit-scrollbar {
     width: 8px;
 }
