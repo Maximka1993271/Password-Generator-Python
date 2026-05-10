@@ -75,7 +75,7 @@ A new slider allows you to customize the roundness of all UI elements from **0 t
 - Fixed PDF export for Cyrillic and Ukrainian text using DejaVuSans font
 - Removed deprecated progress bar for cleaner interface
 
-**[📥 Download Secure Pass Pro v3.9 (.exe)](https://github.com/Maximka1993271/Password-Generator-Python/releases/download/SecurePassProv3.9/SecurePassPro.exe)**
+**[📥 Download Secure Pass Pro v3.9](https://github.com/Maximka1993271/Password-Generator-Python/releases/download/SecurePassProv3.9/SecurePassPro.exe)**
 
 ---
 
@@ -124,47 +124,16 @@ To build a standalone Windows executable:
 ```bash
 pyinstaller --noconfirm --onefile --windowed --clean --icon="icon.ico" --add-data "icon.ico;." --add-data "Computer Mouse Click.mp3;." --add-data "DejaVuSans.ttf;." --collect-all qrcode --collect-all customtkinter --hidden-import="PIL._tkinter_finder" --name "SecurePassPro" Secure_Pass_Pro.pyw
 
+```bash
+pyinstaller --noconfirm --onefile --windowed --clean --icon="icon.ico" --add-data "icon.ico;." --add-data "Computer Mouse Click.mp3;." --add-data "DejaVuSans.ttf;." --collect-all qrcode --collect-all customtkinter --hidden-import="PIL._tkinter_finder" --name "SecurePassPro" Secure_Pass_Pro.pyw
+
 📜 Classic Branch: v2.0.0
 https://github.com/Maximka1993271/Password-Generator-Python/raw/main/Secure_Pass_MainWindow.png
 
 Classic branch for users who prefer a minimal Tkinter-based interface.
 
-Stable classic UI for older Windows systems.
+- Stable classic UI for older Windows systems.
 
-Core features: password generation, history, themes, and basic controls.
+- Core features: password generation, history, themes, and basic controls.
 
-![v2.0.0 Preview](https://github.com/Maximka1993271/Password-Generator-Python/raw/main/Secure_Pass_MainWindow.png)
-
-Classic branch for users who prefer a minimal Tkinter-based interface.
-
-- **Stable classic UI** for older Windows systems.
-- **Core features**: password generation, history, themes, and basic controls.
-
-**[📥 Download v2.0.0 Classic](https://github.com/Maximka1993271/Password-Generator-Python/releases/download/SecurePassProv2.0.0/SecurePassPro.exe)**
-
-📄 License
-MIT License – free for personal and commercial use.
-
-© 2026 Maxim Melnikov | Secure Pass Pro
-
-
-**Что исправлено:**
-
-1. **Информация про Classic Branch v2.0.0 перемещена в самый низ** - после всей информации о v3.9
-
-2. **Весь контент о новых функциях v3.9** (настройки, язык, тема, звук, закругление углов, DejaVuSans.ttf) расположен **до** Classic Branch
-
-3. **Структура теперь правильная:**
-   - Main Features v3.9
-   - What's New in v3.9 (все новые функции)
-   - Download v3.9
-   - Developer Information
-   - Classic Branch v2.0.0 (в самом низу)
-   - License
-
-4. **DejaVuSans.ttf информация** добавлена в:
-   - Main Features (Export and sharing)
-   - What's New (Enhanced PDF Export)
-   - Technology Stack
-   - Changelog
-   - Build Command
+**[📥 Download v2.0.0](https://github.com/Maximka1993271/Password-Generator-Python/releases/download/SecurePassProv2.0.0/SecurePassPro.exe)**
