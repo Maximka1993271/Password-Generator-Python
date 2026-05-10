@@ -43,23 +43,32 @@ It combines cryptographically secure password generation, multilingual interface
 
 ## 🚀 What’s New in v3.9
 
-1. **Redesigned interface**
-   Balanced layout with a dedicated side menu and **neon color-coded action buttons**.
+### 🎛️ Centralized Settings Panel
+A brand new **Settings window** has been added, accessible via the **Settings** button in the main menu. All customization options are now conveniently located in one place.
 
-2. **Improved security logic**
-   Added entropy-based strength calculation, SHA-256 read-back verification for text exports, and safer clipboard cleanup.
+### 🌐 Language Switcher
+Quickly switch between **Русский**, **English**, and **Українська** directly from the settings panel. Interface language updates instantly without restart.
 
-3. **Triple localization**
-   Full interface support for Russian, English, and Ukrainian.
+### 🎨 Theme Selector
+Choose your preferred appearance:
+- **System** – follows your Windows theme
+- **Light** – bright and clean interface
+- **Dark** – comfortable for night use
 
-4. **Smart character filtering**
-   Exclude similar characters like `i`, `l`, `1`, `o`, `0`, and unclear punctuation symbols.
+### 🔊 Sound Control
+Toggle UI sound effects on/off with a single click. When enabled, mechanical mouse click sounds provide satisfying feedback.
 
-5. **Enhanced Sound Engine**
-   Professional mechanical mouse click sound (replaced standard `winsound` Beeps).
+### 📐 Corner Radius Control
+A new slider allows you to customize the roundness of all UI elements from **0 to 25 pixels** – make it perfectly square or beautifully rounded.
 
-6. **Extended export & viewing support**
-   Stable saving and **opening** for `.txt`, `.log`, `.key`, and `.pdf` formats.
+### Additional Improvements
+- Redesigned interface with balanced layout and **neon color-coded action buttons**
+- Added entropy-based strength calculation with SHA-256 verification
+- Smart character filtering to exclude similar characters (i, l, 1, o, O, 0)
+- Enhanced mechanical mouse click sound (replaced standard winsound Beeps)
+- Extended export & viewing support for `.txt`, `.log`, `.key`, and `.pdf` formats
+- Fixed PDF export for Cyrillic and Ukrainian text using DejaVuSans font
+- Removed deprecated progress bar for cleaner interface
 
 **[📥 Download Secure Pass Pro v3.9 (.exe)](https://github.com/Maximka1993271/Password-Generator-Python/releases/download/SecurePassProv3.9/SecurePassPro.exe)**
 
@@ -88,9 +97,39 @@ Classic branch for users who prefer a minimal Tkinter-based interface.
 - **Libraries**: `Pillow`, `qrcode`, `fpdf`
 - **Security**: `secrets`, `hashlib`, `random.SystemRandom`
 
+### Changelog v3.9 (2026-05-10)
+
+**New Features:**
+- Added Settings window with language, theme, sound and corner radius controls
+- Added Language Switcher (RU/EN/UA) with instant UI translation
+- Added Theme Selector (System/Light/Dark) with safe theme switching
+- Added Sound Toggle with mechanical click feedback
+- Added Corner Radius Slider (0-25px) for UI customization
+
+**Improvements:**
+- Removed deprecated theme buttons from bottom panel
+- Optimized window rendering for better performance
+- Improved button highlighting for active theme/language selection
+- Enhanced clipboard auto-cleanup mechanism
+- Updated strength indicator with 5-star rating system
+
+**Fixes:**
+- Fixed theme change freezing issues
+- Fixed PDF export for Cyrillic and Ukrainian text using DejaVuSans font
+- Fixed Ukrainian author name spelling (Максим Мельніков)
+
+**Removed:**
+- Removed deprecated progress bar for cleaner interface
+- Removed duplicate controls from main window
+
 ### Build Command
 
 To build a standalone Windows executable:
 
 ```bash
 pyinstaller --noconfirm --onefile --windowed --clean --icon="icon.ico" --add-data "icon.ico;." --add-data "Computer Mouse Click.mp3;." --collect-all qrcode --collect-all customtkinter --hidden-import="PIL._tkinter_finder" --name "SecurePassPro" Secure_Pass_Pro.pyw
+
+📄 License
+MIT License – free for personal and commercial use.
+
+© 2026 Maxim Melnikov | Secure Pass Pro
