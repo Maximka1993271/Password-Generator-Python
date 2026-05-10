@@ -41,7 +41,7 @@ It combines cryptographically secure password generation, multilingual interface
 
 ---
 
-## 🚀 What’s New in v3.9
+## 🚀 What's New in v3.9
 
 ### 🎛️ Centralized Settings Panel
 A brand new **Settings window** has been added, accessible via the **Settings** button in the main menu. All customization options are now conveniently located in one place.
@@ -76,19 +76,6 @@ A new slider allows you to customize the roundness of all UI elements from **0 t
 - Removed deprecated progress bar for cleaner interface
 
 **[📥 Download Secure Pass Pro v3.9 (.exe)](https://github.com/Maximka1993271/Password-Generator-Python/releases/download/SecurePassProv3.9/SecurePassPro.exe)**
-
----
-
-## 📜 Classic Branch: v2.0.0
-
-![v2.0.0 Preview](https://github.com/Maximka1993271/Password-Generator-Python/raw/main/Secure_Pass_MainWindow.png)
-
-Classic branch for users who prefer a minimal Tkinter-based interface.
-
-- **Stable classic UI** for older Windows systems.
-- **Core features**: password generation, history, themes, and basic controls.
-
-**[📥 Download v2.0.0 Classic](https://github.com/Maximka1993271/Password-Generator-Python/releases/download/SecurePassProv2.0.0/SecurePassPro.exe)**
 
 ---
 
@@ -137,6 +124,23 @@ To build a standalone Windows executable:
 ```bash
 pyinstaller --noconfirm --onefile --windowed --clean --icon="icon.ico" --add-data "icon.ico;." --add-data "Computer Mouse Click.mp3;." --add-data "DejaVuSans.ttf;." --collect-all qrcode --collect-all customtkinter --hidden-import="PIL._tkinter_finder" --name "SecurePassPro" Secure_Pass_Pro.pyw
 
+📜 Classic Branch: v2.0.0
+https://github.com/Maximka1993271/Password-Generator-Python/raw/main/Secure_Pass_MainWindow.png
+
+Classic branch for users who prefer a minimal Tkinter-based interface.
+
+Stable classic UI for older Windows systems.
+
+Core features: password generation, history, themes, and basic controls.
+
+![v2.0.0 Preview](https://github.com/Maximka1993271/Password-Generator-Python/raw/main/Secure_Pass_MainWindow.png)
+
+Classic branch for users who prefer a minimal Tkinter-based interface.
+
+- **Stable classic UI** for older Windows systems.
+- **Core features**: password generation, history, themes, and basic controls.
+
+**[📥 Download v2.0.0 Classic](https://github.com/Maximka1993271/Password-Generator-Python/releases/download/SecurePassProv2.0.0/SecurePassPro.exe)**
 
 📄 License
 MIT License – free for personal and commercial use.
@@ -144,19 +148,23 @@ MIT License – free for personal and commercial use.
 © 2026 Maxim Melnikov | Secure Pass Pro
 
 
-**Что добавлено про DejaVuSans.ttf:**
+**Что исправлено:**
 
-1. **В раздел "Export and sharing"** - добавлена строка о полной поддержке кириллицы в PDF с использованием DejaVuSans.ttf
+1. **Информация про Classic Branch v2.0.0 перемещена в самый низ** - после всей информации о v3.9
 
-2. **Новый подраздел "📄 Enhanced PDF Export"** в "What's New" с тремя пунктами:
-   - Full Unicode support for Cyrillic characters
-   - Embedded DejaVuSans.ttf font
-   - No more garbled text
+2. **Весь контент о новых функциях v3.9** (настройки, язык, тема, звук, закругление углов, DejaVuSans.ttf) расположен **до** Classic Branch
 
-3. **В Technology Stack** - добавлена строка "PDF Font: DejaVuSans.ttf (embedded, full Cyrillic support)"
+3. **Структура теперь правильная:**
+   - Main Features v3.9
+   - What's New in v3.9 (все новые функции)
+   - Download v3.9
+   - Developer Information
+   - Classic Branch v2.0.0 (в самом низу)
+   - License
 
-4. **В Changelog** - добавлен пункт "Added DejaVuSans.ttf font for proper Cyrillic display in PDF exports" и "Full Unicode/UTF-8 support for PDF documents"
-
-5. **В Build Command** - добавлен параметр `--add-data "DejaVuSans.ttf;."`
-
-6. **В Fixes** - оставлен пункт про фикс PDF экспорта
+4. **DejaVuSans.ttf информация** добавлена в:
+   - Main Features (Export and sharing)
+   - What's New (Enhanced PDF Export)
+   - Technology Stack
+   - Changelog
+   - Build Command
