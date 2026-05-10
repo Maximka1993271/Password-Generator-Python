@@ -22,6 +22,11 @@ It combines cryptographically secure password generation, multilingual interface
   - Estimated crack-time category.
   - Five-star visual strength indicator.
 
+- **Color-coded password field pulsation** ⚡
+  - 🔴 **Red pulse** – Weak password (under 40 bits)
+  - 🟠 **Orange pulse** – Medium password (40-79 bits)
+  - 🟢 **Green pulse** – Strong password (80+ bits)
+
 - **Privacy and safety**
   - Clipboard auto-cleanup after 60 seconds.
   - Local password history with one-click clearing.
@@ -67,6 +72,17 @@ A new slider allows you to customize the roundness of all UI elements from **0 t
 - **Embedded DejaVuSans.ttf** font for professional PDF output
 - No more garbled text or missing characters in exported documents
 
+### 🎨 Color Pulsation Animation (New!)
+The password field now features a **0.3-second neon glow animation** after each generation, with colors indicating password strength:
+
+| Strength | Entropy | Color | Effect |
+|----------|---------|-------|--------|
+| Weak | < 40 bits | 🔴 Red | Warning glow |
+| Medium | 40–79 bits | 🟠 Orange | Caution glow |
+| Strong | 80+ bits | 🟢 Green | Security glow |
+
+This provides **instant visual feedback** about password quality without needing to read the rating text.
+
 ### Additional Improvements
 - Redesigned interface with balanced layout and **neon color-coded action buttons**
 - Added entropy-based strength calculation with SHA-256 verification
@@ -90,6 +106,7 @@ A new slider allows you to customize the roundness of all UI elements from **0 t
 - **Libraries**: `Pillow`, `qrcode`, `fpdf`
 - **PDF Font**: `DejaVuSans.ttf` (embedded, full Cyrillic support)
 - **Security**: `secrets`, `hashlib`, `random.SystemRandom`
+- **Animations**: Color-coded neon pulsation (Red/Orange/Green)
 
 ### Changelog v3.9 (2026-05-10)
 
@@ -101,6 +118,7 @@ A new slider allows you to customize the roundness of all UI elements from **0 t
 - Added **Corner Radius Slider** (0-25px) for UI customization
 - Added **DejaVuSans.ttf font** for proper Cyrillic display in PDF exports
 - Added **dedicated Settings button** in the main menu with green neon color
+- Added **Color-coded password field pulsation** (Red/Orange/Green based on entropy)
 
 **Fixes:**
 - Fixed theme change freezing issues
@@ -115,6 +133,7 @@ A new slider allows you to customize the roundness of all UI elements from **0 t
 - Enhanced clipboard auto-cleanup mechanism
 - Updated strength indicator with 5-star rating system
 - **Full Unicode/UTF-8 support for PDF documents**
+- **Added visual feedback with color-coded password field animation**
 
 **Removed:**
 - Removed deprecated progress bar for cleaner interface
