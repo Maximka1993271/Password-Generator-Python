@@ -27,15 +27,10 @@ import datetime
 import tkinter as tk
 from tkinter import filedialog, messagebox
 from typing import Dict
-import ctypes  # Added for Windows API (corner rounding) / Добавлено для API Windows (скругление углов) / Додано для API Windows (заокруглення кутів)
+import ctypes
 
 
 def _show_startup_error(title, text):
-    """
-    Startup error dialog with root cleanup
-    Диалог ошибки запуска с очисткой корневого окна
-    Діалог помилки запуску з очищенням кореневого вікна
-    """
     root = tk.Tk()
     root.withdraw()
     try:
@@ -43,43 +38,32 @@ def _show_startup_error(title, text):
     finally:
         root.destroy()
 
-# Check OS for sound support / Проверка ОС для поддержки звука / Перевірка ОС для підтримки звуку
+
 _IS_WINDOWS = platform.system() == "Windows"
 if _IS_WINDOWS:
     import winsound
 
-# Requirements check / Проверка системных требований / Перевірка системних вимог
 if sys.version_info < (3, 9):
     _show_startup_error("Error", "Python 3.9+ required!")
     sys.exit(1)
 
-# Dependencies check / Проверка библиотек / Перевірка бібліотек
 try:
     import customtkinter as ctk
     import qrcode
-    from PIL import Image  # Pillow availability check / Проверка наличия Pillow / Перевірка наявності Pillow
+    from PIL import Image
     from fpdf import FPDF
 except ImportError as exc:
     _show_startup_error("Error", f"Required: pip install qrcode[pil] pillow customtkinter fpdf\n\n{exc}")
     sys.exit(1)
 
 HISTORY_MAX = 50
-# ИСПРАВЛЕНИЕ 1: Имя константы было AMBIGUOUS_CHARS, но в коде использовалось AMBIGUOUS_CHARS —
-# оба написания теперь унифицированы. Оригинал: AMBIGUOUS_CHARS = "il1Lo0O"
 AMBIGUOUS_CHARS = "il1Lo0O"
 UNAMBIG_CHARS = "{}[]()/\\'\"`~,;:.<>"
 UPD_URL = "https://github.com/Maximka1993271/Password-Generator-Python/releases"
-
-# Single authoritative list of supported file extensions
-# Единственный список поддерживаемых расширений / Єдиний список підтримуваних розширень
 SUPPORTED_EXTENSIONS = [".txt", ".log", ".key", ".pdf"]
 
+
 class ToolTip:
-    """
-    Simple ToolTip implementation for widgets
-    Реализация всплывающих подсказок
-    Реалізація підказок, що спливають
-    """
     def __init__(self, widget):
         self.widget = widget
         self.text = ""
@@ -109,11 +93,11 @@ class ToolTip:
         if tw:
             tw.destroy()
 
-# Localization Dictionary / Словарь локализации / Словник локалізації
+
 LANGUAGES: Dict[str, Dict[str, str]] = {
     "RU": {
         "win_title": "Secure Pass Pro v3.9",
-        "proton_title": "Secure Pass Pro",
+        "proton_title": "Secure Pass Pro v3.9",
         "menu_title": "Меню",
         "len": "Длина",
         "author": "Автор: Максим Мельников",
@@ -133,7 +117,7 @@ LANGUAGES: Dict[str, Dict[str, str]] = {
         "btn_hist": "История",
         "btn_upd": "Обновить программу",
         "btn_about": "О программе",
-        "btn_theme": "Цвет программы",
+        "btn_settings": "Настройки",
         "radius": "Закругление углов",
         "sound_on": "Звук: ВКЛ", "sound_off": "Звук: ВЫКЛ",
         "theme_sys": "Системная", "theme_dark": "Тёмная", "theme_light": "Светлая",
@@ -154,6 +138,13 @@ LANGUAGES: Dict[str, Dict[str, str]] = {
         "tt_hist": "Показать последние 50 паролей",
         "tt_upd": "Проверить наличие новой версии на GitHub",
         "tt_about": "Информация о разработчике и программе",
+        "tt_settings": "Язык, звук и тема оформления",
+        "settings_title": "Настройки",
+        "settings_lang": "Язык интерфейса",
+        "settings_sound": "Звук приложения",
+        "settings_theme": "Тема оформления",
+        "settings_radius": "Закругление углов",
+        "close": "Закрыть",
         "err_cat": "Выберите хотя бы одну категорию!",
         "err_pool_small": "Слишком мало доступных символов после исключений!",
         "err_save": "Ошибка сохранения: {0}",
@@ -169,7 +160,7 @@ LANGUAGES: Dict[str, Dict[str, str]] = {
     },
     "EN": {
         "win_title": "Secure Pass Pro v3.9",
-        "proton_title": "Secure Pass Pro",
+        "proton_title": "Secure Pass Pro v3.9",
         "menu_title": "Menu",
         "len": "Length",
         "author": "Author: Maxim Melnikov",
@@ -189,7 +180,7 @@ LANGUAGES: Dict[str, Dict[str, str]] = {
         "btn_hist": "History",
         "btn_upd": "Update program",
         "btn_about": "About",
-        "btn_theme": "App color",
+        "btn_settings": "Settings",
         "radius": "Corner radius",
         "sound_on": "Sound: ON", "sound_off": "Sound: OFF",
         "theme_sys": "System", "theme_dark": "Dark", "theme_light": "Light",
@@ -210,6 +201,13 @@ LANGUAGES: Dict[str, Dict[str, str]] = {
         "tt_hist": "Show last 50 generated passwords",
         "tt_upd": "Check for new version on GitHub",
         "tt_about": "Developer and program info",
+        "tt_settings": "Language, sound and theme",
+        "settings_title": "Settings",
+        "settings_lang": "Interface language",
+        "settings_sound": "App Sound",
+        "settings_theme": "Appearance theme",
+        "settings_radius": "Corner radius",
+        "close": "Close",
         "err_cat": "Select at least one category!",
         "err_pool_small": "Too few available characters after exclusions!",
         "err_save": "Save failed: {0}",
@@ -225,10 +223,10 @@ LANGUAGES: Dict[str, Dict[str, str]] = {
     },
     "UA": {
         "win_title": "Secure Pass Pro v3.9",
-        "proton_title": "Secure Pass Pro",
+        "proton_title": "Secure Pass Pro v3.9",
         "menu_title": "Меню",
         "len": "Довжина",
-        "author": "Автор: Максим Мельников",
+        "author": "Автор: Максим Мельніков",
         "upper": "Великі літери",
         "lower": "Малі літери",
         "digits": "Цифри",
@@ -245,7 +243,7 @@ LANGUAGES: Dict[str, Dict[str, str]] = {
         "btn_hist": "Історія",
         "btn_upd": "Оновити програму",
         "btn_about": "Про програму",
-        "btn_theme": "Колір програми",
+        "btn_settings": "Налаштування",
         "radius": "Закруглення кутів",
         "sound_on": "Звук: ВКЛ", "sound_off": "Звук: ВИКЛ",
         "theme_sys": "Системна", "theme_dark": "Темна", "theme_light": "Світла",
@@ -266,6 +264,13 @@ LANGUAGES: Dict[str, Dict[str, str]] = {
         "tt_hist": "Показати останні 50 паролів",
         "tt_upd": "Перевірити наявність нової версії на GitHub",
         "tt_about": "Інформація про розробника та програму",
+        "tt_settings": "Мова, звук та тема оформлення",
+        "settings_title": "Налаштування",
+        "settings_lang": "Мова інтерфейсу",
+        "settings_sound": "Звук програми",
+        "settings_theme": "Тема оформлення",
+        "settings_radius": "Закруглення кутів",
+        "close": "Закрити",
         "err_cat": "Виберіть хоча б одну категорію!",
         "err_pool_small": "Занадто мало доступних символів після виключень!",
         "err_save": "Помилка збереження: {0}",
@@ -281,11 +286,40 @@ LANGUAGES: Dict[str, Dict[str, str]] = {
     }
 }
 
+
+class UTF8PDF(FPDF):
+    """Custom PDF class with UTF-8 support using DejaVu font"""
+    
+    def __init__(self):
+        super().__init__()
+        self.dejavu_loaded = False
+    
+    def load_dejavu_font(self, font_path):
+        """Load DejaVu Sans font for UTF-8 support"""
+        try:
+            if os.path.exists(font_path):
+                self.add_font('DejaVu', '', font_path, uni=True)
+                self.dejavu_loaded = True
+                return True
+        except Exception:
+            pass
+        return False
+    
+    def draw_text(self, text):
+        """Draw text with UTF-8 support"""
+        if self.dejavu_loaded:
+            self.set_font('DejaVu', size=12)
+        else:
+            self.set_font('Arial', size=12)
+        self.cell(200, 10, txt=text, ln=True, align='C')
+
+
 class SecurePassPro(ctk.CTk):
     def __init__(self):
         super().__init__()
         self.current_lang = "RU"
-        self.current_theme_key = "theme_sys"
+        self.current_theme = "System"
+        self.current_radius = 10
         self.history = deque(maxlen=HISTORY_MAX)
         self._radius_widgets = []
         self._clipboard_timer = None
@@ -294,13 +328,22 @@ class SecurePassPro(ctk.CTk):
         self._pdf_font_path = self._get_resource_path("DejaVuSans.ttf")
         self._secure_random = random.SystemRandom()
         self.sound_enabled = tk.BooleanVar(value=True)
+        self.settings_window = None
+        self.about_window = None
+        self.history_window = None
+        self.qr_window = None
+        self.lang_buttons = {}
+        self.theme_buttons = {}
+        
+        # Оптимизация
+        ctk.set_widget_scaling(1.0)
+        ctk.set_window_scaling(1.0)
         
         self.title("Secure Pass Pro v3.9")
         self.resizable(False, False)
 
         self._setup_main_icon()
         
-        # Generator Logic Flags / Флаги логики генератора / Прапорці логіки генератора
         self.upper_var = tk.BooleanVar(value=True)
         self.lower_var = tk.BooleanVar(value=True)
         self.digits_var = tk.BooleanVar(value=True)
@@ -313,40 +356,146 @@ class SecurePassPro(ctk.CTk):
         self._setup_ui()
         self._apply_lang("RU")
         self._center_main_window()
-        
-        # Apply system rounding to main window / Применить внешнее закругление окна / Застосувати зовнішнє закруглення вікна
         self._apply_window_rounding(self)
+        
+        # Загружаем настройки после создания UI
+        self.after(50, self._load_all_settings)
+        self.after(50, self._load_radius_settings)
+
+    def _load_radius_settings(self):
+        """Load saved corner radius from config file"""
+        try:
+            config_file = os.path.join(os.path.expanduser("~"), ".securepasspro", "config.txt")
+            if os.path.exists(config_file):
+                with open(config_file, "r", encoding="utf-8") as f:
+                    for line in f:
+                        if line.startswith("RADIUS="):
+                            radius = int(line.strip().split("=")[1])
+                            if 0 <= radius <= 25:
+                                self.current_radius = radius
+                                self._change_radius(radius)
+        except:
+            pass
+
+    def _save_radius_settings(self, radius):
+        """Save corner radius to config file"""
+        try:
+            config_dir = os.path.join(os.path.expanduser("~"), ".securepasspro")
+            os.makedirs(config_dir, exist_ok=True)
+            config_file = os.path.join(config_dir, "config.txt")
+            existing = {}
+            if os.path.exists(config_file):
+                with open(config_file, "r", encoding="utf-8") as f:
+                    for line in f:
+                        if "=" in line:
+                            key, val = line.strip().split("=", 1)
+                            existing[key] = val
+            existing["RADIUS"] = str(radius)
+            with open(config_file, "w", encoding="utf-8") as f:
+                for key, val in existing.items():
+                    f.write(f"{key}={val}\n")
+        except:
+            pass
+
+    def _load_all_settings(self):
+        """Load all settings from config file"""
+        try:
+            config_file = os.path.join(os.path.expanduser("~"), ".securepasspro", "config.txt")
+            if os.path.exists(config_file):
+                with open(config_file, "r", encoding="utf-8") as f:
+                    for line in f:
+                        if line.startswith("THEME="):
+                            theme = line.strip().split("=")[1]
+                            if theme in ["System", "Light", "Dark"]:
+                                self.current_theme = theme
+                                ctk.set_appearance_mode(theme)
+                        elif line.startswith("LANG="):
+                            lang = line.strip().split("=")[1]
+                            if lang in ["RU", "EN", "UA"]:
+                                self._apply_lang(lang)
+                        elif line.startswith("SOUND="):
+                            sound_val = line.strip().split("=")[1].lower() == "true"
+                            self.sound_enabled.set(sound_val)
+        except:
+            pass
+
+    def _save_theme_settings(self):
+        try:
+            config_dir = os.path.join(os.path.expanduser("~"), ".securepasspro")
+            os.makedirs(config_dir, exist_ok=True)
+            config_file = os.path.join(config_dir, "config.txt")
+            existing = {}
+            if os.path.exists(config_file):
+                with open(config_file, "r", encoding="utf-8") as f:
+                    for line in f:
+                        if "=" in line:
+                            key, val = line.strip().split("=", 1)
+                            existing[key] = val
+            existing["THEME"] = self.current_theme
+            with open(config_file, "w", encoding="utf-8") as f:
+                for key, val in existing.items():
+                    f.write(f"{key}={val}\n")
+        except:
+            pass
+
+    def _save_language_settings(self):
+        try:
+            config_dir = os.path.join(os.path.expanduser("~"), ".securepasspro")
+            os.makedirs(config_dir, exist_ok=True)
+            config_file = os.path.join(config_dir, "config.txt")
+            existing = {}
+            if os.path.exists(config_file):
+                with open(config_file, "r", encoding="utf-8") as f:
+                    for line in f:
+                        if "=" in line:
+                            key, val = line.strip().split("=", 1)
+                            existing[key] = val
+            existing["LANG"] = self.current_lang
+            with open(config_file, "w", encoding="utf-8") as f:
+                for key, val in existing.items():
+                    f.write(f"{key}={val}\n")
+        except:
+            pass
+
+    def _save_sound_settings(self):
+        try:
+            config_dir = os.path.join(os.path.expanduser("~"), ".securepasspro")
+            os.makedirs(config_dir, exist_ok=True)
+            config_file = os.path.join(config_dir, "config.txt")
+            existing = {}
+            if os.path.exists(config_file):
+                with open(config_file, "r", encoding="utf-8") as f:
+                    for line in f:
+                        if "=" in line:
+                            key, val = line.strip().split("=", 1)
+                            existing[key] = val
+            existing["SOUND"] = str(self.sound_enabled.get())
+            with open(config_file, "w", encoding="utf-8") as f:
+                for key, val in existing.items():
+                    f.write(f"{key}={val}\n")
+        except:
+            pass
 
     def _apply_window_rounding(self, window):
-        """
-        Rounding the external window corners (Windows 11 effect)
-        Закругление внешних углов окна программы (эффект Windows 11)
-        Закруглення зовнішніх кутів вікна програми (ефект Windows 11)
-        """
         if not _IS_WINDOWS: return
         try:
             window.update()
             HWND = ctypes.windll.user32.GetParent(window.winfo_id())
             DWMWA_WINDOW_CORNER_PREFERENCE = 33
-            DWMWCP_ROUND = 2  # Standard rounding / Стандартное скругление / Стандартне заокруглення
+            DWMWCP_ROUND = 2
             ctypes.windll.dwmapi.DwmSetWindowAttribute(
                 HWND, 
                 DWMWA_WINDOW_CORNER_PREFERENCE, 
                 ctypes.byref(ctypes.c_int(DWMWCP_ROUND)), 
                 ctypes.sizeof(ctypes.c_int(DWMWCP_ROUND))
             )
-        except (AttributeError, OSError, tk.TclError) as exc:
-            logging.debug("Window rounding failed: %s", exc)
+        except:
+            pass
 
     def _get_icon_path(self):
         return self._get_resource_path("icon.ico")
 
     def _get_resource_path(self, filename):
-        """
-        Resource path for source and PyInstaller builds
-        Путь к ресурсу для исходника и сборки PyInstaller
-        Шлях до ресурсу для джерельного файлу та збірки PyInstaller
-        """
         if hasattr(sys, '_MEIPASS'):
             base_dir = sys._MEIPASS
         else:
@@ -363,7 +512,7 @@ class SecurePassPro(ctk.CTk):
                     if self._icon_image is None:
                         self._icon_image = tk.PhotoImage(file=icon_path)
                     window.iconphoto(True, self._icon_image)
-            except (OSError, tk.TclError):
+            except:
                 pass
 
     def _setup_main_icon(self):
@@ -372,37 +521,22 @@ class SecurePassPro(ctk.CTk):
     def _play_sound(self, sound_type: str = "click"):
         if not self.sound_enabled.get() or not _IS_WINDOWS: 
             return
-            
         try:
-            # Определяем путь к файлу (учитываем сборку PyInstaller)
             if hasattr(sys, '_MEIPASS'):
                 base_path = sys._MEIPASS
             else:
                 base_path = os.path.dirname(os.path.abspath(__file__))
-            
-            # Мы используем один и тот же файл для всех типов действий,
-            # чтобы избежать стандартных Windows Beep
             file_name = "Computer Mouse Click.mp3"
             file_path = os.path.join(base_path, file_name)
-            
             if os.path.exists(file_path):
-                # Используем WinAPI через ctypes для проигрывания без «бипов»
                 winmm = ctypes.windll.winmm
-                
-                # Команды MCI для Windows
                 alias = "app_click"
                 winmm.mciSendStringW(f'close {alias}', None, 0, 0)
                 winmm.mciSendStringW(f'open "{file_path}" type mpegvideo alias {alias}', None, 0, 0)
                 winmm.mciSendStringW(f'play {alias} from 0', None, 0, 0)
-                
-                # Автоматическое закрытие ресурса через 1 секунду
                 self.after(1000, lambda: winmm.mciSendStringW(f'close {alias}', None, 0, 0))
-            else:
-                # Если файла нет, просто молчим. Никаких winsound.MessageBeep!
-                logging.debug("Sound file not found: %s", file_path)
-                
-        except Exception as exc:
-            logging.debug("Audio Error: %s", exc)
+        except:
+            pass
 
     def _center_main_window(self):
         self.update_idletasks()
@@ -410,25 +544,35 @@ class SecurePassPro(ctk.CTk):
         y = (self.winfo_screenheight() // 2) - (780 // 2)
         self.geometry(f"850x780+{x}+{y}")
 
-    def _center_window(self, window, width, height):
+    def _center_window_relative_to_parent(self, window, width, height):
         window.update_idletasks()
-        x = self.winfo_x() + (self.winfo_width() // 2) - (width // 2)
-        y = self.winfo_y() + (self.winfo_height() // 2) - (height // 2)
+        parent_x = self.winfo_x()
+        parent_y = self.winfo_y()
+        parent_width = self.winfo_width()
+        parent_height = self.winfo_height()
+        
+        x = parent_x + (parent_width // 2) - (width // 2)
+        y = parent_y + (parent_height // 2) - (height // 2)
+        
+        screen_width = self.winfo_screenwidth()
+        screen_height = self.winfo_screenheight()
+        
+        if x < 0:
+            x = 10
+        if y < 30:
+            y = 30
+        if x + width > screen_width:
+            x = screen_width - width - 10
+        if y + height > screen_height:
+            y = screen_height - height - 10
+            
         window.geometry(f"{width}x{height}+{x}+{y}")
-        window.transient(self)
-        window.grab_set()
 
     def _setup_ui(self):
-        """
-        Building the GUI structure
-        Создание структуры графического интерфейса
-        Створення структури графічного інтерфейсу
-        """
         self.grid_columnconfigure(0, weight=1)
         self.grid_columnconfigure(1, weight=0)
         self.grid_rowconfigure(0, weight=1)
 
-        # Left Panel (Settings & Result) / Левая панель (настройки и результат) / Ліва панель (налаштування та результат)
         self.left_panel = ctk.CTkFrame(self, fg_color="transparent")
         self.left_panel.grid(row=0, column=0, sticky="nsew", padx=20, pady=(10, 0))
 
@@ -475,13 +619,9 @@ class SecurePassPro(ctk.CTk):
         self.entry_res.pack(pady=10, padx=40, fill="x")
         self._radius_widgets.append(self.entry_res)
 
-        # Strength indicators / Индикаторы стойкости / Індикатори стійкості
-        self.strength_bar = ctk.CTkProgressBar(self.left_panel, width=400, height=8)
-        self.strength_bar.set(0)
-        self.strength_bar.pack(pady=(5, 5))
-        
-        self.lbl_stars_top = ctk.CTkLabel(self.left_panel, text="", font=("Segoe UI", 24), text_color="#FFD700")
-        self.lbl_stars_top.pack()
+        # Звезды надежности пароля
+        self.lbl_stars_top = ctk.CTkLabel(self.left_panel, text="", font=("Segoe UI", 24))
+        self.lbl_stars_top.pack(pady=(5, 0))
 
         self.lbl_strength_text = ctk.CTkLabel(self.left_panel, text="", font=("Segoe UI", 14, "bold"))
         self.lbl_strength_text.pack()
@@ -491,7 +631,6 @@ class SecurePassPro(ctk.CTk):
         self.lbl_crack = ctk.CTkLabel(self.left_panel, text="", font=("Segoe UI", 13, "bold"), wraplength=500)
         self.lbl_crack.pack(pady=(0, 5))
 
-        # Right Panel (Menu) / Правая панель (меню) / Права панель (меню)
         self.right_panel = ctk.CTkFrame(self, width=250)
         self.right_panel.grid(row=0, column=1, sticky="nsew", padx=(0, 20), pady=20)
         self.right_panel.grid_propagate(False)
@@ -507,39 +646,20 @@ class SecurePassPro(ctk.CTk):
         self.btn_qr = self._create_menu_btn(self.right_panel, "btn_qr", "tt_qr", self._show_qr, "#8764b8")
         self.btn_hist = self._create_menu_btn(self.right_panel, "btn_hist", "tt_hist", self._show_history, "#4b4b4b")
         self.btn_upd = self._create_menu_btn(self.right_panel, "btn_upd", "tt_upd", lambda: webbrowser.open(UPD_URL), "#ca5010")
+        self.btn_settings = self._create_menu_btn(self.right_panel, "btn_settings", "tt_settings", self._show_settings, "#2d6a4f")
         self.btn_about = self._create_menu_btn(self.right_panel, "btn_about", "tt_about", self._show_about, "#4b4b4b")
 
-        # Bottom Panel (Control & Personalization) / Нижняя панель (управление и персонализация) / Нижня панель (керування та персоналізація)
+        # Нижняя панель с золотыми звездами (оценка программы)
         self.bottom_frame = ctk.CTkFrame(self, fg_color=("#e0e0e0", "#1e1e1e"), corner_radius=15)
         self.bottom_frame.grid(row=1, column=0, columnspan=2, sticky="ew", padx=20, pady=(0, 15))
         
-        self.lbl_radius = ctk.CTkLabel(self.bottom_frame, text="", text_color=("black", "white"), height=20)
-        self.lbl_radius.pack(pady=(5, 0))
-        self.slider_radius = ctk.CTkSlider(self.bottom_frame, from_=0, to=25, width=400, command=self._change_radius)
-        self.slider_radius.set(10)
-        self.slider_radius.pack(pady=2)
-
-        self.ctrl_line = ctk.CTkFrame(self.bottom_frame, fg_color="transparent")
-        self.ctrl_line.pack(fill="x", padx=20, pady=5)
-
-        self.lang_sw = ctk.CTkSegmentedButton(self.ctrl_line, values=["RU", "EN", "UA"], command=self._apply_lang)
-        self.lang_sw.set("RU")
-        self.lang_sw.pack(side="left")
-
-        self.btn_sound = ctk.CTkButton(self.ctrl_line, text="", width=120, command=self._toggle_sound, fg_color="#4b4b4b")
-        self.btn_sound.pack(side="left", padx=10)
-
-        self.btn_theme = ctk.CTkOptionMenu(self.ctrl_line, values=[], command=self._change_theme, width=200)
-        self.btn_theme.pack(side="right")
-
-        self.lbl_app_rating = ctk.CTkLabel(self.bottom_frame, text="★★★★★", font=("Segoe UI", 24), text_color="#FFD700", height=25)
-        self.lbl_app_rating.pack(pady=(0, 5))
+        self.lbl_app_rating = ctk.CTkLabel(self.bottom_frame, text="★★★★★", font=("Segoe UI", 20), text_color="#FFD700")
+        self.lbl_app_rating.pack(pady=(5, 5))
 
     def _create_menu_btn(self, parent, lang_key, tt_key, cmd, color):
-        # Цвета для свечения (границы)
         colors_map = {
             "#0067c0": "#00A2FF", "#107c10": "#20CF20", "#0078d4": "#309FFF",
-            "#8764b8": "#B080FF", "#4b4b4b": "#808080", "#ca5010": "#FF8C00"
+            "#8764b8": "#B080FF", "#4b4b4b": "#808080", "#ca5010": "#FF8C00", "#2d6a4f": "#40916c"
         }
         neon_color = colors_map.get(color, color)
 
@@ -553,7 +673,7 @@ class SecurePassPro(ctk.CTk):
             border_color=neon_color,
             font=("Segoe UI Variable", 13, "bold"),
             hover_color=neon_color,
-            corner_radius=10
+            corner_radius=self.current_radius
         )
         btn.pack(pady=6, padx=15, fill="x")
         
@@ -565,74 +685,285 @@ class SecurePassPro(ctk.CTk):
         return btn
 
     def _run_menu_command(self, command):
-        """
-        Run menu action with click feedback
-        Запуск действия меню со звуком клика
-        Запуск дії меню зі звуком кліка
-        """
         self._play_sound("click")
         command()
 
     def _change_radius(self, val):
         rad = int(val)
-        L = LANGUAGES[self.current_lang]
-        self.lbl_radius.configure(text=f"{L['radius']}: {rad}")
+        self.current_radius = rad
         
         menu_btns = [
             self.btn_gen, self.btn_copy, self.btn_save, self.btn_open, 
-            self.btn_qr, self.btn_hist, self.btn_upd, self.btn_about
+            self.btn_qr, self.btn_hist, self.btn_upd, self.btn_settings, self.btn_about
         ]
 
         for btn in menu_btns:
             btn.configure(corner_radius=rad)
-            if hasattr(btn, "neon_container"):
-                btn.neon_container.configure(corner_radius=rad)
 
-        # Остальные виджеты (поле вывода, панели и т.д.)
         for w in self._radius_widgets:
             if w not in menu_btns: 
                 try:
                     w.configure(corner_radius=rad)
-                except Exception:
+                except:
                     pass
 
-        # Чекбоксы всегда чуть меньше
-        cb_rad = rad // 2
+        cb_rad = max(rad // 2, 0)
         for cb in [self.cb_upper, self.cb_lower, self.cb_digits, self.cb_symb,
                    self.cb_ambig, self.cb_unambig, self.cb_at_least, self.cb_hide]:
             cb.configure(corner_radius=cb_rad)
         
-        # ИСПРАВЛЕНИЕ 2: Убран дублированный блок menu_btns + цикл (был продублирован дважды).
-        # Синхронизация рамки через master, если это CTkFrame
-        for btn in menu_btns:
-            if hasattr(btn, "master") and isinstance(btn.master, ctk.CTkFrame):
-                btn.master.configure(corner_radius=rad)
-        
         self.bottom_frame.configure(corner_radius=rad)
+        self.right_panel.configure(corner_radius=rad)
+        
+        # Update radius label in settings window if open
+        if hasattr(self, 'settings_radius_label') and self.settings_radius_label and self.settings_radius_label.winfo_exists():
+            L = LANGUAGES[self.current_lang]
+            self.settings_radius_label.configure(text=f"{L['settings_radius']}: {rad}")
+        
+        # Save radius setting
+        self._save_radius_settings(rad)
 
-    def _change_theme(self, choice):
+    def _show_settings(self):
+        if self.settings_window and self.settings_window.winfo_exists():
+            self.settings_window.lift()
+            self.settings_window.focus_force()
+            return
+        
         L = LANGUAGES[self.current_lang]
-        theme_map = {
-            L["theme_sys"]: ("theme_sys", "System"),
-            L["theme_dark"]: ("theme_dark", "Dark"),
-            L["theme_light"]: ("theme_light", "Light"),
+        
+        self.settings_window = ctk.CTkToplevel(self)
+        self.settings_window.title(L["settings_title"])
+        self.settings_window.resizable(False, False)
+        self._set_window_icon(self.settings_window)
+        
+        self.settings_window.transient(self)
+        self.settings_window.attributes('-topmost', True)
+        self.settings_window.after(100, lambda: self.settings_window.attributes('-topmost', False))
+        self.settings_window.focus_force()
+        self.settings_window.grab_set()
+        
+        self._center_window_relative_to_parent(self.settings_window, 420, 480)
+        self._apply_window_rounding(self.settings_window)
+        
+        self.settings_window.protocol("WM_DELETE_WINDOW", self._close_settings)
+        
+        main_frame = ctk.CTkFrame(self.settings_window, fg_color="transparent")
+        main_frame.pack(fill="both", expand=True, padx=30, pady=20)
+        
+        # Language selection
+        lang_label = ctk.CTkLabel(main_frame, text=L["settings_lang"], font=("Segoe UI", 16, "bold"))
+        lang_label.pack(pady=(0, 8))
+        
+        lang_frame = ctk.CTkFrame(main_frame, fg_color="transparent")
+        lang_frame.pack(pady=(0, 12))
+        
+        for lang in ["RU", "EN", "UA"]:
+            btn = ctk.CTkButton(
+                lang_frame, 
+                text=lang, 
+                width=80, 
+                height=35,
+                command=lambda l=lang: self._change_language(l),
+                fg_color="#2d6a4f" if self.current_lang == lang else "#4b4b4b",
+                font=("Segoe UI", 14, "bold"),
+                corner_radius=8
+            )
+            btn.pack(side="left", padx=5)
+            self.lang_buttons[lang] = btn
+        
+        # Separator
+        sep1 = ctk.CTkFrame(main_frame, height=2, fg_color="gray")
+        sep1.pack(fill="x", pady=8)
+        
+        # Theme selection
+        theme_label = ctk.CTkLabel(main_frame, text=L["settings_theme"], font=("Segoe UI", 16, "bold"))
+        theme_label.pack(pady=(8, 8))
+        
+        theme_frame = ctk.CTkFrame(main_frame, fg_color="transparent")
+        theme_frame.pack(pady=(0, 12))
+        
+        sys_btn = ctk.CTkButton(
+            theme_frame, text=L["theme_sys"], width=100, height=35,
+            command=lambda: self._change_theme("System"),
+            fg_color="#2d6a4f" if self.current_theme == "System" else "#4b4b4b",
+            font=("Segoe UI", 12), corner_radius=8
+        )
+        sys_btn.pack(side="left", padx=5)
+        
+        light_btn = ctk.CTkButton(
+            theme_frame, text=L["theme_light"], width=100, height=35,
+            command=lambda: self._change_theme("Light"),
+            fg_color="#2d6a4f" if self.current_theme == "Light" else "#4b4b4b",
+            font=("Segoe UI", 12), corner_radius=8
+        )
+        light_btn.pack(side="left", padx=5)
+        
+        dark_btn = ctk.CTkButton(
+            theme_frame, text=L["theme_dark"], width=100, height=35,
+            command=lambda: self._change_theme("Dark"),
+            fg_color="#2d6a4f" if self.current_theme == "Dark" else "#4b4b4b",
+            font=("Segoe UI", 12), corner_radius=8
+        )
+        dark_btn.pack(side="left", padx=5)
+        
+        self.theme_buttons = {"System": sys_btn, "Light": light_btn, "Dark": dark_btn}
+        
+        # Separator
+        sep2 = ctk.CTkFrame(main_frame, height=2, fg_color="gray")
+        sep2.pack(fill="x", pady=8)
+        
+        # Corner radius selection
+        radius_label = ctk.CTkLabel(main_frame, text=f"{L['settings_radius']}: {self.current_radius}", font=("Segoe UI", 16, "bold"))
+        radius_label.pack(pady=(8, 5))
+        self.settings_radius_label = radius_label
+        
+        radius_slider = ctk.CTkSlider(main_frame, from_=0, to=25, command=self._on_radius_change, width=300)
+        radius_slider.set(self.current_radius)
+        radius_slider.pack(pady=(5, 12))
+        
+        # Separator
+        sep3 = ctk.CTkFrame(main_frame, height=2, fg_color="gray")
+        sep3.pack(fill="x", pady=8)
+        
+        # Sound toggle
+        sound_label = ctk.CTkLabel(main_frame, text=L["settings_sound"], font=("Segoe UI", 16, "bold"))
+        sound_label.pack(pady=(8, 8))
+        
+        sound_text = L["sound_on"] if self.sound_enabled.get() else L["sound_off"]
+        sound_btn = ctk.CTkButton(
+            main_frame,
+            text=sound_text,
+            width=150,
+            height=40,
+            command=self._toggle_sound_settings,
+            fg_color="#0078d4",
+            font=("Segoe UI", 14),
+            corner_radius=10
+        )
+        sound_btn.pack(pady=(0, 15))
+        
+        # Close button
+        close_btn = ctk.CTkButton(
+            main_frame,
+            text=L["close"],
+            command=self._close_settings,
+            fg_color="#ca5010",
+            width=150,
+            height=40,
+            font=("Segoe UI", 14),
+            corner_radius=10
+        )
+        close_btn.pack(pady=(5, 10))
+        
+        self.settings_labels = {
+            'lang': lang_label,
+            'theme': theme_label,
+            'sound': sound_label,
+            'close_btn': close_btn,
+            'sound_btn': sound_btn,
+            'radius_slider': radius_slider
         }
-        self.current_theme_key, mode = theme_map.get(choice, ("theme_light", "Light"))
-        self.after(0, lambda: ctk.set_appearance_mode(mode))
+
+    def _on_radius_change(self, val):
+        """Handle radius slider change"""
+        rad = int(val)
+        if hasattr(self, 'settings_radius_label') and self.settings_radius_label and self.settings_radius_label.winfo_exists():
+            L = LANGUAGES[self.current_lang]
+            self.settings_radius_label.configure(text=f"{L['settings_radius']}: {rad}")
+        self._change_radius(rad)
+
+    def _close_settings(self):
+        if self.settings_window:
+            self.settings_window.grab_release()
+            self.settings_window.destroy()
+            self.settings_window = None
+            self.settings_labels = {}
+            self.lang_buttons = {}
+            self.theme_buttons = {}
+
+    def _change_language(self, lang):
+        self.current_lang = lang
+        self._apply_lang(lang)
+        self._save_language_settings()
+        
+        # Update language button colors
+        if self.lang_buttons:
+            for l, btn in self.lang_buttons.items():
+                if btn.winfo_exists():
+                    btn.configure(fg_color="#2d6a4f" if l == lang else "#4b4b4b")
+        
+        if self.settings_window and self.settings_window.winfo_exists():
+            L = LANGUAGES[self.current_lang]
+            self.settings_window.title(L["settings_title"])
+            
+            if self.settings_labels:
+                if 'lang' in self.settings_labels and self.settings_labels['lang']:
+                    self.settings_labels['lang'].configure(text=L["settings_lang"])
+                if 'theme' in self.settings_labels and self.settings_labels['theme']:
+                    self.settings_labels['theme'].configure(text=L["settings_theme"])
+                if 'sound' in self.settings_labels and self.settings_labels['sound']:
+                    self.settings_labels['sound'].configure(text=L["settings_sound"])
+                if 'close_btn' in self.settings_labels and self.settings_labels['close_btn']:
+                    self.settings_labels['close_btn'].configure(text=L["close"])
+                if 'sound_btn' in self.settings_labels and self.settings_labels['sound_btn']:
+                    self.settings_labels['sound_btn'].configure(text=L["sound_on"] if self.sound_enabled.get() else L["sound_off"])
+            
+            # Update radius label
+            if hasattr(self, 'settings_radius_label') and self.settings_radius_label and self.settings_radius_label.winfo_exists():
+                self.settings_radius_label.configure(text=f"{L['settings_radius']}: {self.current_radius}")
+            
+            # Update theme buttons text
+            if hasattr(self, "theme_buttons"):
+                if "System" in self.theme_buttons and self.theme_buttons["System"].winfo_exists():
+                    self.theme_buttons["System"].configure(text=L["theme_sys"])
+                if "Light" in self.theme_buttons and self.theme_buttons["Light"].winfo_exists():
+                    self.theme_buttons["Light"].configure(text=L["theme_light"])
+                if "Dark" in self.theme_buttons and self.theme_buttons["Dark"].winfo_exists():
+                    self.theme_buttons["Dark"].configure(text=L["theme_dark"])
+
+    def _change_theme(self, mode):
+        """Safe theme change - close settings window first to avoid freezing"""
+        self.current_theme = mode
+        self._save_theme_settings()
+        
+        # Update button colors immediately
+        if self.theme_buttons:
+            for name, btn in self.theme_buttons.items():
+                if btn.winfo_exists():
+                    if name == mode:
+                        btn.configure(fg_color="#2d6a4f")
+                    else:
+                        btn.configure(fg_color="#4b4b4b")
+        
+        # Close settings window to prevent freezing
+        if self.settings_window and self.settings_window.winfo_exists():
+            self._close_settings()
+        
+        # Apply theme with minimal delay
+        def apply_theme():
+            try:
+                ctk.set_appearance_mode(mode)
+                self.update_idletasks()
+            except:
+                pass
+        
+        self.after(50, apply_theme)
+
+    def _toggle_sound_settings(self):
+        self.sound_enabled.set(not self.sound_enabled.get())
+        if hasattr(self, 'settings_labels') and self.settings_labels and 'sound_btn' in self.settings_labels and self.settings_labels['sound_btn']:
+            L = LANGUAGES[self.current_lang]
+            self.settings_labels['sound_btn'].configure(text=L["sound_on"] if self.sound_enabled.get() else L["sound_off"])
+        self._play_sound("click")
+        self._save_sound_settings()
 
     def _apply_lang(self, lang):
-        """
-        Switching UI Language
-        Смена языка интерфейса
-        Зміна мови інтерфейсу
-        """
         self.current_lang = lang
         L = LANGUAGES[lang]
         self.lbl_author.configure(text=L["author"])
         self.lbl_menu.configure(text=L["menu_title"])
         self.lbl_title.configure(text=L["proton_title"])
         self._update_len_label(self.slider_len.get())
-        self._update_sound_btn_text()
         self.cb_upper.configure(text=L["upper"])
         self.cb_lower.configure(text=L["lower"])
         self.cb_digits.configure(text=L["digits"])
@@ -641,14 +972,14 @@ class SecurePassPro(ctk.CTk):
         self.cb_unambig.configure(text=L["unambig"])
         self.cb_at_least.configure(text=L["at_least"])
         self.cb_hide.configure(text=L["hide"])
-        menu_btns = [self.btn_gen, self.btn_copy, self.btn_save, self.btn_open, self.btn_qr, self.btn_hist, self.btn_upd, self.btn_about]
+        
+        menu_btns = [self.btn_gen, self.btn_copy, self.btn_save, self.btn_open, 
+                     self.btn_qr, self.btn_hist, self.btn_upd, self.btn_settings, self.btn_about]
         for btn in menu_btns:
             btn.configure(text=L[btn.lang_key])
             if btn.lang_key in self._tooltips:
                 self._tooltips[btn.lang_key].set_text(L[btn.tt_key])
-        self.btn_theme.configure(values=[L["theme_sys"], L["theme_dark"], L["theme_light"]])
-        self.btn_theme.set(L[self.current_theme_key])
-        self._change_radius(self.slider_radius.get())
+        
         self.title(L["win_title"])
 
     def _update_len_label(self, val):
@@ -661,24 +992,8 @@ class SecurePassPro(ctk.CTk):
         else:
             self.entry_res.configure(show="")
 
-    def _toggle_sound(self):
-        self.sound_enabled.set(not self.sound_enabled.get())
-        self._update_sound_btn_text()
-        self._play_sound("click")
-
-    def _update_sound_btn_text(self):
-        L = LANGUAGES[self.current_lang]
-        txt = L["sound_on"] if self.sound_enabled.get() else L["sound_off"]
-        self.btn_sound.configure(text=txt)
-
     def _generate(self):
-        """
-        Main Generation Logic (Secrets Module)
-        Основная логика генерации (Модуль Secrets)
-        Основна логіка генерації (Модуль Secrets)
-        """
         L = LANGUAGES[self.current_lang]
-        # ИСПРАВЛЕНИЕ 3: Было AMBIGUOUS_CHARS (опечатка), исправлено на AMBIGUOUS_CHARS
         exclude = set(AMBIGUOUS_CHARS if self.ambig_var.get() else "")
         if self.unambig_var.get(): exclude.update(set(UNAMBIG_CHARS))
         
@@ -710,12 +1025,12 @@ class SecurePassPro(ctk.CTk):
                 if p: result.append(secrets.choice(p))
                 
         if len(result) > length:
-            self._secure_random.shuffle(result)
+            random.shuffle(result)
             result = result[:length]
         else:
             while len(result) < length:
                 result.append(secrets.choice(full_pool))
-        self._secure_random.shuffle(result)
+        random.shuffle(result)
         pwd = "".join(result)
         
         self.entry_res.delete(0, "end")
@@ -726,21 +1041,32 @@ class SecurePassPro(ctk.CTk):
         combinations = f"{pool_size**length:.1e}"
         self.lbl_strength.configure(text=L["strength"].format(combinations))
         
-        if entropy_bits < 40: crack_phrase, color, progress, stars = L["time_sec"], "#FF4C4C", 0.25, "★☆☆☆☆"
-        elif entropy_bits < 60: crack_phrase, color, progress, stars = L["time_day"], "#FFA500", 0.5, "★★★☆☆"
-        elif entropy_bits < 80: crack_phrase, color, progress, stars = L["time_year"], "#FFFF00", 0.75, "★★★★☆"
-        else: crack_phrase, color, progress, stars = L["time_cent"], "#2ECC71", 1.0, "★★★★★"
+        # Звезды надежности пароля с правильными цветами
+        if entropy_bits < 40:
+            stars_display = "★☆☆☆☆"
+            stars_color = "#FF4C4C"
+            st_text = L["st_low"]
+            crack_phrase = L["time_sec"]
+        elif entropy_bits < 60:
+            stars_display = "★★★☆☆"
+            stars_color = "#FFA500"
+            st_text = L["st_mid"]
+            crack_phrase = L["time_day"]
+        elif entropy_bits < 80:
+            stars_display = "★★★★☆"
+            stars_color = "#FFD700"
+            st_text = L["st_mid"]
+            crack_phrase = L["time_year"]
+        else:
+            stars_display = "★★★★★"
+            stars_color = "#2ECC71"
+            st_text = L["st_high"]
+            crack_phrase = L["time_cent"]
         
-        self.strength_bar.configure(progress_color=color)
-        self.strength_bar.set(progress)
-        self.lbl_stars_top.configure(text=stars, text_color=color)
-        st_text = L["st_low"] if progress <= 0.25 else (L["st_mid"] if progress <= 0.75 else L["st_high"])
-        self.lbl_strength_text.configure(text=st_text, text_color=color)
-        self.lbl_crack.configure(text=L["crack_time"].format(crack_phrase), text_color=color)
+        self.lbl_stars_top.configure(text=stars_display, text_color=stars_color)
+        self.lbl_strength_text.configure(text=st_text, text_color=stars_color)
+        self.lbl_crack.configure(text=L["crack_time"].format(crack_phrase), text_color=stars_color)
         
-        # Единственная запись в историю с корректным форматом временной метки
-        # Single history entry with proper timestamp format
-        # Єдиний запис в історію з правильним форматом мітки часу
         timestamp = datetime.datetime.now().strftime("[%H:%M:%S]")
         self.history.append(f"{timestamp} {pwd}")
 
@@ -755,7 +1081,7 @@ class SecurePassPro(ctk.CTk):
         if self._clipboard_timer:
             try:
                 self.after_cancel(self._clipboard_timer)
-            except (tk.TclError, ValueError):
+            except:
                 pass
         self._clipboard_timer = self.after(60000, lambda value=pwd: self._clear_clipboard_if_current(value))
         
@@ -764,68 +1090,43 @@ class SecurePassPro(ctk.CTk):
         self.after(2000, lambda: self.btn_copy.configure(text=old_text))
 
     def _clear_clipboard_if_current(self, expected):
-        """
-        Clipboard auto-cleanup after copying
-        Автоочистка буфера после копирования
-        Автоочищення буфера після копіювання
-        """
         try:
             if self.clipboard_get() == expected:
                 self.clipboard_clear()
-        except (tk.TclError, RuntimeError, AttributeError):
+        except:
             pass
         finally:
             self._clipboard_timer = None
 
     def _verify_pdf(self, path):
-        """
-        PDF integrity check after write
-        Проверка целостности PDF после записи
-        Перевірка цілісності PDF після запису
-        """
         try:
             with open(path, "rb") as f:
                 header = f.read(5)
                 return header == b"%PDF-"
-        except OSError:
+        except:
             return False
 
     def _verify_text_file(self, path, expected_bytes):
-        """
-        Text save integrity check via SHA-256 (streaming, memory-safe)
-        Проверка целостности сохранения текста через SHA-256 (потоковая, безопасна по памяти)
-        Перевірка цілісності збереження тексту через SHA-256 (потокова, безпечна за пам'яттю)
-        """
         expected_hash = hashlib.sha256(expected_bytes).hexdigest()
         sha256_hash = hashlib.sha256()
         try:
             with open(path, "rb") as f:
-                # Read in 4 KB blocks — safe for large files / Читаем блоками 4 КБ — безопасно для больших файлов / Читаємо блоками 4 КБ
                 for byte_block in iter(lambda: f.read(4096), b""):
                     sha256_hash.update(byte_block)
             return sha256_hash.hexdigest() == expected_hash
-        except OSError:
+        except:
             return False
 
     def _get_supported_extension(self, path, extensions):
-        """
-        Validates file extension against allowed list
-        Проверяет расширение файла по списку допустимых
-        Перевіряє розширення файлу за списком допустимих
-        """
         ext = os.path.splitext(path)[1].lower()
         valid_exts = list(extensions)
         if ".pdf" not in valid_exts:
             valid_exts.append(".pdf")
-            
         if ext not in valid_exts:
             raise ValueError(ext)
         return ext
 
     def _save(self):
-        """
-        Save to TXT/KEY/LOG/PDF / Сохранение / Збереження
-        """
         L = LANGUAGES[self.current_lang]
         pwd = self.entry_res.get()
         if not pwd: return
@@ -845,50 +1146,56 @@ class SecurePassPro(ctk.CTk):
             try:
                 ext = self._get_supported_extension(path, SUPPORTED_EXTENSIONS)
                 if ext == ".pdf":
-                    pdf = FPDF()
+                    # Create PDF with UTF-8 support
+                    pdf = UTF8PDF()
                     pdf.set_author("Maxim Melnikov")
                     pdf.set_creator("Secure Pass Pro v3.9")
                     pdf.set_title("Secure Pass Pro Password")
                     pdf.add_page()
                     
-                    font_name = "Arial"
+                    # Load DejaVu font if available
+                    dejavu_loaded = False
                     if os.path.exists(self._pdf_font_path):
-                        pdf.add_font("DejaVu", "", self._pdf_font_path, uni=True)
-                        font_name = "DejaVu"
-
-                    pdf.set_font(font_name, 'B', 16)
+                        try:
+                            pdf.add_font('DejaVu', '', self._pdf_font_path, uni=True)
+                            dejavu_loaded = True
+                        except Exception:
+                            pass
+                    
+                    # Set font
+                    if dejavu_loaded:
+                        pdf.set_font('DejaVu', '', 16)
+                    else:
+                        pdf.set_font('Arial', 'B', 16)
+                    
                     pdf.cell(200, 10, txt="Secure Pass Pro v3.9", ln=True, align='C')
                     
-                    pdf.set_font(font_name, size=12)
+                    # Set font for content
+                    if dejavu_loaded:
+                        pdf.set_font('DejaVu', '', 12)
+                    else:
+                        pdf.set_font('Arial', '', 12)
+                    
                     pdf.ln(10)
                     
                     date_val = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-                    if font_name == "Arial":
-                        pdf.cell(200, 10, txt=f"Date: {date_val}", ln=True)
-                        pdf.cell(200, 10, txt=f"Password: {pwd}", ln=True)
-                    else:
-                        pdf.cell(200, 10, txt=f"{L['pdf_date']}: {date_val}", ln=True)
-                        pdf.cell(200, 10, txt=f"{L['pdf_pass']}: {pwd}", ln=True)
+                    pdf.cell(200, 10, txt=f"{L['pdf_date']}: {date_val}", ln=True)
+                    pdf.cell(200, 10, txt=f"{L['pdf_pass']}: {pwd}", ln=True)
                     
                     pdf.output(path)
-                    if not self._verify_pdf(path): raise IOError(L["err_integrity"])
+                    if not self._verify_pdf(path): 
+                        raise IOError(L["err_integrity"])
                 else:
                     pwd_bytes = pwd.encode("utf-8")
                     with open(path, "wb") as f:
                         f.write(pwd_bytes)
-                    if not self._verify_text_file(path, pwd_bytes): raise IOError(L["err_integrity"])
+                    if not self._verify_text_file(path, pwd_bytes): 
+                        raise IOError(L["err_integrity"])
                 self._play_sound("success")
-            except (OSError, ValueError, RuntimeError, UnicodeEncodeError, tk.TclError, IOError) as e:
-                # ИСПРАВЛЕНИЕ 6: IOError не был включён в список перехватываемых исключений _save,
-                # поэтому raise IOError(L["err_integrity"]) вылетал необработанным.
+            except Exception as e:
                 messagebox.showerror(L.get("err_title", "Error"), L["err_save"].format(e))
 
     def _open(self):
-        """
-        Open password from TXT/KEY/LOG/PDF
-        Открыть пароль из TXT/KEY/LOG/PDF
-        Відкрити пароль з TXT/KEY/LOG/PDF
-        """
         L = LANGUAGES[self.current_lang]
         supported_str = ";".join(f"*{ext}" for ext in SUPPORTED_EXTENSIONS)
         
@@ -907,13 +1214,11 @@ class SecurePassPro(ctk.CTk):
             return
 
         try:
-            # Validate extension / Проверяем расширение / Перевіряємо розширення
             ext = os.path.splitext(path)[1].lower()
             if ext not in SUPPORTED_EXTENSIONS:
                 raise ValueError(L["err_unsupported"].format(ext))
 
             if path.lower().endswith(".pdf"):
-                # Open PDF externally, cross-platform / Открыть PDF во внешней программе, кроссплатформенно / Відкрити PDF у зовнішній програмі
                 if _IS_WINDOWS:
                     os.startfile(path)
                 else:
@@ -928,26 +1233,40 @@ class SecurePassPro(ctk.CTk):
 
         except ValueError as ve:
             messagebox.showwarning(L.get("err_title", "Error"), str(ve))
-        except (OSError, UnicodeDecodeError, tk.TclError) as e:
+        except Exception as e:
             messagebox.showerror(L.get("err_title", "Error"), L["err_open"].format(e))
 
     def _show_qr(self):
         pwd = self.entry_res.get()
         if not pwd: return
+        
+        if self.qr_window and self.qr_window.winfo_exists():
+            self.qr_window.lift()
+            self.qr_window.focus_force()
+            return
+        
         L = LANGUAGES[self.current_lang]
-        rad = int(self.slider_radius.get())
-        qr_win = ctk.CTkToplevel(self)
-        qr_win.title(L["btn_qr"])
-        self._set_window_icon(qr_win)
-        self._center_window(qr_win, 380, 480)
-        self._apply_window_rounding(qr_win)
+        rad = self.current_radius
+        
+        self.qr_window = ctk.CTkToplevel(self)
+        self.qr_window.title(L["btn_qr"])
+        self._set_window_icon(self.qr_window)
+        
+        self.qr_window.transient(self)
+        self.qr_window.attributes('-topmost', True)
+        self.qr_window.after(100, lambda: self.qr_window.attributes('-topmost', False))
+        
+        self._center_window_relative_to_parent(self.qr_window, 380, 480)
+        self._apply_window_rounding(self.qr_window)
+        
+        self.qr_window.protocol("WM_DELETE_WINDOW", self._close_qr)
         
         resampling_source = getattr(Image, "Resampling", Image)
         resampling_filter = getattr(resampling_source, "LANCZOS", getattr(Image, "NEAREST", 0))
         img = qrcode.make(pwd).resize((280, 280), resampling_filter)
         ctk_img = ctk.CTkImage(light_image=img, dark_image=img, size=(280, 280))
         
-        f = ctk.CTkFrame(qr_win, fg_color="transparent")
+        f = ctk.CTkFrame(self.qr_window, fg_color="transparent")
         f.pack(expand=True, fill="both", padx=20, pady=20)
         ctk.CTkLabel(f, text=L["btn_qr"], font=("Segoe UI", 18, "bold")).pack()
         
@@ -956,18 +1275,38 @@ class SecurePassPro(ctk.CTk):
         qr_label = ctk.CTkLabel(disp, image=ctk_img, text="")
         qr_label.image = ctk_img
         qr_label.pack(padx=10, pady=10)
-        ctk.CTkButton(f, text="OK", command=qr_win.destroy, corner_radius=rad).pack(pady=10)
+        ctk.CTkButton(f, text="OK", command=self._close_qr, corner_radius=rad).pack(pady=10)
+        
+        self.qr_window.focus_force()
+
+    def _close_qr(self):
+        if self.qr_window:
+            self.qr_window.destroy()
+            self.qr_window = None
 
     def _show_history(self):
-        L = LANGUAGES[self.current_lang]
-        rad = int(self.slider_radius.get())
-        h_win = ctk.CTkToplevel(self)
-        h_win.title(L["btn_hist"])
-        self._set_window_icon(h_win)
-        self._center_window(h_win, 500, 580)
-        self._apply_window_rounding(h_win)
+        if self.history_window and self.history_window.winfo_exists():
+            self.history_window.lift()
+            self.history_window.focus_force()
+            return
         
-        f = ctk.CTkFrame(h_win, fg_color="transparent")
+        L = LANGUAGES[self.current_lang]
+        rad = self.current_radius
+        
+        self.history_window = ctk.CTkToplevel(self)
+        self.history_window.title(L["btn_hist"])
+        self._set_window_icon(self.history_window)
+        
+        self.history_window.transient(self)
+        self.history_window.attributes('-topmost', True)
+        self.history_window.after(100, lambda: self.history_window.attributes('-topmost', False))
+        
+        self._center_window_relative_to_parent(self.history_window, 500, 580)
+        self._apply_window_rounding(self.history_window)
+        
+        self.history_window.protocol("WM_DELETE_WINDOW", self._close_history)
+        
+        f = ctk.CTkFrame(self.history_window, fg_color="transparent")
         f.pack(expand=True, fill="both", padx=20, pady=20)
         ctk.CTkLabel(f, text=L["btn_hist"], font=("Segoe UI", 20, "bold")).pack(pady=10)
         
@@ -977,9 +1316,6 @@ class SecurePassPro(ctk.CTk):
         if not self.history:
             txt.insert("1.0", L["hist_empty"])
         else:
-            # ИСПРАВЛЕНИЕ 9: list(reversed(deque)) показывал бы новые записи последними,
-            # а list(self.history) — в порядке добавления (последние в конце).
-            # deque.append() добавляет справа, поэтому reversed даёт новые первыми — это верно.
             history_snapshot = list(reversed(self.history))
             txt.insert("1.0", "\n".join(history_snapshot))
         
@@ -992,55 +1328,64 @@ class SecurePassPro(ctk.CTk):
             fg_color="#d13438",
             command=lambda textbox=txt: self._clear_history_textbox(textbox)
         ).pack(side="left", padx=5)
-        ctk.CTkButton(btn_f, text="OK", corner_radius=rad, command=h_win.destroy).pack(side="right", padx=5)
+        ctk.CTkButton(btn_f, text="OK", corner_radius=rad, command=self._close_history).pack(side="right", padx=5)
+        
+        self.history_window.focus_force()
+        self.history_textbox = txt
+
+    def _close_history(self):
+        if self.history_window:
+            self.history_window.destroy()
+            self.history_window = None
+            self.history_textbox = None
 
     def _clear_history_textbox(self, textbox):
-        """
-        Clear password history window
-        Очистка окна истории паролей
-        Очищення вікна історії паролів
-        """
         L = LANGUAGES[self.current_lang]
         self.history.clear()
         textbox.delete("1.0", "end")
         textbox.insert("1.0", L["hist_empty"])
 
     def _show_about(self):
-        """
-        About window
-        Окно 'О программе'
-        Вікно 'Про програму'
-        """
+        if self.about_window and self.about_window.winfo_exists():
+            self.about_window.lift()
+            self.about_window.focus_force()
+            return
+        
         L = LANGUAGES[self.current_lang]
         wiki_url = "https://github.com/Maximka1993271/Password-Generator-Python/wiki/Security-Logic"
         
-        about_win = ctk.CTkToplevel(self)
-        about_win.title(L["btn_about"])
-        about_win.resizable(False, False)
-        about_win.attributes("-topmost", True)
+        self.about_window = ctk.CTkToplevel(self)
+        self.about_window.title(L["btn_about"])
+        self.about_window.resizable(False, False)
         
-        self._center_window(about_win, 400, 320) 
-        self._apply_window_rounding(about_win)
+        self.about_window.transient(self)
+        self.about_window.attributes('-topmost', True)
+        self.about_window.after(100, lambda: self.about_window.attributes('-topmost', False))
+        
+        self._center_window_relative_to_parent(self.about_window, 400, 350)
+        self._apply_window_rounding(self.about_window)
+        
+        self.about_window.protocol("WM_DELETE_WINDOW", self._close_about)
 
-        ctk.CTkLabel(about_win, text="Secure Pass Pro", font=("Segoe UI", 22, "bold")).pack(pady=(25, 5))
-        ctk.CTkLabel(about_win, text="Version 3.9", font=("Segoe UI", 14)).pack(pady=(0, 15))
+        ctk.CTkLabel(self.about_window, text="Secure Pass Pro", font=("Segoe UI", 22, "bold")).pack(pady=(25, 5))
+        ctk.CTkLabel(self.about_window, text="Version 3.9", font=("Segoe UI", 14)).pack(pady=(0, 15))
 
         ctk.CTkLabel(
-            about_win, 
+            self.about_window, 
             text=L["about_text"], 
             wraplength=350, 
             font=("Segoe UI", 13)
         ).pack(pady=10)
 
         ctk.CTkButton(
-            about_win, 
+            self.about_window, 
             text="OK", 
             width=120, 
-            command=about_win.destroy
+            command=self._close_about
         ).pack(pady=(20, 10))
 
         lbl_wiki = ctk.CTkLabel(
-            about_win, 
+            self.about_window, 
             text=L.get("wiki_link", "Security Logic Wiki"), 
             font=("Segoe UI", 12, "underline"),
             text_color="#1f538d",
@@ -1049,10 +1394,15 @@ class SecurePassPro(ctk.CTk):
         lbl_wiki.pack(pady=(0, 20))
         lbl_wiki.bind("<Button-1>", lambda e: webbrowser.open(wiki_url))
         
-        about_win.focus_set()
+        self.about_window.focus_force()
+
+    def _close_about(self):
+        if self.about_window:
+            self.about_window.destroy()
+            self.about_window = None
+
 
 if __name__ == "__main__":
-    # Установка темы по умолчанию / Set default theme / Встановити тему за замовчуванням
     ctk.set_appearance_mode("System")
     ctk.set_default_color_theme("blue")
     
