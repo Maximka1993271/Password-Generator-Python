@@ -36,7 +36,7 @@ It combines cryptographically secure password generation, multilingual interface
 
 - **Export and sharing**
   - Save and **Open** passwords as `.txt`, `.log`, `.key`, or `.pdf`.
-  - Unicode PDF export support.
+  - **Full Cyrillic support in PDF exports** using embedded DejaVuSans.ttf font.
   - QR-code generation for quick transfer to mobile devices.
 
 ---
@@ -60,6 +60,11 @@ Toggle UI sound effects on/off with a single click. When enabled, mechanical mou
 
 ### 📐 Corner Radius Control
 A new slider allows you to customize the roundness of all UI elements from **0 to 25 pixels** – make it perfectly square or beautifully rounded.
+
+### 📄 Enhanced PDF Export
+- **Full Unicode support** for Cyrillic characters (Russian & Ukrainian)
+- **Embedded DejaVuSans.ttf** font for professional PDF output
+- No more garbled text or missing characters in exported documents
 
 ### Additional Improvements
 - Redesigned interface with balanced layout and **neon color-coded action buttons**
@@ -95,6 +100,7 @@ Classic branch for users who prefer a minimal Tkinter-based interface.
 - **GUI**: `customtkinter`
 - **Audio**: `Windows Multimedia API (winmm)`
 - **Libraries**: `Pillow`, `qrcode`, `fpdf`
+- **PDF Font**: `DejaVuSans.ttf` (embedded, full Cyrillic support)
 - **Security**: `secrets`, `hashlib`, `random.SystemRandom`
 
 ### Changelog v3.9 (2026-05-10)
@@ -105,6 +111,7 @@ Classic branch for users who prefer a minimal Tkinter-based interface.
 - Added Theme Selector (System/Light/Dark) with safe theme switching
 - Added Sound Toggle with mechanical click feedback
 - Added Corner Radius Slider (0-25px) for UI customization
+- **Added DejaVuSans.ttf font** for proper Cyrillic display in PDF exports
 
 **Improvements:**
 - Removed deprecated theme buttons from bottom panel
@@ -112,6 +119,7 @@ Classic branch for users who prefer a minimal Tkinter-based interface.
 - Improved button highlighting for active theme/language selection
 - Enhanced clipboard auto-cleanup mechanism
 - Updated strength indicator with 5-star rating system
+- **Full Unicode/UTF-8 support for PDF documents**
 
 **Fixes:**
 - Fixed theme change freezing issues
@@ -127,9 +135,28 @@ Classic branch for users who prefer a minimal Tkinter-based interface.
 To build a standalone Windows executable:
 
 ```bash
-pyinstaller --noconfirm --onefile --windowed --clean --icon="icon.ico" --add-data "icon.ico;." --add-data "Computer Mouse Click.mp3;." --collect-all qrcode --collect-all customtkinter --hidden-import="PIL._tkinter_finder" --name "SecurePassPro" Secure_Pass_Pro.pyw
+pyinstaller --noconfirm --onefile --windowed --clean --icon="icon.ico" --add-data "icon.ico;." --add-data "Computer Mouse Click.mp3;." --add-data "DejaVuSans.ttf;." --collect-all qrcode --collect-all customtkinter --hidden-import="PIL._tkinter_finder" --name "SecurePassPro" Secure_Pass_Pro.pyw
+
 
 📄 License
 MIT License – free for personal and commercial use.
 
 © 2026 Maxim Melnikov | Secure Pass Pro
+
+
+**Что добавлено про DejaVuSans.ttf:**
+
+1. **В раздел "Export and sharing"** - добавлена строка о полной поддержке кириллицы в PDF с использованием DejaVuSans.ttf
+
+2. **Новый подраздел "📄 Enhanced PDF Export"** в "What's New" с тремя пунктами:
+   - Full Unicode support for Cyrillic characters
+   - Embedded DejaVuSans.ttf font
+   - No more garbled text
+
+3. **В Technology Stack** - добавлена строка "PDF Font: DejaVuSans.ttf (embedded, full Cyrillic support)"
+
+4. **В Changelog** - добавлен пункт "Added DejaVuSans.ttf font for proper Cyrillic display in PDF exports" и "Full Unicode/UTF-8 support for PDF documents"
+
+5. **В Build Command** - добавлен параметр `--add-data "DejaVuSans.ttf;."`
+
+6. **В Fixes** - оставлен пункт про фикс PDF экспорта
