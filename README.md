@@ -33,10 +33,11 @@ It combines cryptographically secure password generation, multilingual interface
   - High-DPI friendly layout.
   - Adjustable corner radius for UI elements in real time.
   - **New Neon-Glow effects for side menu buttons.**
+  - **New dedicated Settings button** with green accent color.
 
 - **Export and sharing**
   - Save and **Open** passwords as `.txt`, `.log`, `.key`, or `.pdf`.
-  - Unicode PDF export support.
+  - **Full Cyrillic support in PDF exports** using embedded DejaVuSans.ttf font.
   - QR-code generation for quick transfer to mobile devices.
 
 ---
@@ -61,6 +62,11 @@ Toggle UI sound effects on/off with a single click. When enabled, mechanical mou
 ### 📐 Corner Radius Control
 A new slider allows you to customize the roundness of all UI elements from **0 to 25 pixels** – make it perfectly square or beautifully rounded.
 
+### 📄 Enhanced PDF Export
+- **Full Unicode support** for Cyrillic characters (Russian & Ukrainian)
+- **Embedded DejaVuSans.ttf** font for professional PDF output
+- No more garbled text or missing characters in exported documents
+
 ### Additional Improvements
 - Redesigned interface with balanced layout and **neon color-coded action buttons**
 - Added entropy-based strength calculation with SHA-256 verification
@@ -71,6 +77,48 @@ A new slider allows you to customize the roundness of all UI elements from **0 t
 - Removed deprecated progress bar for cleaner interface
 
 **[📥 Download Secure Pass Pro v3.9 (.exe)](https://github.com/Maximka1993271/Password-Generator-Python/releases/download/SecurePassProv3.9/SecurePassPro.exe)**
+
+---
+
+## ⚙️ Developer Information
+
+### Technology Stack
+
+- **Language**: Python 3.9+
+- **GUI**: `customtkinter`
+- **Audio**: `Windows Multimedia API (winmm)`
+- **Libraries**: `Pillow`, `qrcode`, `fpdf`
+- **PDF Font**: `DejaVuSans.ttf` (embedded, full Cyrillic support)
+- **Security**: `secrets`, `hashlib`, `random.SystemRandom`
+
+### Changelog v3.9 (2026-05-10)
+
+**New Features:**
+- Added **Settings window** with language, theme, sound and corner radius controls
+- Added **Language Switcher** (RU/EN/UA) with instant UI translation
+- Added **Theme Selector** (System/Light/Dark) with safe theme switching
+- Added **Sound Toggle** with mechanical click feedback
+- Added **Corner Radius Slider** (0-25px) for UI customization
+- Added **DejaVuSans.ttf font** for proper Cyrillic display in PDF exports
+- Added **dedicated Settings button** in the main menu with green neon color
+
+**Fixes:**
+- Fixed theme change freezing issues
+- Fixed PDF export for Cyrillic and Ukrainian text using DejaVuSans font
+- Fixed Ukrainian author name spelling (Максим Мельніков)
+- Fixed duplicate code in build commands
+
+**Improvements:**
+- Removed deprecated theme buttons from bottom panel
+- Optimized window rendering for better performance
+- Improved button highlighting for active theme/language selection
+- Enhanced clipboard auto-cleanup mechanism
+- Updated strength indicator with 5-star rating system
+- **Full Unicode/UTF-8 support for PDF documents**
+
+**Removed:**
+- Removed deprecated progress bar for cleaner interface
+- Removed duplicate controls from main window
 
 ---
 
