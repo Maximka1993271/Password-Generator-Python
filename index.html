@@ -97,7 +97,7 @@
 
     <section id="pdf-section" class="features-section">
         <h2 class="section-title">Полная поддержка <span class="highlight">Кириллицы в PDF</span></h2>
-        <div class="features-grid grid-2" style="max-width: 600px; margin: 0 auto;">
+        <div class="features-grid grid-2">
             <div class="card">
                 <div class="card-icon">🖋️</div>
                 <h3>DejaVuSans.ttf</h3>
@@ -122,7 +122,7 @@
             <div class="card">
                 <div class="card-icon">⏳</div>
                 <h3>Time-to-Crack</h3>
-                <p>Оценка времени взлома методом Brute-force: от «мгновенно» до «столетий».</p>
+                <p>Оценка времени взлома методом Brute-force: от "мгновенно" до "столетий".</p>
             </div>
             <div class="card">
                 <div class="card-icon">⭐</div>
@@ -134,24 +134,24 @@
 
     <section id="tech-section" class="tech-stack features-section">
         <h2 class="section-title">Цветовая <span class="highlight">Дифференциация</span></h2>
-        <div class="tech-grid" style="display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; text-align: center;">
-            <div class="tech-item" style="border-bottom: 3px solid #1f538d; background: rgba(31, 83, 141, 0.1);">
+        <div class="tech-grid">
+            <div class="tech-item">
                 <h4>🔵 Синий (Neon)</h4>
                 <p>Генерация пароля</p>
             </div>
-            <div class="tech-item" style="border-bottom: 3px solid #2d7d32; background: rgba(45, 125, 50, 0.1);">
+            <div class="tech-item">
                 <h4>🟢 Зеленый (Neon)</h4>
                 <p>Копирование в буфер</p>
             </div>
-            <div class="tech-item" style="border-bottom: 3px solid #00acc1; background: rgba(0, 172, 193, 0.1);">
+            <div class="tech-item">
                 <h4>🔵 Бирюзовый (Neon)</h4>
                 <p>Работа с PDF/Файлами</p>
             </div>
-            <div class="tech-item" style="border-bottom: 3px solid #5d3a9b; background: rgba(93, 58, 155, 0.1);">
+            <div class="tech-item">
                 <h4>🟣 Фиолетовый (Neon)</h4>
                 <p>Создание QR-кода</p>
             </div>
-            <div class="tech-item" style="border-bottom: 3px solid #2d6a4f; background: rgba(45, 106, 79, 0.1);">
+            <div class="tech-item">
                 <h4>🟢 Зеленый (Neon)</h4>
                 <p>Кнопка Настройки</p>
             </div>
@@ -160,8 +160,8 @@
 
     <section id="tech-specs" class="features-section dark-bg">
         <h2 class="section-title">Технические <span class="highlight">данные</span></h2>
-        <div style="max-width: 800px; margin: 0 auto; line-height: 1.8;">
-            <ul style="list-style: none; padding: 0; margin-bottom: 30px;">
+        <div class="tech-specs-container">
+            <ul class="tech-list">
                 <li><strong>Разработчик:</strong> Максим Мельников (Maxim Melnikov)</li>
                 <li><strong>Версия:</strong> 3.9 Stable (10.05.2026)</li>
                 <li><strong>Ядро:</strong> Python 3.14.4 (CSPRNG Secrets)</li>
@@ -169,9 +169,9 @@
                 <li><strong>Шрифт PDF:</strong> DejaVuSans.ttf (Полная поддержка кириллицы)</li>
                 <li><strong>Сборка:</strong> Windows 11 Pro Optimized</li>
             </ul>
-            <div style="background: #111; padding: 20px; border-radius: 10px; border: 1px solid #333;">
-                <p style="color: #888; font-family: monospace; font-size: 0.9em; margin-bottom: 10px;">// Команда сборки v3.9 (Full Package)</p>
-                <code style="color: #00acc1; font-size: 0.8em; word-break: break-all;">
+            <div class="build-command">
+                <p class="command-label">// Команда сборки v3.9 (Full Package)</p>
+                <code class="command-code">
                     pyinstaller --noconfirm --onefile --windowed --clean --icon="icon.ico" --add-data "icon.ico;." --add-data "Computer Mouse Click.mp3;." --add-data "DejaVuSans.ttf;." --collect-all qrcode --collect-all customtkinter --hidden-import="PIL._tkinter_finder" --name "SecurePassPro" Secure_Pass_Pro.pyw
                 </code>
             </div>
@@ -197,9 +197,9 @@
     </section>
 
     <footer>
-        <div class="footer-content" style="text-align: center; padding: 60px 0;">
+        <div class="footer-content">
             <p>© 2026 Максим Мельников • MIT License</p>
-            <div class="footer-tags" style="margin-top: 20px; display: flex; justify-content: center; gap: 15px; flex-wrap: wrap;">
+            <div class="footer-tags">
                 <span class="badge">Python 3.14+</span>
                 <span class="badge">Neon-Amoled UX</span>
                 <span class="badge">CSPRNG Secrets</span>
@@ -209,7 +209,7 @@
                 <span class="badge">DejaVuSans PDF</span>
                 <span class="badge">Cyrillic Support</span>
             </div>
-            <p style="font-size: 0.85em; margin-top: 20px; opacity: 0.6; max-width: 700px; margin-left: auto; margin-right: auto;">
+            <p class="footer-description">
                 Локализация: RU, EN, UA. Программа гарантирует полную приватность данных. Генерация происходит локально, 
                 поддержка PDF и звукового сопровождения интегрирована нативно. В версии 3.9 добавлена централизованная панель 
                 настроек с управлением языком, темой, звуком и закруглением углов. PDF-экспорт использует шрифт DejaVuSans.ttf 
