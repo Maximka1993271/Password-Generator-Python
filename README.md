@@ -145,9 +145,41 @@ This provides **instant visual feedback** about password quality without needing
 
 ![v2.0.0 Preview](https://github.com/Maximka1993271/Password-Generator-Python/raw/main/Secure_Pass_MainWindow.png)
 
-Classic branch for users who prefer a minimal Tkinter-based interface.
+### About v2.0.0 Classic
 
-- **Stable classic UI** for older Windows systems.
-- **Core features**: password generation, history, themes, and basic controls.
+The **Classic branch** is a lightweight, stable version built with standard **Tkinter** (no external dependencies). It's perfect for users who:
+- Prefer a minimal interface without animations
+- Use older Windows systems with limited resources
+- Want just the core password generation features
 
-**[📥 Download v2.0.0 Classic](https://github.com/Maximka1993271/Password-Generator-Python/releases/download/SecurePassProv2.0.0/SecurePassPro.exe)**
+### ✨ v2.0.0 Features
+
+| Feature | v2.0.0 Classic |
+|---------|----------------|
+| Cryptographic generation (secrets) | ✅ Yes |
+| Password strength meter | ✅ Entropy-based |
+| Crack time estimation (MD5) | ✅ Yes |
+| QR code generation | ✅ Yes |
+| Password history | ✅ Yes (last 5) |
+| File export (`.txt`) | ✅ Save & Open |
+| Multi-language (RU/EN/UA) | ✅ Yes |
+| Light/Dark/System themes | ✅ Yes |
+| Hotkeys (Ctrl+G, Ctrl+S, Ctrl+O) | ✅ Yes |
+| SHA-256 integrity check | ❌ No |
+| PDF export | ❌ No |
+| Color pulsation animation | ❌ No |
+| Corner radius control | ❌ No |
+| Settings window | ❌ No |
+
+### 🛠️ Tech Stack (v2.0.0)
+
+- **Language**: Python 3.9+
+- **GUI**: `tkinter` (built-in)
+- **Libraries**: `Pillow`, `qrcode`
+- **Security**: `secrets`, `hashlib`
+- **Sound**: `winsound.Beep()`
+
+### 📦 v2.0.0 Build Command
+
+```bash
+pyinstaller --noconfirm --onefile --windowed --icon="app_icon.ico" --add-data "app_icon.ico;." --name "SecurePassPro" Secure_Pass_Pro.pyw
