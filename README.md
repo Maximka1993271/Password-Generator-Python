@@ -42,7 +42,7 @@ It combines cryptographically secure password generation, multilingual interface
 
 ---
 
-## 🚀 What’s New in v3.9
+## 🚀 What's New in v3.9
 
 ### 🎛️ Centralized Settings Panel
 A brand new **Settings window** has been added, accessible via the **Settings** button in the main menu. All customization options are now conveniently located in one place.
