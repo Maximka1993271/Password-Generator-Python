@@ -28,7 +28,7 @@ It combines cryptographically secure password generation, multilingual interface
   - 🟢 **Green pulse** – Strong password (80+ bits)
 
 - **Privacy and safety**
-  - Clipboard auto-cleanup after 60 seconds.
+  - Configurable clipboard auto-cleanup **(10-120 seconds, adjustable in settings)** – better than KeePassXC's fixed 30 seconds!
   - Local password history with one-click clearing.
   - Text export integrity check via **SHA-256**.
   - Protection against too-small character pools.
@@ -86,6 +86,9 @@ Toggle UI sound effects on/off with a single click. When enabled, mechanical mou
 ### 📐 Corner Radius Control
 A new slider allows you to customize the roundness of all UI elements from **0 to 25 pixels** – make it perfectly square or beautifully rounded.
 
+### ⏱️ Configurable Clipboard Timeout (New!)
+Adjust the clipboard auto-clear delay from **10 to 120 seconds** using a slider in settings. The setting is saved to `config.txt` and persists between sessions. This gives you more control than KeePassXC's fixed 30 seconds!
+
 ### 📄 Enhanced PDF Export
 - **Full Unicode support** for Cyrillic characters (Russian & Ukrainian)
 - **Embedded DejaVuSans.ttf** font for professional PDF output
@@ -127,7 +130,7 @@ This provides **instant visual feedback** about password quality without needing
 - **Security**: `secrets`, `hashlib`, `random.SystemRandom`
 - **Animations**: Color-coded neon pulsation (Red/Orange/Green)
 
-### Changelog v4.0 (2026-05-11)
+### Changelog v4.0 (2026-05-12)
 
 **New Features:**
 - Added **Master Password** protection with SHA-256 hashing (5 attempts limit)
@@ -140,6 +143,7 @@ This provides **instant visual feedback** about password quality without needing
 - Added **Theme Selector** (System/Light/Dark) with safe theme switching
 - Added **Sound Toggle** with mechanical click feedback
 - Added **Corner Radius Slider** (0-25px) for UI customization
+- Added **Configurable Clipboard Timeout** (10-120 seconds slider, saves to config)
 - Added **DejaVuSans.ttf font** for proper Cyrillic display in PDF exports
 - Added **dedicated Settings button** in the main menu with green neon color
 - Added **Color-coded password field pulsation** (Red/Orange/Green based on entropy)
@@ -158,7 +162,7 @@ This provides **instant visual feedback** about password quality without needing
 - Removed deprecated theme buttons from bottom panel
 - Optimized window rendering for better performance
 - Improved button highlighting for active theme/language selection
-- Enhanced clipboard auto-cleanup mechanism
+- Enhanced clipboard auto-cleanup mechanism with configurable timeout
 - Updated strength indicator with 5-star rating system
 - **Full Unicode/UTF-8 support for PDF documents**
 - **Added visual feedback with color-coded password field animation**
@@ -199,6 +203,7 @@ The **Classic branch** is a lightweight, stable version built with standard **Tk
 | Corner radius control | ❌ No |
 | Settings window | ❌ No |
 | Master password | ❌ No |
+| Configurable clipboard timeout | ❌ No |
 
 ### 🛠️ Tech Stack (v2.0.0)
 
