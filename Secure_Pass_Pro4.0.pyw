@@ -864,7 +864,7 @@ class SecurePassPro(ctk.CTk):
         # Кнопка "глазок" — показать/скрыть пароль
         # Eye button — show/hide password
         # Кнопка "окомір" — показати/приховати пароль
-        self._eye_visible = True   # Начальное состояние: пароль виден / Initially visible
+        # Состояние глазка всегда берётся из hide_var — не храним отдельный флаг
         self.btn_eye = ctk.CTkButton(
             self.entry_frame,
             text="👁",
@@ -1321,21 +1321,23 @@ class SecurePassPro(ctk.CTk):
         self.lbl_len.configure(text=f"{L['len']}: {int(val)}")
 
     def _toggle_hide(self):
-        # Единый источник правды — hide_var / Single source of truth — hide_var
-        hidden = self.hide_var.get()
-        self._eye_visible = not hidden
-        self.entry_res.configure(show="*" if hidden else "")
-        self.btn_eye.configure(text="🙈" if hidden else "👁")
+        """Вызывается чекбоксом. hide_var уже изменён — просто синхронизируем UI.
+        Called by checkbox. hide_var already changed — just sync the UI.
+        Викликається чекбоксом. hide_var вже змінено — синхронізуємо UI."""
+        self._sync_eye_to_hide_var()
 
     def _toggle_eye(self):
-        """
-        Кнопка глазок: показать/скрыть, синхронизируя чекбокс.
-        Eye button: toggle visibility, keeping checkbox in sync.
-        Кнопка окомір: перемикання видимості з синхронізацією чекбокса.
-        """
-        self.hide_var.set(not self._eye_visible)
-        self._eye_visible = not self._eye_visible
-        hidden = not self._eye_visible
+        """Вызывается кнопкой. Меняем hide_var, затем синхронизируем UI.
+        Called by button. Flip hide_var, then sync UI.
+        Викликається кнопкою. Змінюємо hide_var, потім синхронізуємо UI."""
+        self.hide_var.set(not self.hide_var.get())
+        self._sync_eye_to_hide_var()
+
+    def _sync_eye_to_hide_var(self):
+        """Единственное место, где entry_res и btn_eye обновляются.
+        Single place where entry_res and btn_eye are updated.
+        Єдине місце, де оновлюються entry_res і btn_eye."""
+        hidden = self.hide_var.get()
         self.entry_res.configure(show="*" if hidden else "")
         self.btn_eye.configure(text="🙈" if hidden else "👁")
 
