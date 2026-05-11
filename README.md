@@ -111,7 +111,7 @@ This provides **instant visual feedback** about password quality without needing
 - Fixed PDF export for Cyrillic and Ukrainian text using DejaVuSans font
 - Removed deprecated progress bar for cleaner interface
 
-**[📥 Download Secure Pass Pro v4.0 (.exe)](https://github.com/Maximka1993271/Password-Generator-Python/releases/download/SecurePassProv4.0/SecurePassPro.exe)**
+**[📥 Download Secure Pass Pro v4.0 (.exe)](https://github.com/Maximka1993271/Password-Generator-Python/releases/download/v4.0/SecurePassPro.exe)**
 
 ---
 
