@@ -1,15 +1,15 @@
-# 🛡️ Secure Pass Pro v3.9
+# 🛡️ Secure Pass Pro v4.0
 
 **🔐 Secure password generator with a multilingual Python GUI for Windows**
 
 Secure Pass Pro is a modern desktop password generator built with Python and CustomTkinter.
 It combines cryptographically secure password generation, multilingual interface, QR-code export, privacy controls, and a polished dark UI.
 
-![v3.9 Preview](https://github.com/Maximka1993271/Password-Generator-Python/raw/main/Secure_Pass_MainWindow39.jpg)
+![v4.0 Preview](https://github.com/Maximka1993271/Password-Generator-Python/raw/main/Secure_Pass_MainWindow39.jpg)
 
 ---
 
-## ✨ Main Features v3.9
+## ✨ Main Features v4.0
 
 - **Cryptographically secure generation**
   Uses Python `secrets` module and system CSPRNG for unpredictable password generation.
@@ -47,7 +47,26 @@ It combines cryptographically secure password generation, multilingual interface
 
 ---
 
-## 🚀 What's New in v3.9
+## 🚀 What's New in v4.0
+
+### 🔒 Master Password Protection
+Set a **master password** to protect access to the entire program. SHA-256 hashed with 5 attempts before lockout.
+
+### ✅ File Integrity Verification
+Automatic `.sha256` checksum creation when saving files and verification when opening them. Prevents tampering.
+
+### 🔄 No Consecutive Repeats
+New option to avoid repeated characters in a row (e.g., `aaa`, `111`).
+
+### 👁️ Password Visibility Toggle
+One-click **eye button** to show/hide the password, synced with the "Hide symbols" checkbox.
+
+### ⌨️ Hotkeys Support
+- **F5** – Generate new password
+- **Ctrl+C** – Copy to clipboard
+- **Ctrl+S** – Save to file
+- **Ctrl+O** – Open file
+- **Esc** – Close settings dialog
 
 ### 🎛️ Centralized Settings Panel
 A brand new **Settings window** has been added, accessible via the **Settings** button in the main menu. All customization options are now conveniently located in one place.
@@ -92,7 +111,7 @@ This provides **instant visual feedback** about password quality without needing
 - Fixed PDF export for Cyrillic and Ukrainian text using DejaVuSans font
 - Removed deprecated progress bar for cleaner interface
 
-**[📥 Download Secure Pass Pro v3.9 (.exe)](https://github.com/Maximka1993271/Password-Generator-Python/releases/download/SecurePassProv3.9/SecurePassPro.exe)**
+**[📥 Download Secure Pass Pro v4.0 (.exe)](https://github.com/Maximka1993271/Password-Generator-Python/releases/download/SecurePassProv4.0/SecurePassPro.exe)**
 
 ---
 
@@ -108,9 +127,14 @@ This provides **instant visual feedback** about password quality without needing
 - **Security**: `secrets`, `hashlib`, `random.SystemRandom`
 - **Animations**: Color-coded neon pulsation (Red/Orange/Green)
 
-### Changelog v3.9 (2026-05-10)
+### Changelog v4.0 (2026-05-11)
 
 **New Features:**
+- Added **Master Password** protection with SHA-256 hashing (5 attempts limit)
+- Added **File Integrity Verification** (`.sha256` checksums)
+- Added **No Consecutive Repeats** option for password generation
+- Added **Password Visibility Toggle** (eye button) with checkbox sync
+- Added **Hotkeys support** (F5, Ctrl+C, Ctrl+S, Ctrl+O, Esc)
 - Added **Settings window** with language, theme, sound and corner radius controls
 - Added **Language Switcher** (RU/EN/UA) with instant UI translation
 - Added **Theme Selector** (System/Light/Dark) with safe theme switching
@@ -119,8 +143,12 @@ This provides **instant visual feedback** about password quality without needing
 - Added **DejaVuSans.ttf font** for proper Cyrillic display in PDF exports
 - Added **dedicated Settings button** in the main menu with green neon color
 - Added **Color-coded password field pulsation** (Red/Orange/Green based on entropy)
+- Added **Tooltips** for all buttons including the eye button
 
 **Fixes:**
+- Fixed checkbox/eye button synchronization
+- Added fallback when password without repeats cannot be generated
+- Fixed clipboard clearing timer issues
 - Fixed theme change freezing issues
 - Fixed PDF export for Cyrillic and Ukrainian text using DejaVuSans font
 - Fixed Ukrainian author name spelling (Максим Мельніков)
@@ -170,6 +198,7 @@ The **Classic branch** is a lightweight, stable version built with standard **Tk
 | Color pulsation animation | ❌ No |
 | Corner radius control | ❌ No |
 | Settings window | ❌ No |
+| Master password | ❌ No |
 
 ### 🛠️ Tech Stack (v2.0.0)
 
