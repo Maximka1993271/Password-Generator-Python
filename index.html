@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Secure Pass Pro v3.9 — Профессиональный генератор паролей. Amoled UI с неоновой подсветкой, расчет энтропии, просмотр PDF и криптостойкость. Цветная пульсация пароля: красный (слабый), оранжевый (средний), зелёный (надёжный).">
-    <title>Secure Pass Pro v3.9 | Профессиональная защита паролей</title>
+    <meta name="description" content="Secure Pass Pro v4.0 — Профессиональный генератор паролей. Master-пароль, контроль целостности SHA-256, защита от повторов, Amoled UI с неоновой подсветкой, расчет энтропии, просмотр PDF и криптостойкость. Цветная пульсация пароля: красный (слабый), оранжевый (средний), зелёный (надёжный).">
+    <title>Secure Pass Pro v4.0 | Профессиональная защита паролей</title>
     
     <link rel="icon" type="image/png" href="https://github.com/Maximka1993271/Password-Generator-Python/blob/main/app_icon.png?raw=true">
     <link rel="apple-touch-icon" href="https://github.com/Maximka1993271/Password-Generator-Python/blob/main/app_icon.png?raw=true">
@@ -18,7 +18,7 @@
         <nav>
             <div class="logo">🛡️ Secure Pass Pro</div>
             <ul>
-                <li><a href="#v39-section">Возможности v3.9</a></li>
+                <li><a href="#v40-section">Возможности v4.0</a></li>
                 <li><a href="#settings-section">Настройки</a></li>
                 <li><a href="#pdf-section">PDF Кириллица</a></li>
                 <li><a href="#animation-section">Анимации</a></li>
@@ -32,36 +32,61 @@
 
     <section class="hero">
         <div class="hero-content">
-            <div class="version-badge">Latest Release v3.9 Stable</div>
+            <div class="version-badge">Latest Release v4.0 Stable</div>
             <h1>Безопасность без <br><span class="highlight">компромиссов</span></h1>
-            <p>Профессиональный инструмент на Python 3.14+, объединяющий Neon-Amoled дизайн, новый звук клика и криптостойкий движок для Windows 11 Pro.</p>
+            <p>Профессиональный инструмент на Python 3.9+, объединяющий Neon-Amoled дизайн, мастер-пароль, контроль целостности файлов и криптостойкий движок для Windows.</p>
             <div class="hero-btns">
-                <a href="https://github.com/Maximka1993271/Password-Generator-Python/releases/download/SecurePassProv3.9/SecurePassPro.exe" class="btn-primary">Скачать v3.9 Stable</a>
-                <a href="#v39-section" class="btn-secondary">Что нового?</a>
+                <a href="https://github.com/Maximka1993271/Password-Generator-Python/releases/download/v4.0/SecurePassPro.exe" class="btn-primary">Скачать v4.0 Stable</a>
+                <a href="#v40-section" class="btn-secondary">Что нового?</a>
             </div>
         </div>
         <div class="hero-image">
-            <img src="https://github.com/Maximka1993271/Password-Generator-Python/raw/main/Secure_Pass_MainWindow39.jpg" alt="Secure Pass Pro v3.9 UI">
+            <img src="https://github.com/Maximka1993271/Password-Generator-Python/raw/main/Secure_Pass_MainWindow40.jpg" alt="Secure Pass Pro v4.0 UI">
         </div>
     </section>
 
-    <section id="v39-section" class="features-section">
-        <h2 class="section-title">UX Revolution в <span class="highlight">v3.9</span></h2>
+    <section id="v40-section" class="features-section">
+        <h2 class="section-title">Ключевые нововведения <span class="highlight">v4.0</span></h2>
         <div class="features-grid">
+            <div class="card">
+                <div class="card-icon">🔒</div>
+                <h3>Мастер-пароль</h3>
+                <p>Защита доступа к программе мастер-паролем. SHA-256 хеширование, 5 попыток входа — при превышении программа блокируется.</p>
+            </div>
+            <div class="card">
+                <div class="card-icon">✅</div>
+                <h3>Контроль целостности</h3>
+                <p>Автоматическое создание SHA-256 контрольных сумм (.sha256) при сохранении и проверка при открытии файлов.</p>
+            </div>
+            <div class="card">
+                <div class="card-icon">🔄</div>
+                <h3>Защита от повторов</h3>
+                <p>Новая опция "Избегать повторов символов подряд" — исключает появление одинаковых символов (aaa, 111).</p>
+            </div>
+            <div class="card">
+                <div class="card-icon">👁️</div>
+                <h3>Кнопка-глазок</h3>
+                <p>Одним кликом показывайте или скрывайте пароль. Полная синхронизация с чекбоксом "Скрывать символы".</p>
+            </div>
+            <div class="card">
+                <div class="card-icon">⌨️</div>
+                <h3>Горячие клавиши</h3>
+                <p>F5 — генерация, Ctrl+C — копирование, Ctrl+S — сохранить, Ctrl+O — открыть, Esc — закрыть диалоги.</p>
+            </div>
             <div class="card">
                 <div class="card-icon">🌈</div>
                 <h3>Neon Buttons</h3>
-                <p>Новое меню действий с адаптивной неоновой подсветкой и улучшенным визуальным откликом.</p>
+                <p>Меню действий с адаптивной неоновой подсветкой и улучшенным визуальным откликом.</p>
             </div>
             <div class="card">
                 <div class="card-icon">📄</div>
                 <h3>PDF Viewer</h3>
-                <p>Добавлена возможность не только экспортировать, но и открывать PDF файлы прямо в приложении.</p>
+                <p>Возможность не только экспортировать, но и открывать PDF файлы прямо в приложении.</p>
             </div>
             <div class="card">
                 <div class="card-icon">🔊</div>
                 <h3>Pro Sound</h3>
-                <p>Замена стандартных сигналов Windows на реалистичный звук механического клика мыши.</p>
+                <p>Реалистичный звук механического клика мыши с возможностью отключения в настройках.</p>
             </div>
             <div class="card">
                 <div class="card-icon">📐</div>
@@ -94,6 +119,11 @@
                 <h3>Ползунок закругления</h3>
                 <p>Интерактивный слайдер для настройки скругления всех углов интерфейса от 0 до 25 пикселей.</p>
             </div>
+            <div class="card">
+                <div class="card-icon">🔒</div>
+                <h3>Управление мастер-паролем</h3>
+                <p>Установка и удаление мастер-пароля через окно настроек. Безопасное хранение хеша.</p>
+            </div>
         </div>
     </section>
 
@@ -113,7 +143,7 @@
         </div>
     </section>
 
-    <!-- НОВАЯ СЕКЦИЯ: Цветная пульсация пароля -->
+    <!-- Секция: Цветная пульсация пароля -->
     <section id="animation-section" class="features-section dark-bg">
         <h2 class="section-title">Цветная <span class="highlight">Пульсация</span> пароля</h2>
         <div class="features-grid">
@@ -157,6 +187,11 @@
                 <div class="card-icon">⭐</div>
                 <h3>Visual Rating</h3>
                 <p>Пятизвездочный рейтинг надежности и 3-уровневая цветовая шкала (Red/Orange/Green).</p>
+            </div>
+            <div class="card">
+                <div class="card-icon">🛡️</div>
+                <h3>SHA-256 верификация</h3>
+                <p>Контроль целостности сохранённых файлов через SHA-256 хеширование.</p>
             </div>
         </div>
     </section>
@@ -204,15 +239,17 @@
         <div class="tech-specs-container">
             <ul class="tech-list">
                 <li><strong>Разработчик:</strong> Максим Мельников (Maxim Melnikov)</li>
-                <li><strong>Версия:</strong> 3.9 Stable (10.05.2026)</li>
-                <li><strong>Ядро:</strong> Python 3.14.4 (CSPRNG Secrets)</li>
-                <li><strong>Аудио:</strong> WinMM API (Custom Click)</li>
+                <li><strong>Версия:</strong> 4.0 Stable (11.05.2026)</li>
+                <li><strong>Ядро:</strong> Python 3.9+ (CSPRNG Secrets)</li>
+                <li><strong>Защита:</strong> Мастер-пароль (SHA-256) + Контроль целостности (.sha256)</li>
+                <li><strong>Аудио:</strong> WinMM API (Custom Click) с возможностью отключения</li>
                 <li><strong>Анимация:</strong> Цветная пульсация (красный/оранжевый/зелёный)</li>
+                <li><strong>Горячие клавиши:</strong> F5, Ctrl+C, Ctrl+S, Ctrl+O, Esc</li>
                 <li><strong>Шрифт PDF:</strong> DejaVuSans.ttf (Полная поддержка кириллицы)</li>
-                <li><strong>Сборка:</strong> Windows 11 Pro Optimized</li>
+                <li><strong>Сборка:</strong> Windows 10/11 Optimized</li>
             </ul>
             <div class="build-command">
-                <p class="command-label">// Команда сборки v3.9 (Full Package)</p>
+                <p class="command-label">// Команда сборки v4.0 (Full Package)</p>
                 <code class="command-code">
                     pyinstaller --noconfirm --onefile --windowed --clean --icon="icon.ico" --add-data "icon.ico;." --add-data "Computer Mouse Click.mp3;." --add-data "DejaVuSans.ttf;." --collect-all qrcode --collect-all customtkinter --hidden-import="PIL._tkinter_finder" --name "SecurePassPro" Secure_Pass_Pro.pyw
                 </code>
@@ -225,9 +262,9 @@
         <div class="download-grid">
             <div class="download-card highlight-card">
                 <div class="card-icon">🏆</div>
-                <h3>Secure Pass Pro v3.9</h3>
-                <p><b>Рекомендуется.</b> Neon UI, поддержка PDF с кириллицей (DejaVuSans), новый звук клика, цветная пульсация пароля и высокая криптостойкость.</p>
-                <a href="https://github.com/Maximka1993271/Password-Generator-Python/releases/download/SecurePassProv3.9/SecurePassPro.exe" class="btn-primary full-width">Скачать v3.9 (.EXE)</a>
+                <h3>Secure Pass Pro v4.0</h3>
+                <p><b>Рекомендуется.</b> Master-пароль, контроль целостности SHA-256, защита от повторов, кнопка-глазок, горячие клавиши, Neon UI, поддержка PDF с кириллицей (DejaVuSans), звук клика, цветная пульсация пароля и высокая криптостойкость.</p>
+                <a href="https://github.com/Maximka1993271/Password-Generator-Python/releases/download/v4.0/SecurePassPro.exe" class="btn-primary full-width">Скачать v4.0 (.EXE)</a>
             </div>
             <div class="download-card">
                 <div class="card-icon">📁</div>
@@ -242,10 +279,13 @@
         <div class="footer-content">
             <p>© 2026 Максим Мельников • MIT License</p>
             <div class="footer-tags">
-                <span class="badge">Python 3.14+</span>
+                <span class="badge">Python 3.9+</span>
                 <span class="badge">Neon-Amoled UX</span>
                 <span class="badge">CSPRNG Secrets</span>
-                <span class="badge">Win 11 Optimized</span>
+                <span class="badge">Master Password</span>
+                <span class="badge">SHA-256 Integrity</span>
+                <span class="badge">Hotkeys Support</span>
+                <span class="badge">Win 10/11 Optimized</span>
                 <span class="badge">Triple Localization</span>
                 <span class="badge">Corner Radius Control</span>
                 <span class="badge">DejaVuSans PDF</span>
@@ -255,9 +295,10 @@
             </div>
             <p class="footer-description">
                 Локализация: RU, EN, UA. Программа гарантирует полную приватность данных. Генерация происходит локально, 
-                поддержка PDF и звукового сопровождения интегрирована нативно. В версии 3.9 добавлена централизованная панель 
-                настроек с управлением языком, темой, звуком и закруглением углов. PDF-экспорт использует шрифт DejaVuSans.ttf 
-                для корректного отображения кириллицы. <strong>Новинка: цветная неоновая пульсация</strong> — красный (слабый), 
+                поддержка PDF и звукового сопровождения интегрирована нативно. В версии 4.0 добавлены: мастер-пароль для защиты доступа, 
+                контроль целостности файлов через SHA-256, опция "Избегать повторов символов подряд", кнопка-глазок для показа/скрытия пароля, 
+                горячие клавиши (F5, Ctrl+C, Ctrl+S, Ctrl+O, Esc), централизованная панель настроек с управлением языком, темой, звуком и закруглением углов. 
+                PDF-экспорт использует шрифт DejaVuSans.ttf для корректного отображения кириллицы. <strong>Новинка: цветная неоновая пульсация</strong> — красный (слабый), 
                 оранжевый (средний), зелёный (надёжный) пароль.
             </p>
         </div>
