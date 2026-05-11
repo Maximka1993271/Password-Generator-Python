@@ -1,5 +1,5 @@
 /* SECURE PASS PRO - PREMIUM STYLESHEET 
-   Версия: 3.9 Stable (Amoled Optimized)
+   Версия: 4.0 Stable (Amoled Optimized)
 */
 
 :root {
@@ -309,6 +309,12 @@ nav ul li a.active {
     font-size: 0.85rem;
 }
 
+/* --- ХОВЕР ЭФФЕКТЫ ДЛЯ НЕОНОВЫХ КАРТОЧЕК --- */
+.card[data-type="clipboard"]:hover {
+    border-color: #FFA500;
+    box-shadow: 0 0 20px rgba(255, 165, 0, 0.2);
+}
+
 /* --- ТЕХНИЧЕСКИЕ ДАННЫЕ --- */
 .tech-specs-container {
     max-width: 900px;
@@ -450,6 +456,18 @@ footer {
     font-size: 0.7rem;
     color: #888;
     border: 1px solid #1a1a1a;
+    transition: var(--transition);
+}
+
+.badge:hover {
+    border-color: var(--accent-color);
+    color: var(--accent-color);
+}
+
+/* Специальный бейдж для таймаута буфера */
+.badge-clipboard {
+    border-color: #FFA500;
+    color: #FFA500;
 }
 
 .footer-description {
@@ -587,6 +605,17 @@ footer {
     }
 }
 
+/* Анимация пульсации для карточки буфера */
+@keyframes pulse-border {
+    0% { border-color: var(--border-color); }
+    50% { border-color: #FFA500; box-shadow: 0 0 15px rgba(255, 165, 0, 0.3); }
+    100% { border-color: var(--border-color); }
+}
+
+.card:has(.card-icon[style*="⏱️"]) {
+    animation: pulse-border 2s infinite;
+}
+
 /* --- СКРОЛЛБАР --- */
 ::-webkit-scrollbar {
     width: 8px;
@@ -609,3 +638,43 @@ footer {
 .red-text { color: #FF4444; }
 .orange-text { color: #FFA500; }
 .green-text { color: #2ECC71; }
+
+/* --- ДОПОЛНИТЕЛЬНЫЕ СТИЛИ ДЛЯ ТАЙМАУТА БУФЕРА --- */
+.clipboard-highlight {
+    background: linear-gradient(135deg, #1a1a1a 0%, #0d1a1a 100%);
+    border-left: 4px solid #FFA500;
+}
+
+.settings-icon {
+    transition: var(--transition);
+}
+
+.settings-icon:hover {
+    transform: rotate(15deg);
+}
+
+/* Стиль для слайдера в настройках (имитация) */
+.slider-demo {
+    width: 100%;
+    height: 4px;
+    background: #333;
+    border-radius: 2px;
+    margin: 10px 0;
+}
+
+.slider-demo .slider-value {
+    width: 60px;
+    height: 4px;
+    background: #FFA500;
+    border-radius: 2px;
+    position: relative;
+}
+
+.slider-demo .slider-value::after {
+    content: "⚫";
+    position: absolute;
+    right: -8px;
+    top: -6px;
+    font-size: 14px;
+    color: #FFA500;
+}
