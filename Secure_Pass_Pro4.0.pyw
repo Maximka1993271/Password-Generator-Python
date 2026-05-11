@@ -123,7 +123,7 @@ LANGUAGES: Dict[str, Dict[str, str]] = {
         "sound_on": "Звук: ВКЛ", "sound_off": "Звук: ВЫКЛ",
         "theme_sys": "Системная", "theme_dark": "Тёмная", "theme_light": "Светлая",
         "about_text": "Secure Pass Pro v4.0\n\nПрофессиональный инструмент для генерации паролей.\nИспользует криптографически стойкие алгоритмы.",
-        "copied": "Скопировано! (60с)",
+        "copied": "Скопировано! ({0}с)",
         "strength": "Стойкость: ~{0} вариантов",
         "crack_time": "{0}",
         "time_sec": "Несколько секунд на взлом",
@@ -179,6 +179,8 @@ LANGUAGES: Dict[str, Dict[str, str]] = {
         "integrity_fail": "🚨 КРИТИЧЕСКАЯ ОШИБКА: Файл повреждён или подменён!\nКонтрольная сумма не совпадает. Открытие отменено.",
         "integrity_ok": "✅ Целостность файла подтверждена.",
         "tt_eye": "Показать / скрыть пароль",
+        "clip_timeout": "Очистка буфера: {0} сек",
+        "tt_clip_timeout": "Через сколько секунд буфер обмена будет очищен после копирования",
     },
     "EN": {
         "win_title": "Secure Pass Pro v4.0",
@@ -207,7 +209,7 @@ LANGUAGES: Dict[str, Dict[str, str]] = {
         "sound_on": "Sound: ON", "sound_off": "Sound: OFF",
         "theme_sys": "System", "theme_dark": "Dark", "theme_light": "Light",
         "about_text": "Secure Pass Pro v4.0\n\nProfessional password generation tool.\nUses cryptographically secure algorithms.",
-        "copied": "Copied! (60s)",
+        "copied": "Copied! ({0}s)",
         "strength": "Strength: ~{0} combos",
         "crack_time": "{0}",
         "time_sec": "A few seconds to crack",
@@ -263,6 +265,8 @@ LANGUAGES: Dict[str, Dict[str, str]] = {
         "integrity_fail": "🚨 CRITICAL ERROR: File is corrupted or tampered!\nChecksum mismatch. Opening cancelled.",
         "integrity_ok": "✅ File integrity verified.",
         "tt_eye": "Show / hide password",
+        "clip_timeout": "Clipboard clear: {0} sec",
+        "tt_clip_timeout": "Seconds before clipboard is cleared after copying",
     },
     "UA": {
         "win_title": "Secure Pass Pro v4.0",
@@ -291,7 +295,7 @@ LANGUAGES: Dict[str, Dict[str, str]] = {
         "sound_on": "Звук: ВКЛ", "sound_off": "Звук: ВИКЛ",
         "theme_sys": "Системна", "theme_dark": "Темна", "theme_light": "Світла",
         "about_text": "Secure Pass Pro v4.0\n\nПрофесійний інструмент для генерації паролів.\nВикористовує криптографічно стійкі алгоритми.",
-        "copied": "Скопійовано! (60с)",
+        "copied": "Скопійовано! ({0}с)",
         "strength": "Стійкість: ~{0} варіантів",
         "crack_time": "{0}",
         "time_sec": "Кілька секунд на злам",
@@ -347,6 +351,8 @@ LANGUAGES: Dict[str, Dict[str, str]] = {
         "integrity_fail": "🚨 КРИТИЧНА ПОМИЛКА: Файл пошкоджений або підмінений!\nКонтрольна сума не збігається. Відкриття скасовано.",
         "integrity_ok": "✅ Цілісність файлу підтверджена.",
         "tt_eye": "Показати / приховати пароль",
+        "clip_timeout": "Очищення буфера: {0} сек",
+        "tt_clip_timeout": "Через скільки секунд буфер обміну буде очищено після копіювання",
     }
 }
 
@@ -480,6 +486,7 @@ class SecurePassPro(ctk.CTk):
         self.history = deque(maxlen=HISTORY_MAX)
         self._radius_widgets = []
         self._clipboard_timer = None
+        self.clipboard_timeout = 60  # секунд / seconds / секунд (10–120)
         self._tooltips = {}
         self._icon_image = None
         self._pdf_font_path = self._get_resource_path("DejaVuSans.ttf")
@@ -646,6 +653,37 @@ class SecurePassPro(ctk.CTk):
                         elif line.startswith("SOUND="):
                             sound_val = line.strip().split("=")[1].lower() == "true"
                             self.sound_enabled.set(sound_val)
+                        elif line.startswith("CLIP_TIMEOUT="):
+                            try:
+                                t = int(line.strip().split("=")[1])
+                                if 10 <= t <= 120:
+                                    self.clipboard_timeout = t
+                            except ValueError:
+                                pass
+        except:
+            pass
+
+    def _save_clipboard_timeout(self, seconds: int):
+        """
+        Сохраняет таймаут ТОЛЬКО если config.txt уже существует.
+        Saves timeout ONLY if config.txt already exists — never creates the file.
+        Зберігає таймаут ТІЛЬКИ якщо config.txt вже існує.
+        """
+        try:
+            config_dir = os.path.join(os.path.expanduser("~"), ".securepasspro")
+            config_file = os.path.join(config_dir, "config.txt")
+            if not os.path.exists(config_file):
+                return  # Файл не существует — не создаём / Don't create
+            existing = {}
+            with open(config_file, "r", encoding="utf-8") as f:
+                for line in f:
+                    if "=" in line:
+                        key, val = line.strip().split("=", 1)
+                        existing[key] = val
+            existing["CLIP_TIMEOUT"] = str(seconds)
+            with open(config_file, "w", encoding="utf-8") as f:
+                for key, val in existing.items():
+                    f.write(f"{key}={val}\n")
         except:
             pass
 
@@ -1050,7 +1088,7 @@ class SecurePassPro(ctk.CTk):
         self.settings_window.focus_force()
         self.settings_window.grab_set()
         
-        self._center_window_relative_to_parent(self.settings_window, 420, 480)
+        self._center_window_relative_to_parent(self.settings_window, 420, 580)
         self._apply_window_rounding(self.settings_window)
         
         self.settings_window.protocol("WM_DELETE_WINDOW", self._close_settings)
@@ -1162,8 +1200,27 @@ class SecurePassPro(ctk.CTk):
             corner_radius=10
         )
         close_btn.pack(pady=(5, 10))
-        
-        # --- Секция мастер-пароля / Master password section / Секція майстер-пароля ---
+
+        # --- Секция таймаута буфера / Clipboard timeout section / Секція таймауту буфера ---
+        sep_clip = ctk.CTkFrame(main_frame, height=2, fg_color="gray")
+        sep_clip.pack(fill="x", pady=8)
+
+        clip_timeout_label = ctk.CTkLabel(
+            main_frame,
+            text=L["clip_timeout"].format(self.clipboard_timeout),
+            font=("Segoe UI", 16, "bold")
+        )
+        clip_timeout_label.pack(pady=(8, 5))
+        self._clip_timeout_label_ref = clip_timeout_label
+
+        clip_slider = ctk.CTkSlider(
+            main_frame, from_=10, to=120,
+            number_of_steps=110,
+            width=300,
+            command=self._on_clip_timeout_change
+        )
+        clip_slider.set(self.clipboard_timeout)
+        clip_slider.pack(pady=(0, 10))
         sep4 = ctk.CTkFrame(main_frame, height=2, fg_color="gray")
         sep4.pack(fill="x", pady=8)
 
@@ -1192,6 +1249,23 @@ class SecurePassPro(ctk.CTk):
             'sound_btn': sound_btn,
             'radius_slider': radius_slider
         }
+
+    def _on_clip_timeout_change(self, val):
+        """
+        Обработчик слайдера таймаута буфера обмена.
+        Clipboard timeout slider handler.
+        Обробник слайдера таймауту буфера обміну.
+        """
+        seconds = int(val)
+        self.clipboard_timeout = seconds
+        if hasattr(self, '_clip_timeout_label_ref') and \
+                self._clip_timeout_label_ref and \
+                self._clip_timeout_label_ref.winfo_exists():
+            L = LANGUAGES[self.current_lang]
+            self._clip_timeout_label_ref.configure(
+                text=L["clip_timeout"].format(seconds)
+            )
+        self._save_clipboard_timeout(seconds)
 
     def _on_radius_change(self, val):
         """Handle radius slider change"""
@@ -1491,10 +1565,13 @@ class SecurePassPro(ctk.CTk):
                 self.after_cancel(self._clipboard_timer)
             except:
                 pass
-        self._clipboard_timer = self.after(60000, lambda value=pwd: self._clear_clipboard_if_current(value))
-        
+        self._clipboard_timer = self.after(
+            self.clipboard_timeout * 1000,
+            lambda value=pwd: self._clear_clipboard_if_current(value)
+        )
+
         old_text = L["btn_copy"]
-        self.btn_copy.configure(text=L["copied"])
+        self.btn_copy.configure(text=L["copied"].format(self.clipboard_timeout))
         self.after(2000, lambda: self.btn_copy.configure(text=old_text))
 
     def _clear_clipboard_if_current(self, expected):
