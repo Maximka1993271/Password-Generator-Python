@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Secure Pass Pro v4.0 — Профессиональный генератор паролей. Master-пароль, контроль целостности SHA-256, защита от повторов, Amoled UI с неоновой подсветкой, расчет энтропии, просмотр PDF и криптостойкость. Цветная пульсация пароля: красный (слабый), оранжевый (средний), зелёный (надёжный).">
+    <meta name="description" content="Secure Pass Pro v4.0 — Профессиональный генератор паролей. Master-пароль, контроль целостности SHA-256, защита от повторов, настраиваемая очистка буфера (10-120 сек), Amoled UI с неоновой подсветкой, расчет энтропии, просмотр PDF и криптостойкость. Цветная пульсация пароля: красный (слабый), оранжевый (средний), зелёный (надёжный).">
     <title>Secure Pass Pro v4.0 | Профессиональная защита паролей</title>
     
     <link rel="icon" type="image/png" href="https://github.com/Maximka1993271/Password-Generator-Python/blob/main/app_icon.png?raw=true">
@@ -34,7 +34,7 @@
         <div class="hero-content">
             <div class="version-badge">Latest Release v4.0 Stable</div>
             <h1>Безопасность без <br><span class="highlight">компромиссов</span></h1>
-            <p>Профессиональный инструмент на Python 3.9+, объединяющий Neon-Amoled дизайн, мастер-пароль, контроль целостности файлов и криптостойкий движок для Windows.</p>
+            <p>Профессиональный инструмент на Python 3.9+, объединяющий Neon-Amoled дизайн, мастер-пароль, контроль целостности файлов, настраиваемую очистку буфера и криптостойкий движок для Windows.</p>
             <div class="hero-btns">
                 <a href="https://github.com/Maximka1993271/Password-Generator-Python/releases/download/v4.0/SecurePassPro.exe" class="btn-primary">Скачать v4.0 Stable</a>
                 <a href="#v40-section" class="btn-secondary">Что нового?</a>
@@ -93,6 +93,11 @@
                 <h3>Dynamic Radius</h3>
                 <p>Настройка закругления углов элементов (0-25px) в реальном времени, включая неоновые кнопки.</p>
             </div>
+            <div class="card">
+                <div class="card-icon">⏱️</div>
+                <h3>Очистка буфера</h3>
+                <p>Настраиваемая очистка буфера обмена от 10 до 120 секунд — больше контроля, чем у KeePassXC!</p>
+            </div>
         </div>
     </section>
 
@@ -123,6 +128,11 @@
                 <div class="card-icon">🔒</div>
                 <h3>Управление мастер-паролем</h3>
                 <p>Установка и удаление мастер-пароля через окно настроек. Безопасное хранение хеша.</p>
+            </div>
+            <div class="card">
+                <div class="card-icon">⏱️</div>
+                <h3>Таймаут буфера</h3>
+                <p>Слайдер от 10 до 120 секунд для настройки времени очистки буфера обмена после копирования.</p>
             </div>
         </div>
     </section>
@@ -239,9 +249,10 @@
         <div class="tech-specs-container">
             <ul class="tech-list">
                 <li><strong>Разработчик:</strong> Максим Мельников (Maxim Melnikov)</li>
-                <li><strong>Версия:</strong> 4.0 Stable (11.05.2026)</li>
+                <li><strong>Версия:</strong> 4.0 Stable (12.05.2026)</li>
                 <li><strong>Ядро:</strong> Python 3.9+ (CSPRNG Secrets)</li>
                 <li><strong>Защита:</strong> Мастер-пароль (SHA-256) + Контроль целостности (.sha256)</li>
+                <li><strong>Очистка буфера:</strong> Настраиваемая 10-120 секунд (слайдер в настройках)</li>
                 <li><strong>Аудио:</strong> WinMM API (Custom Click) с возможностью отключения</li>
                 <li><strong>Анимация:</strong> Цветная пульсация (красный/оранжевый/зелёный)</li>
                 <li><strong>Горячие клавиши:</strong> F5, Ctrl+C, Ctrl+S, Ctrl+O, Esc</li>
@@ -263,7 +274,7 @@
             <div class="download-card highlight-card">
                 <div class="card-icon">🏆</div>
                 <h3>Secure Pass Pro v4.0</h3>
-                <p><b>Рекомендуется.</b> Master-пароль, контроль целостности SHA-256, защита от повторов, кнопка-глазок, горячие клавиши, Neon UI, поддержка PDF с кириллицей (DejaVuSans), звук клика, цветная пульсация пароля и высокая криптостойкость.</p>
+                <p><b>Рекомендуется.</b> Master-пароль, контроль целостности SHA-256, защита от повторов, кнопка-глазок, горячие клавиши, <b>настраиваемая очистка буфера (10-120 сек)</b>, Neon UI, поддержка PDF с кириллицей (DejaVuSans), звук клика, цветная пульсация пароля и высокая криптостойкость.</p>
                 <a href="https://github.com/Maximka1993271/Password-Generator-Python/releases/download/v4.0/SecurePassPro.exe" class="btn-primary full-width">Скачать v4.0 (.EXE)</a>
             </div>
             <div class="download-card">
@@ -285,6 +296,7 @@
                 <span class="badge">Master Password</span>
                 <span class="badge">SHA-256 Integrity</span>
                 <span class="badge">Hotkeys Support</span>
+                <span class="badge">Clipboard Timeout</span>
                 <span class="badge">Win 10/11 Optimized</span>
                 <span class="badge">Triple Localization</span>
                 <span class="badge">Corner Radius Control</span>
@@ -297,7 +309,8 @@
                 Локализация: RU, EN, UA. Программа гарантирует полную приватность данных. Генерация происходит локально, 
                 поддержка PDF и звукового сопровождения интегрирована нативно. В версии 4.0 добавлены: мастер-пароль для защиты доступа, 
                 контроль целостности файлов через SHA-256, опция "Избегать повторов символов подряд", кнопка-глазок для показа/скрытия пароля, 
-                горячие клавиши (F5, Ctrl+C, Ctrl+S, Ctrl+O, Esc), централизованная панель настроек с управлением языком, темой, звуком и закруглением углов. 
+                горячие клавиши (F5, Ctrl+C, Ctrl+S, Ctrl+O, Esc), <strong>настраиваемая очистка буфера обмена (10-120 секунд)</strong>, 
+                централизованная панель настроек с управлением языком, темой, звуком, закруглением углов и таймаутом буфера. 
                 PDF-экспорт использует шрифт DejaVuSans.ttf для корректного отображения кириллицы. <strong>Новинка: цветная неоновая пульсация</strong> — красный (слабый), 
                 оранжевый (средний), зелёный (надёжный) пароль.
             </p>
