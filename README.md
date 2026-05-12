@@ -50,7 +50,7 @@ It combines cryptographically secure password generation, multilingual interface
 ## 🚀 What's New in v4.0
 
 ### 🔒 Master Password Protection
-Set a **master password** to protect access to the entire program. SHA-256 hashed with 5 attempts before lockout.
+Set a **master password** to protect access to the entire program. PBKDF2 hashed (100,000 iterations, 32-byte salt) with 5 attempts before lockout.
 
 ### ✅ File Integrity Verification
 Automatic `.sha256` checksum creation when saving files and verification when opening them. Prevents tampering.
@@ -87,12 +87,19 @@ Toggle UI sound effects on/off with a single click. When enabled, mechanical mou
 A new slider allows you to customize the roundness of all UI elements from **0 to 25 pixels** – make it perfectly square or beautifully rounded.
 
 ### ⏱️ Configurable Clipboard Timeout (New!)
-Adjust the clipboard auto-clear delay from **10 to 120 seconds** using a slider in settings. The setting is saved to `config.txt` and persists between sessions. This gives you more control than KeePassXC's fixed 30 seconds!
+Adjust the clipboard auto-clear delay from **10 to 120 seconds** using a slider in settings. The setting is saved to `config.json` and persists between sessions. This gives you more control than KeePassXC's fixed 30 seconds!
 
 ### 📄 Enhanced PDF Export
 - **Full Unicode support** for Cyrillic characters (Russian & Ukrainian)
 - **Embedded DejaVuSans.ttf** font for professional PDF output
 - No more garbled text or missing characters in exported documents
+
+### 🌈 RGB Animation (New!)
+Dynamic color-cycling border around the main window with:
+- **Four independent RGB strips** – Different phases for top/bottom/left/right borders
+- **RGB under titlebar** – Additional strip below the window title bar
+- **Windows 11 titlebar color sync** – Titlebar changes color along with animation
+- **ON/OFF toggle buttons** – Enable/disable from settings, preference saved
 
 ### 🎨 Color Pulsation Animation (New!)
 The password field now features a **0.3-second neon glow animation** after each generation, with colors indicating password strength:
@@ -113,6 +120,9 @@ This provides **instant visual feedback** about password quality without needing
 - Extended export & viewing support for `.txt`, `.log`, `.key`, and `.pdf` formats
 - Fixed PDF export for Cyrillic and Ukrainian text using DejaVuSans font
 - Removed deprecated progress bar for cleaner interface
+- **Improved checkbox appearance** – Better looking checkmark indicators
+- **Master Password section in Settings** – Status indicator and management buttons
+- **Fixed translation for all master password dialogs** – Proper RU/EN/UA support
 
 **[📥 Download Secure Pass Pro v4.0 (.exe)](https://github.com/Maximka1993271/Password-Generator-Python/releases/download/v4.0/SecurePassPro.exe)**
 
@@ -127,27 +137,30 @@ This provides **instant visual feedback** about password quality without needing
 - **Audio**: `Windows Multimedia API (winmm)`
 - **Libraries**: `Pillow`, `qrcode`, `fpdf`
 - **PDF Font**: `DejaVuSans.ttf` (embedded, full Cyrillic support)
-- **Security**: `secrets`, `hashlib`, `random.SystemRandom`
-- **Animations**: Color-coded neon pulsation (Red/Orange/Green)
+- **Security**: `secrets`, `hashlib`, `random.SystemRandom`, `PBKDF2`
+- **Animations**: Color-coded neon pulsation (Red/Orange/Green), RGB border cycling
 
 ### Changelog v4.0 (2026-05-12)
 
 **New Features:**
-- Added **Master Password** protection with SHA-256 hashing (5 attempts limit)
+- Added **Master Password** protection with PBKDF2 hashing (100,000 iterations, 32-byte salt, 5 attempts limit)
 - Added **File Integrity Verification** (`.sha256` checksums)
 - Added **No Consecutive Repeats** option for password generation
 - Added **Password Visibility Toggle** (eye button) with checkbox sync
 - Added **Hotkeys support** (F5, Ctrl+C, Ctrl+S, Ctrl+O, Esc)
-- Added **Settings window** with language, theme, sound and corner radius controls
+- Added **Settings window** with language, theme, sound, corner radius, clipboard timeout, RGB, and master password controls
 - Added **Language Switcher** (RU/EN/UA) with instant UI translation
 - Added **Theme Selector** (System/Light/Dark) with safe theme switching
 - Added **Sound Toggle** with mechanical click feedback
 - Added **Corner Radius Slider** (0-25px) for UI customization
-- Added **Configurable Clipboard Timeout** (10-120 seconds slider, saves to config)
+- Added **Configurable Clipboard Timeout** (10-120 seconds slider, saves to config.json)
+- Added **RGB Animation** – 4 independent border strips + titlebar color sync with ON/OFF toggle
 - Added **DejaVuSans.ttf font** for proper Cyrillic display in PDF exports
 - Added **dedicated Settings button** in the main menu with green neon color
 - Added **Color-coded password field pulsation** (Red/Orange/Green based on entropy)
 - Added **Tooltips** for all buttons including the eye button
+- Added **"Set Master Password"** and **"Remove Master Password"** buttons in Settings
+- Added **Master Password status indicator** (🔒 Set / 🔓 Not set)
 
 **Fixes:**
 - Fixed checkbox/eye button synchronization
@@ -157,6 +170,13 @@ This provides **instant visual feedback** about password quality without needing
 - Fixed PDF export for Cyrillic and Ukrainian text using DejaVuSans font
 - Fixed Ukrainian author name spelling (Максим Мельніков)
 - Fixed duplicate code in build commands
+- Fixed `winreg` import error on Linux/macOS – proper platform detection
+- Fixed `self.settings_labels` AttributeError when pressing Escape before opening settings
+- Fixed `self.history_textbox` AttributeError in `_close_history`
+- Fixed 8 missing widget attributes in `__init__` – all settings widgets now properly initialized
+- Fixed `tt_copy` tooltip formatting – timeout value now displays correctly
+- Fixed translation for all master password dialogs (RU/EN/UA)
+- Fixed color scheme for all popup dialogs
 
 **Improvements:**
 - Removed deprecated theme buttons from bottom panel
@@ -166,10 +186,15 @@ This provides **instant visual feedback** about password quality without needing
 - Updated strength indicator with 5-star rating system
 - **Full Unicode/UTF-8 support for PDF documents**
 - **Added visual feedback with color-coded password field animation**
+- **Redesigned Settings window** – scrollable frame with separator lines and better organization
+- **Improved checkbox appearance** – better checkmark indicators with proper spacing
+- **JSON configuration format** – replaced `.txt` with `.json` for more reliable settings storage
 
 **Removed:**
 - Removed deprecated progress bar for cleaner interface
 - Removed duplicate controls from main window
+- Removed dead code: `self._settings_buttons`, `self._settings_widgets`
+- Removed unnecessary `hasattr()` checks
 
 ---
 
@@ -204,6 +229,7 @@ The **Classic branch** is a lightweight, stable version built with standard **Tk
 | Settings window | ❌ No |
 | Master password | ❌ No |
 | Configurable clipboard timeout | ❌ No |
+| RGB animation | ❌ No |
 
 ### 🛠️ Tech Stack (v2.0.0)
 
