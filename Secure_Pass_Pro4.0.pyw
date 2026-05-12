@@ -27,11 +27,10 @@ import tkinter as tk
 from tkinter import filedialog
 import ctypes
 import json
-from typing import Optional, Dict, Any, List
+from typing import Any
 
 
 def _show_startup_error(title: str, text: str) -> None:
-    """Show error dialog on startup"""
     root = tk.Tk()
     root.withdraw()
     try:
@@ -42,6 +41,12 @@ def _show_startup_error(title: str, text: str) -> None:
 
 
 _IS_WINDOWS = platform.system() == "Windows"
+_IS_MACOS   = platform.system() == "Darwin"
+
+# Кросс-платформенные шрифты / Cross-platform fonts / Кросплатформенні шрифти
+_FONT_UI   = "Segoe UI"  if _IS_WINDOWS else ("SF Pro Display" if _IS_MACOS else "DejaVu Sans")
+_FONT_MONO = "Consolas"  if _IS_WINDOWS else ("Menlo"          if _IS_MACOS else "DejaVu Sans Mono")
+_FONT_BTN  = "Segoe UI"  if _IS_WINDOWS else ("SF Pro Display" if _IS_MACOS else "DejaVu Sans")
 
 if sys.version_info < (3, 9):
     _show_startup_error("Error", "Python 3.9+ required!")
@@ -67,31 +72,26 @@ CONFIG_DIR = os.path.join(os.path.expanduser("~"), ".securepasspro")
 CONFIG_FILE = os.path.join(CONFIG_DIR, "config.json")
 MASTER_FILE = os.path.join(CONFIG_DIR, "master.key")
 
-# Global radius for all dialogs (will be updated from main app)
+# Global radius for all dialogs
 _global_radius = 10
-_global_theme = "dark"
-_global_lang = "RU"
 
 
 def set_global_radius(radius: int) -> None:
-    """Set global radius for all dialogs"""
     global _global_radius
     _global_radius = radius
 
 
 def get_global_radius() -> int:
-    """Get global radius for dialogs"""
     return _global_radius
 
 
 def _get_resource_path(filename: str) -> str:
-    """Get path to resource file (works with PyInstaller)"""
     base_dir = sys._MEIPASS if hasattr(sys, '_MEIPASS') else os.path.dirname(os.path.abspath(__file__))
     return os.path.join(base_dir, filename)
 
 
 def _center_screen(win: tk.Tk | ctk.CTkToplevel, width: int, height: int) -> None:
-    """Center window on screen"""
+    """Center window on screen (absolute center of display)"""
     screen_w = win.winfo_screenwidth()
     screen_h = win.winfo_screenheight()
     x = (screen_w - width) // 2
@@ -101,31 +101,20 @@ def _center_screen(win: tk.Tk | ctk.CTkToplevel, width: int, height: int) -> Non
 
 # ==================== MASTER PASSWORD ====================
 class MasterPassword:
-    """Master password protection with PBKDF2"""
-    
     MAX_ATTEMPTS = 5
     SALT_SIZE = 32
     ITERATIONS = 100000
     
     @classmethod
     def _derive_key(cls, password: str, salt: bytes) -> bytes:
-        """Derive key from password using PBKDF2"""
-        return hashlib.pbkdf2_hmac(
-            'sha256',
-            password.encode('utf-8'),
-            salt,
-            cls.ITERATIONS,
-            dklen=32
-        )
+        return hashlib.pbkdf2_hmac('sha256', password.encode('utf-8'), salt, cls.ITERATIONS, dklen=32)
     
     @classmethod
     def is_set(cls) -> bool:
-        """Check if master password is set"""
         return os.path.exists(MASTER_FILE)
     
     @classmethod
     def verify(cls, password: str) -> bool:
-        """Verify master password"""
         if not cls.is_set():
             return True
         try:
@@ -139,7 +128,6 @@ class MasterPassword:
     
     @classmethod
     def set_password(cls, password: str) -> None:
-        """Set new master password"""
         os.makedirs(CONFIG_DIR, exist_ok=True)
         salt = secrets.token_bytes(cls.SALT_SIZE)
         derived = cls._derive_key(password, salt)
@@ -148,7 +136,6 @@ class MasterPassword:
     
     @classmethod
     def remove(cls) -> None:
-        """Remove master password"""
         try:
             os.remove(MASTER_FILE)
         except Exception:
@@ -156,7 +143,6 @@ class MasterPassword:
     
     @classmethod
     def prompt_on_startup(cls, lang: str = "RU", theme: str = "dark") -> bool:
-        """Show password prompt on startup"""
         if not cls.is_set():
             return True
         
@@ -190,8 +176,6 @@ class MasterPassword:
 
 # ==================== CUSTOM DIALOGS ====================
 class CTkMessageBox:
-    """Custom message boxes matching app theme with rounded corners"""
-    
     _current_theme = "dark"
     _current_lang = "RU"
     
@@ -204,22 +188,13 @@ class CTkMessageBox:
         cls._current_lang = lang
     
     @staticmethod
-    def _get_colors(theme: str) -> Dict[str, str]:
+    def _get_colors(theme: str) -> dict[str, str]:
         if theme == "light":
-            return {
-                "bg": "#F3F3F3", "fg": "#000000", "button_fg": "#1f538d",
-                "button_text": "#FFFFFF", "label_text": "#000000", "entry_bg": "#FFFFFF"
-            }
-        return {
-            "bg": "#1d1e1e", "fg": "#FFFFFF", "button_fg": "#1f538d",
-            "button_text": "#FFFFFF", "label_text": "#FFFFFF", "entry_bg": "#2b2b2b"
-        }
+            return {"bg": "#F3F3F3", "fg": "#000000", "button_fg": "#1f538d", "button_text": "#FFFFFF", "label_text": "#000000", "entry_bg": "#FFFFFF"}
+        return {"bg": "#1d1e1e", "fg": "#FFFFFF", "button_fg": "#1f538d", "button_text": "#FFFFFF", "label_text": "#FFFFFF", "entry_bg": "#2b2b2b"}
     
     @staticmethod
-    def _show(parent, title: str, message: str, button_text: str = "OK",
-              icon: str = "ℹ️", icon_color: str = "#4EC9B0",
-              button_color: str = "#1f538d", is_question: bool = False) -> Optional[str]:
-        
+    def _show(parent, title: str, message: str, button_text: str = "OK", icon: str = "ℹ️", icon_color: str = "#4EC9B0", button_color: str = "#1f538d", is_question: bool = False) -> str | None:
         win = ctk.CTkToplevel(parent)
         win.title(title)
         win.resizable(False, False)
@@ -229,13 +204,13 @@ class CTkMessageBox:
         colors = CTkMessageBox._get_colors(CTkMessageBox._current_theme)
         L = LANGUAGES.get(CTkMessageBox._current_lang, LANGUAGES["RU"])
         
-        w, h = (400, 220) if is_question else (400, 200)
+        w, h = (420, 220) if is_question else (420, 200)
+        
         _center_screen(win, w, h)
         win.configure(fg_color=colors["bg"])
         
         ctk.CTkLabel(win, text=icon, font=("Segoe UI", 40), text_color=icon_color).pack(pady=(20, 5))
-        ctk.CTkLabel(win, text=message, font=("Segoe UI", 13), wraplength=350,
-                    justify="center", text_color=colors["label_text"]).pack(pady=(0, 15))
+        ctk.CTkLabel(win, text=message, font=("Segoe UI", 13), wraplength=360, justify="center", text_color=colors["label_text"]).pack(pady=(0, 15))
         
         btn_frame = ctk.CTkFrame(win, fg_color="transparent")
         btn_frame.pack()
@@ -246,17 +221,16 @@ class CTkMessageBox:
         if is_question:
             def on_yes(): result[0] = "yes"; win.destroy()
             def on_no(): result[0] = "no"; win.destroy()
-            ctk.CTkButton(btn_frame, text=L.get("yes", "Да"), width=100, height=35,
-                         command=on_yes, fg_color="#2d6a4f", corner_radius=radius).pack(side="left", padx=8)
-            ctk.CTkButton(btn_frame, text=L.get("no", "Нет"), width=100, height=35,
-                         command=on_no, fg_color="#8b0000", corner_radius=radius).pack(side="left", padx=8)
+            ctk.CTkButton(btn_frame, text=L.get("yes", "Да"), width=100, height=35, command=on_yes, fg_color="#2d6a4f", corner_radius=radius).pack(side="left", padx=8)
+            ctk.CTkButton(btn_frame, text=L.get("no", "Нет"), width=100, height=35, command=on_no, fg_color="#8b0000", corner_radius=radius).pack(side="left", padx=8)
         else:
             def on_ok(): result[0] = "ok"; win.destroy()
             btn_text = button_text if button_text != "OK" else L.get("ok", "OK")
-            ctk.CTkButton(btn_frame, text=btn_text, width=120, height=35,
-                         command=on_ok, fg_color=colors["button_fg"], corner_radius=radius).pack()
+            ctk.CTkButton(btn_frame, text=btn_text, width=120, height=35, command=on_ok, fg_color=colors["button_fg"], corner_radius=radius).pack()
         
         win.after(100, lambda: win.attributes("-topmost", False))
+        win.after(50, lambda: _center_screen(win, w, h))
+        
         parent.wait_window(win)
         return result[0]
     
@@ -279,11 +253,8 @@ class CTkMessageBox:
 
 
 class CTkInputDialog:
-    """Custom input dialog matching app theme with rounded corners"""
-    
-    def __init__(self, parent, title: str, prompt: str, show: str = "", 
-                 theme: str = "dark", lang: str = "RU"):
-        self.result: Optional[str] = None
+    def __init__(self, parent, title: str, prompt: str, show: str = "", theme: str = "dark", lang: str = "RU"):
+        self.result: str | None = None
         self.win = ctk.CTkToplevel(parent)
         self.win.title(title)
         self.win.resizable(False, False)
@@ -298,13 +269,11 @@ class CTkInputDialog:
         else:
             bg_color, fg_color, entry_bg, btn_fg = "#1d1e1e", "#FFFFFF", "#2b2b2b", "#1f538d"
         
-        _center_screen(self.win, 380, 200)
+        _center_screen(self.win, 420, 220)
         self.win.configure(fg_color=bg_color)
         
-        ctk.CTkLabel(self.win, text=prompt, font=("Segoe UI", 13), wraplength=340,
-                    text_color=fg_color).pack(padx=20, pady=(20, 8))
-        self.entry = ctk.CTkEntry(self.win, width=320, height=40, font=("Segoe UI", 14),
-                                  show=show, fg_color=entry_bg, text_color=fg_color)
+        ctk.CTkLabel(self.win, text=prompt, font=("Segoe UI", 13), wraplength=360, text_color=fg_color).pack(padx=20, pady=(20, 8))
+        self.entry = ctk.CTkEntry(self.win, width=360, height=40, font=("Segoe UI", 14), show=show, fg_color=entry_bg, text_color=fg_color, corner_radius=radius)
         self.entry.pack(padx=20, pady=(0, 12))
         self.entry.focus_set()
         self.entry.bind("<Return>", lambda e: self._ok())
@@ -312,13 +281,13 @@ class CTkInputDialog:
         
         btn_frame = ctk.CTkFrame(self.win, fg_color="transparent")
         btn_frame.pack()
-        ctk.CTkButton(btn_frame, text=L["ok"], width=110, height=36, command=self._ok,
-                     fg_color=btn_fg, corner_radius=radius).pack(side="left", padx=8)
-        ctk.CTkButton(btn_frame, text=L["cancel"], width=110, height=36, command=self._cancel,
-                     fg_color="#ca5010", corner_radius=radius).pack(side="left", padx=8)
+        ctk.CTkButton(btn_frame, text=L["ok"], width=110, height=36, command=self._ok, fg_color=btn_fg, corner_radius=radius).pack(side="left", padx=8)
+        ctk.CTkButton(btn_frame, text=L["cancel"], width=110, height=36, command=self._cancel, fg_color="#ca5010", corner_radius=radius).pack(side="left", padx=8)
         
         self.win.protocol("WM_DELETE_WINDOW", self._cancel)
         self.win.after(100, lambda: self.win.attributes("-topmost", False))
+        self.win.after(50, lambda: _center_screen(self.win, 420, 220))
+        
         parent.wait_window(self.win)
     
     def _ok(self) -> None:
@@ -330,14 +299,11 @@ class CTkInputDialog:
         self.win.destroy()
     
     @staticmethod
-    def ask(parent, title: str, prompt: str, show: str = "",
-            theme: str = "dark", lang: str = "RU") -> Optional[str]:
+    def ask(parent, title: str, prompt: str, show: str = "", theme: str = "dark", lang: str = "RU") -> str | None:
         return CTkInputDialog(parent, title, prompt, show, theme, lang).result
 
 
 class ToolTip:
-    """Simple tooltip for widgets"""
-    
     def __init__(self, widget):
         self.widget = widget
         self.text = ""
@@ -356,8 +322,7 @@ class ToolTip:
         self.tip_window = tw = tk.Toplevel(self.widget)
         tw.wm_overrideredirect(True)
         tw.wm_geometry(f"+{x}+{y}")
-        tk.Label(tw, text=self.text, justify='left', background="#ffffe0",
-                relief='solid', borderwidth=1, font=("tahoma", "9", "normal")).pack(ipadx=1)
+        tk.Label(tw, text=self.text, justify='left', background="#ffffe0", relief='solid', borderwidth=1, font=(_FONT_UI, 9, "normal")).pack(ipadx=1)
     
     def hide_tip(self, event=None) -> None:
         if self.tip_window:
@@ -366,8 +331,6 @@ class ToolTip:
 
 
 class UTF8PDF(FPDF):
-    """PDF with UTF-8 support"""
-    
     def __init__(self):
         super().__init__()
         self.dejavu_loaded = False
@@ -388,7 +351,7 @@ class UTF8PDF(FPDF):
 
 
 # ==================== LANGUAGES ====================
-LANGUAGES: Dict[str, Dict[str, str]] = {
+LANGUAGES: dict[str, dict[str, str]] = {
     "RU": {
         "win_title": "Secure Pass Pro v4.0", "menu_title": "Меню", "len": "Длина",
         "author": "Автор: Максим Мельников", "upper": "Заглавные буквы", "lower": "Строчные буквы",
@@ -526,8 +489,6 @@ LANGUAGES: Dict[str, Dict[str, str]] = {
 
 # ==================== MAIN APPLICATION ====================
 class SecurePassPro(ctk.CTk):
-    """Main application class"""
-    
     def __init__(self) -> None:
         super().__init__()
         
@@ -536,21 +497,21 @@ class SecurePassPro(ctk.CTk):
         self.current_theme = "System"
         self.current_radius = 10
         self.clipboard_timeout = 60
-        self._clipboard_timer: Optional[str] = None
-        self._rgb_anim_id: Optional[str] = None
-        self._pulse_animation_id: Optional[str] = None
+        self._clipboard_timer: str | None = None
+        self._rgb_anim_id: str | None = None
+        self._pulse_animation_id: str | None = None
         
         # Set global radius for dialogs
         set_global_radius(self.current_radius)
         
-        # UI state
-        self.upper_var = tk.BooleanVar(value=True)
-        self.lower_var = tk.BooleanVar(value=True)
-        self.digits_var = tk.BooleanVar(value=True)
-        self.symb_var = tk.BooleanVar(value=True)
+        # UI state — разумные дефолты / sensible defaults / розумні дефолти
+        self.upper_var = tk.BooleanVar(value=False)
+        self.lower_var = tk.BooleanVar(value=False)
+        self.digits_var = tk.BooleanVar(value=False)
+        self.symb_var = tk.BooleanVar(value=False)
         self.ambig_var = tk.BooleanVar(value=False)
         self.unambig_var = tk.BooleanVar(value=False)
-        self.at_least_var = tk.BooleanVar(value=True)
+        self.at_least_var = tk.BooleanVar(value=False)
         self.hide_var = tk.BooleanVar(value=False)
         self.no_repeat_var = tk.BooleanVar(value=False)
         self.sound_enabled = tk.BooleanVar(value=True)
@@ -561,34 +522,34 @@ class SecurePassPro(ctk.CTk):
         self._rgb_t = 0.0
         
         # Window references
-        self.settings_window: Optional[ctk.CTkToplevel] = None
-        self.about_window: Optional[ctk.CTkToplevel] = None
-        self.history_window: Optional[ctk.CTkToplevel] = None
-        self.qr_window: Optional[ctk.CTkToplevel] = None
+        self.settings_window: ctk.CTkToplevel | None = None
+        self.about_window: ctk.CTkToplevel | None = None
+        self.history_window: ctk.CTkToplevel | None = None
+        self.qr_window: ctk.CTkToplevel | None = None
         
         # Widget references
-        self._tooltips: Dict[str, ToolTip] = {}
-        self.lang_buttons: Dict[str, ctk.CTkButton] = {}
-        self.theme_buttons: Dict[str, ctk.CTkButton] = {}
-        self.settings_labels: Dict[str, Any] = {}
-        self.history_textbox: Optional[ctk.CTkTextbox] = None
-        self.settings_radius_label: Optional[ctk.CTkLabel] = None
-        self._master_set_btn: Optional[ctk.CTkButton] = None
-        self._master_status_label: Optional[ctk.CTkLabel] = None
-        self._sound_btn: Optional[ctk.CTkButton] = None
-        self._close_btn: Optional[ctk.CTkButton] = None
-        self._clip_timeout_label_ref: Optional[ctk.CTkLabel] = None
-        self._rgb_on_btn_ref: Optional[ctk.CTkButton] = None
-        self._rgb_off_btn_ref: Optional[ctk.CTkButton] = None
+        self._tooltips: dict[str, ToolTip] = {}
+        self.lang_buttons: dict[str, ctk.CTkButton] = {}
+        self.theme_buttons: dict[str, ctk.CTkButton] = {}
+        self.settings_labels: dict[str, Any] = {}
+        self.history_textbox: ctk.CTkTextbox | None = None
+        self.settings_radius_label: ctk.CTkLabel | None = None
+        self._master_set_btn: ctk.CTkButton | None = None
+        self._master_status_label: ctk.CTkLabel | None = None
+        self._sound_btn: ctk.CTkButton | None = None
+        self._close_btn: ctk.CTkButton | None = None
+        self._clip_timeout_label_ref: ctk.CTkLabel | None = None
+        self._rgb_on_btn_ref: ctk.CTkButton | None = None
+        self._rgb_off_btn_ref: ctk.CTkButton | None = None
         
         # RGB canvases
-        self._rgb_c_top: Optional[tk.Canvas] = None
-        self._rgb_c_bottom: Optional[tk.Canvas] = None
-        self._rgb_c_left: Optional[tk.Canvas] = None
-        self._rgb_c_right: Optional[tk.Canvas] = None
+        self._rgb_c_top: tk.Canvas | None = None
+        self._rgb_c_bottom: tk.Canvas | None = None
+        self._rgb_c_left: tk.Canvas | None = None
+        self._rgb_c_right: tk.Canvas | None = None
         
         # Icons and resources
-        self._icon_image: Optional[tk.PhotoImage] = None
+        self._icon_image: tk.PhotoImage | None = None
         self._pdf_font_path = _get_resource_path("DejaVuSans.ttf")
         
         # Setup
@@ -605,32 +566,28 @@ class SecurePassPro(ctk.CTk):
         self._center_main_window()
         self._apply_window_rounding(self)
         
-        # Bind keyboard shortcuts
-        self.bind('<F5>', lambda e: self._generate())
-        self.bind('<Control-c>', lambda e: self._copy())
-        self.bind('<Control-s>', lambda e: self._save())
-        self.bind('<Control-o>', lambda e: self._open())
-        self.bind('<Escape>', lambda e: self._close_settings() if self.settings_window else None)
+        self.bind('<F5>',         lambda e: self._generate())
+        self.bind('<Control-s>',  lambda e: self._save())
+        self.bind('<Control-o>',  lambda e: self._open())
+        self.bind('<Escape>',     lambda e: self._close_settings() if self.settings_window else None)
+        # Ctrl+C только если фокус НЕ в entry — иначе конфликт с системным копированием
+        # Ctrl+C only if focus NOT in entry — else conflicts with system copy
+        # Ctrl+C тільки якщо фокус НЕ в entry — інакше конфлікт з системним копіюванням
+        self.bind('<Control-c>',  lambda e: self._copy() if self.focus_get() is not self.entry_res else None)
         
-        # Load settings after UI is ready
         self.after(50, self._load_all_settings)
-        
-        # Handle window close
         self.protocol("WM_DELETE_WINDOW", self._on_closing)
     
     def _create_rgb_canvases(self) -> None:
-        """Create RGB animation canvases"""
         bw = 3
         self._rgb_c_top = tk.Canvas(self, height=bw, bg="#1d1e1e", highlightthickness=0)
         self._rgb_c_bottom = tk.Canvas(self, height=bw, bg="#1d1e1e", highlightthickness=0)
         self._rgb_c_left = tk.Canvas(self, width=bw, bg="#1d1e1e", highlightthickness=0)
         self._rgb_c_right = tk.Canvas(self, width=bw, bg="#1d1e1e", highlightthickness=0)
-        
         for c in (self._rgb_c_top, self._rgb_c_bottom, self._rgb_c_left, self._rgb_c_right):
             c.place_forget()
     
     def _on_closing(self) -> None:
-        """Clean up and close application"""
         self._stop_rgb()
         if self._pulse_animation_id:
             self.after_cancel(self._pulse_animation_id)
@@ -639,19 +596,14 @@ class SecurePassPro(ctk.CTk):
         self.destroy()
     
     def _get_actual_theme(self) -> str:
-        """Return 'light' or 'dark' based on current theme setting"""
         if self.current_theme == "Light":
             return "light"
         if self.current_theme == "Dark":
             return "dark"
-        # System theme detection
         if _IS_WINDOWS:
             try:
                 import winreg
-                key = winreg.OpenKey(
-                    winreg.HKEY_CURRENT_USER,
-                    r"Software\Microsoft\Windows\CurrentVersion\Themes\Personalize"
-                )
+                key = winreg.OpenKey(winreg.HKEY_CURRENT_USER, r"Software\Microsoft\Windows\CurrentVersion\Themes\Personalize")
                 value, _ = winreg.QueryValueEx(key, "AppsUseLightTheme")
                 winreg.CloseKey(key)
                 return "light" if value == 1 else "dark"
@@ -659,11 +611,10 @@ class SecurePassPro(ctk.CTk):
                 pass
         return "dark"
     
-    def _save_config(self, updates: Dict[str, Any]) -> None:
-        """Save configuration to JSON file"""
+    def _save_config(self, updates: dict[str, Any]) -> None:
         try:
             os.makedirs(CONFIG_DIR, exist_ok=True)
-            existing: Dict[str, Any] = {}
+            existing: dict[str, Any] = {}
             if os.path.exists(CONFIG_FILE):
                 with open(CONFIG_FILE, "r", encoding="utf-8") as f:
                     existing = json.load(f)
@@ -674,12 +625,15 @@ class SecurePassPro(ctk.CTk):
             pass
     
     def _load_all_settings(self) -> None:
-        """Load all settings from config file"""
         try:
             if not os.path.exists(CONFIG_FILE):
                 return
             with open(CONFIG_FILE, "r", encoding="utf-8") as f:
-                config = json.load(f)
+                try:
+                    config = json.load(f)
+                except (json.JSONDecodeError, ValueError):
+                    # Файл повреждён — начинаем с дефолтов / Corrupt file — start with defaults
+                    return
             
             if "THEME" in config and config["THEME"] in ("System", "Light", "Dark"):
                 self.current_theme = config["THEME"]
@@ -713,10 +667,7 @@ class SecurePassPro(ctk.CTk):
         except Exception:
             pass
     
-    # ==================== UI SETUP ====================
-    
     def _setup_ui(self) -> None:
-        """Initialize user interface"""
         self.grid_columnconfigure(0, weight=1)
         self.grid_columnconfigure(1, weight=0)
         self.grid_rowconfigure(0, weight=1)
@@ -725,47 +676,44 @@ class SecurePassPro(ctk.CTk):
         self.left_panel = ctk.CTkFrame(self, fg_color="transparent")
         self.left_panel.grid(row=0, column=0, sticky="nsew", padx=20, pady=(10, 0))
         
-        self.lbl_title = ctk.CTkLabel(self.left_panel, text="Secure Pass Pro v4.0", 
-                                       font=("Segoe UI", 20, "bold"))
+        self.lbl_title = ctk.CTkLabel(self.left_panel, text="Secure Pass Pro v4.0", font=("Segoe UI", 20, "bold"))
         self.lbl_title.pack(pady=(5, 0))
-        self.lbl_author = ctk.CTkLabel(self.left_panel, text="", font=("Segoe UI", 14, "italic"), 
-                                        text_color="gray")
+        self.lbl_author = ctk.CTkLabel(self.left_panel, text="", font=("Segoe UI", 14, "italic"), text_color="gray")
         self.lbl_author.pack(pady=(0, 10))
         
         # Length slider
         self.lbl_len = ctk.CTkLabel(self.left_panel, text="", font=("Segoe UI", 16, "bold"))
         self.lbl_len.pack()
-        self.slider_len = ctk.CTkSlider(self.left_panel, from_=4, to=64, number_of_steps=60, 
-                                         width=400, command=self._update_len_label)
+        self.slider_len = ctk.CTkSlider(self.left_panel, from_=4, to=64, number_of_steps=60, width=400, command=self._update_len_label)
         self.slider_len.set(20)
         self.slider_len.pack(pady=5)
         
-        # Checkboxes
+        # Checkboxes - увеличены отступы между чекбоксами
         self.cb_frame = ctk.CTkFrame(self.left_panel, fg_color="transparent")
-        self.cb_frame.pack(pady=5)
+        self.cb_frame.pack(pady=10)  # увеличен отступ сверху и снизу
         
         self.cb_upper = ctk.CTkCheckBox(self.cb_frame, text="", variable=self.upper_var)
-        self.cb_upper.grid(row=0, column=1, padx=(70, 20), pady=2, sticky="w")
+        self.cb_upper.grid(row=0, column=1, padx=(70, 20), pady=6, sticky="w")  # pady 6 вместо 2
         self.cb_lower = ctk.CTkCheckBox(self.cb_frame, text="", variable=self.lower_var)
-        self.cb_lower.grid(row=0, column=0, padx=(20, 70), pady=2, sticky="w")
+        self.cb_lower.grid(row=0, column=0, padx=(20, 70), pady=6, sticky="w")   # pady 6 вместо 2
         self.cb_digits = ctk.CTkCheckBox(self.cb_frame, text="", variable=self.digits_var)
-        self.cb_digits.grid(row=1, column=1, padx=(70, 20), pady=2, sticky="w")
+        self.cb_digits.grid(row=1, column=1, padx=(70, 20), pady=6, sticky="w")   # pady 6 вместо 2
         self.cb_symb = ctk.CTkCheckBox(self.cb_frame, text="", variable=self.symb_var)
-        self.cb_symb.grid(row=1, column=0, padx=(20, 70), pady=2, sticky="w")
+        self.cb_symb.grid(row=1, column=0, padx=(20, 70), pady=6, sticky="w")     # pady 6 вместо 2
         self.cb_ambig = ctk.CTkCheckBox(self.cb_frame, text="", variable=self.ambig_var)
-        self.cb_ambig.grid(row=2, column=0, columnspan=2, padx=20, pady=(8, 2), sticky="w")
+        self.cb_ambig.grid(row=2, column=0, columnspan=2, padx=20, pady=8, sticky="w")  # pady 8
         self.cb_unambig = ctk.CTkCheckBox(self.cb_frame, text="", variable=self.unambig_var)
-        self.cb_unambig.grid(row=3, column=0, columnspan=2, padx=20, pady=2, sticky="w")
+        self.cb_unambig.grid(row=3, column=0, columnspan=2, padx=20, pady=8, sticky="w")  # pady 8
         self.cb_at_least = ctk.CTkCheckBox(self.cb_frame, text="", variable=self.at_least_var)
-        self.cb_at_least.grid(row=4, column=0, columnspan=2, padx=20, pady=(8, 2), sticky="w")
+        self.cb_at_least.grid(row=4, column=0, columnspan=2, padx=20, pady=8, sticky="w")  # pady 8
         self.cb_hide = ctk.CTkCheckBox(self.cb_frame, text="", variable=self.hide_var, command=self._toggle_hide)
-        self.cb_hide.grid(row=5, column=0, columnspan=2, padx=20, pady=2, sticky="w")
+        self.cb_hide.grid(row=5, column=0, columnspan=2, padx=20, pady=8, sticky="w")      # pady 8
         self.cb_no_repeat = ctk.CTkCheckBox(self.cb_frame, text="", variable=self.no_repeat_var)
-        self.cb_no_repeat.grid(row=6, column=0, columnspan=2, padx=20, pady=(8, 2), sticky="w")
+        self.cb_no_repeat.grid(row=6, column=0, columnspan=2, padx=20, pady=8, sticky="w")  # pady 8
         
         # Password entry
         self.entry_frame = ctk.CTkFrame(self.left_panel, fg_color="transparent")
-        self.entry_frame.pack(pady=10, padx=40, fill="x")
+        self.entry_frame.pack(pady=15, padx=40, fill="x")  # увеличен отступ
         self.entry_res = ctk.CTkEntry(self.entry_frame, height=50, font=("Consolas", 22), justify="center")
         self.entry_res.pack(side="left", fill="x", expand=True)
         
@@ -800,22 +748,17 @@ class SecurePassPro(ctk.CTk):
         self.btn_open = self._create_menu_btn(self.right_panel, "btn_open", "tt_open", self._open, "#0078d4")
         self.btn_qr = self._create_menu_btn(self.right_panel, "btn_qr", "tt_qr", self._show_qr, "#8764b8")
         self.btn_hist = self._create_menu_btn(self.right_panel, "btn_hist", "tt_hist", self._show_history, "#4b4b4b")
-        self.btn_upd = self._create_menu_btn(self.right_panel, "btn_upd", "tt_upd", 
-                                              lambda: webbrowser.open(UPD_URL), "#ca5010")
-        self.btn_settings = self._create_menu_btn(self.right_panel, "btn_settings", "tt_settings", 
-                                                   self._show_settings, "#2d6a4f")
-        self.btn_about = self._create_menu_btn(self.right_panel, "btn_about", "tt_about", 
-                                                self._show_about, "#4b4b4b")
+        self.btn_upd = self._create_menu_btn(self.right_panel, "btn_upd", "tt_upd", lambda: webbrowser.open(UPD_URL), "#ca5010")
+        self.btn_settings = self._create_menu_btn(self.right_panel, "btn_settings", "tt_settings", self._show_settings, "#2d6a4f")
+        self.btn_about = self._create_menu_btn(self.right_panel, "btn_about", "tt_about", self._show_about, "#4b4b4b")
         
         # Bottom frame
         self.bottom_frame = ctk.CTkFrame(self, fg_color=("#e0e0e0", "#1d1e1e"), corner_radius=15)
         self.bottom_frame.grid(row=1, column=0, columnspan=2, sticky="ew", padx=20, pady=(0, 15))
-        self.lbl_app_rating = ctk.CTkLabel(self.bottom_frame, text="★★★★★", font=("Segoe UI", 20), 
-                                            text_color="#FFD700")
+        self.lbl_app_rating = ctk.CTkLabel(self.bottom_frame, text="★★★★★", font=("Segoe UI", 20), text_color="#FFD700")
         self.lbl_app_rating.pack(pady=(5, 5))
     
     def _create_menu_btn(self, parent, lang_key: str, tt_key: str, cmd, color: str) -> ctk.CTkButton:
-        """Create a menu button with tooltip"""
         colors_map = {
             "#0067c0": "#00A2FF", "#107c10": "#20CF20", "#0078d4": "#309FFF",
             "#8764b8": "#B080FF", "#4b4b4b": "#808080", "#ca5010": "#FF8C00", "#2d6a4f": "#40916c"
@@ -823,7 +766,7 @@ class SecurePassPro(ctk.CTk):
         neon_color = colors_map.get(color, color)
         btn = ctk.CTkButton(parent, text="", command=lambda: self._run_menu_command(cmd),
                             fg_color=color, height=45, border_width=2, border_color=neon_color,
-                            font=("Segoe UI Variable", 13, "bold"), hover_color=neon_color,
+                            font=(_FONT_BTN, 13, "bold"), hover_color=neon_color,
                             corner_radius=self.current_radius)
         btn.pack(pady=6, padx=15, fill="x")
         btn.lang_key = lang_key
@@ -832,14 +775,10 @@ class SecurePassPro(ctk.CTk):
         return btn
     
     def _run_menu_command(self, command) -> None:
-        """Execute menu command with sound"""
         self._play_sound("click")
         command()
     
-    # ==================== THEME & STYLE ====================
-    
     def _apply_theme_colors(self, actual_theme: str) -> None:
-        """Apply theme colors to all widgets"""
         if actual_theme == "light":
             bg_main, fg_main, entry_bg = "#F3F3F3", "#000000", "#FFFFFF"
             panel_bg, border_color, checkmark_color = "#F3F3F3", "#d0d0d0", "#1f538d"
@@ -869,12 +808,10 @@ class SecurePassPro(ctk.CTk):
                 c.configure(bg=new_bg)
     
     def _change_radius(self, val: int) -> None:
-        """Change corner radius of all widgets AND update global radius for dialogs"""
         rad = int(val)
         self.current_radius = rad
-        set_global_radius(rad)  # Update global radius for future dialogs
+        set_global_radius(rad)
         
-        # Update main menu buttons
         menu_btns = [self.btn_gen, self.btn_copy, self.btn_save, self.btn_open, self.btn_qr,
                      self.btn_hist, self.btn_upd, self.btn_settings, self.btn_about]
         for btn in menu_btns:
@@ -882,7 +819,6 @@ class SecurePassPro(ctk.CTk):
         
         self.btn_eye.configure(corner_radius=rad)
         
-        # Update checkboxes
         cb_rad = max(rad // 2, 0)
         for cb in [self.cb_upper, self.cb_lower, self.cb_digits, self.cb_symb,
                    self.cb_ambig, self.cb_unambig, self.cb_at_least, self.cb_hide, self.cb_no_repeat]:
@@ -891,35 +827,27 @@ class SecurePassPro(ctk.CTk):
         self.bottom_frame.configure(corner_radius=rad)
         self.right_panel.configure(corner_radius=rad)
         
-        # Update settings window labels if open
         if self.settings_radius_label and self.settings_radius_label.winfo_exists():
             L = LANGUAGES[self.current_lang]
             self.settings_radius_label.configure(text=f"{L['settings_radius']}: {rad}")
         
-        # Update settings window buttons if open
         self._update_settings_radius()
-        
         self._save_config({"RADIUS": rad})
     
     def _update_settings_radius(self) -> None:
-        """Update radius for settings window widgets"""
         rad = self.current_radius
-        
         for btn in self.lang_buttons.values():
             if btn and btn.winfo_exists():
                 btn.configure(corner_radius=rad)
-        
         for btn in self.theme_buttons.values():
             if btn and btn.winfo_exists():
                 btn.configure(corner_radius=rad)
-        
         for btn in [self._sound_btn, self._close_btn, self._master_set_btn,
                     self._rgb_on_btn_ref, self._rgb_off_btn_ref]:
             if btn and btn.winfo_exists():
                 btn.configure(corner_radius=rad)
     
     def _apply_window_rounding(self, window) -> None:
-        """Apply rounded corners to window (Windows 11 only)"""
         if not _IS_WINDOWS:
             return
         try:
@@ -936,7 +864,6 @@ class SecurePassPro(ctk.CTk):
             pass
     
     def _set_window_icon(self, window) -> None:
-        """Set window icon"""
         icon_path = _get_resource_path("icon.ico")
         if os.path.exists(icon_path):
             try:
@@ -950,16 +877,12 @@ class SecurePassPro(ctk.CTk):
                 pass
     
     def _center_main_window(self) -> None:
-        """Center main window on screen"""
         self.update_idletasks()
         x = (self.winfo_screenwidth() // 2) - (850 // 2)
         y = (self.winfo_screenheight() // 2) - (780 // 2)
         self.geometry(f"850x780+{x}+{y}")
     
-    # ==================== LANGUAGE ====================
-    
     def _apply_lang(self, lang: str) -> None:
-        """Apply language to all UI strings"""
         self.current_lang = lang
         L = LANGUAGES[lang]
         
@@ -999,7 +922,6 @@ class SecurePassPro(ctk.CTk):
         self._update_master_status_label()
     
     def _change_language(self, lang: str) -> None:
-        """Change application language"""
         self.current_lang = lang
         self._apply_lang(lang)
         self._save_config({"LANG": lang})
@@ -1007,8 +929,7 @@ class SecurePassPro(ctk.CTk):
         
         for l, btn in self.lang_buttons.items():
             if btn and btn.winfo_exists():
-                btn.configure(fg_color="#2d6a4f" if l == lang else "#4b4b4b",
-                             corner_radius=self.current_radius)
+                btn.configure(fg_color="#2d6a4f" if l == lang else "#4b4b4b", corner_radius=self.current_radius)
         
         if self.settings_window and self.settings_window.winfo_exists():
             self.settings_window.destroy()
@@ -1019,7 +940,6 @@ class SecurePassPro(ctk.CTk):
         self._update_master_status_label()
     
     def _change_theme(self, mode: str) -> None:
-        """Change application theme"""
         self.current_theme = mode
         self._save_config({"THEME": mode})
         
@@ -1029,8 +949,7 @@ class SecurePassPro(ctk.CTk):
         
         for name, btn in self.theme_buttons.items():
             if btn and btn.winfo_exists():
-                btn.configure(fg_color="#2d6a4f" if name == mode else "#4b4b4b",
-                             corner_radius=self.current_radius)
+                btn.configure(fg_color="#2d6a4f" if name == mode else "#4b4b4b", corner_radius=self.current_radius)
         
         if self.settings_window and self.settings_window.winfo_exists():
             self._close_settings()
@@ -1046,7 +965,6 @@ class SecurePassPro(ctk.CTk):
     # ==================== RGB ANIMATION ====================
     
     def _rgb_color(self, phase_offset: float) -> str:
-        """Calculate RGB color for given phase offset"""
         f = self._rgb_t + phase_offset
         r = int((math.sin(f) + 1) / 2 * 255)
         g = int((math.sin(f + 2.1) + 1) / 2 * 255)
@@ -1054,7 +972,6 @@ class SecurePassPro(ctk.CTk):
         return f"#{r:02x}{g:02x}{b:02x}"
     
     def _set_titlebar_color(self, hex_color: str) -> None:
-        """Set Windows 11 titlebar color"""
         if not _IS_WINDOWS:
             return
         try:
@@ -1072,7 +989,6 @@ class SecurePassPro(ctk.CTk):
             pass
     
     def _reset_titlebar_color(self) -> None:
-        """Reset Windows titlebar to default color"""
         if not _IS_WINDOWS:
             return
         try:
@@ -1088,10 +1004,8 @@ class SecurePassPro(ctk.CTk):
             pass
     
     def _animate_rgb(self) -> None:
-        """Animate RGB border colors"""
         if not self.rgb_enabled.get():
             return
-        
         if self._rgb_c_top:
             self._rgb_c_top.configure(bg=self._rgb_color(0.0))
         if self._rgb_c_right:
@@ -1100,39 +1014,31 @@ class SecurePassPro(ctk.CTk):
             self._rgb_c_bottom.configure(bg=self._rgb_color(1.6))
         if self._rgb_c_left:
             self._rgb_c_left.configure(bg=self._rgb_color(2.4))
-        
         self._set_titlebar_color(self._rgb_color(3.2))
-        self._rgb_t += 0.08
-        
+        self._rgb_t = (self._rgb_t + 0.08) % (2 * math.pi)  # сброс чтобы не было float overflow
         if self._rgb_anim_id:
             self.after_cancel(self._rgb_anim_id)
         self._rgb_anim_id = self.after(30, self._animate_rgb)
     
     def _start_rgb(self) -> None:
-        """Start RGB animation"""
         if self._rgb_c_top:
             self._rgb_c_top.place(relx=0, rely=0, relwidth=1)
             self._rgb_c_bottom.place(relx=0, rely=1, anchor="sw", relwidth=1)
             self._rgb_c_left.place(relx=0, rely=0, relheight=1)
             self._rgb_c_right.place(relx=1, rely=0, anchor="ne", relheight=1)
-        
         if not self._rgb_anim_id:
             self._animate_rgb()
     
     def _stop_rgb(self) -> None:
-        """Stop RGB animation"""
         if self._rgb_anim_id:
             self.after_cancel(self._rgb_anim_id)
             self._rgb_anim_id = None
-        
         for c in (self._rgb_c_top, self._rgb_c_bottom, self._rgb_c_left, self._rgb_c_right):
             if c:
                 c.place_forget()
-        
         self._reset_titlebar_color()
     
     def _set_rgb(self, state: bool) -> None:
-        """Enable or disable RGB animation"""
         if self.rgb_enabled.get() == state:
             return
         self.rgb_enabled.set(state)
@@ -1144,31 +1050,23 @@ class SecurePassPro(ctk.CTk):
         self._save_config({"RGB": state})
     
     def _update_rgb_buttons(self) -> None:
-        """Update RGB button appearance"""
         is_on = self.rgb_enabled.get()
         for ref, active in (('_rgb_on_btn_ref', is_on), ('_rgb_off_btn_ref', not is_on)):
             btn = getattr(self, ref, None)
             if btn and btn.winfo_exists():
-                btn.configure(fg_color="#7b2d8b" if active else "#4b4b4b",
-                             corner_radius=self.current_radius)
+                btn.configure(fg_color="#7b2d8b" if active else "#4b4b4b", corner_radius=self.current_radius)
     
     # ==================== PASSWORD GENERATION ====================
     
     def _update_len_label(self, val: float) -> None:
-        """Update length label when slider changes"""
         L = LANGUAGES[self.current_lang]
         self.lbl_len.configure(text=f"{L['len']}: {int(val)}")
     
     def _get_min_length(self) -> int:
-        """Get minimum password length based on active categories"""
-        count = sum([
-            self.upper_var.get(), self.lower_var.get(),
-            self.digits_var.get(), self.symb_var.get()
-        ])
+        count = sum([self.upper_var.get(), self.lower_var.get(), self.digits_var.get(), self.symb_var.get()])
         return max(4, count)
     
-    def _fix_no_repeats(self, chars: List[str], pool: str) -> Optional[str]:
-        """Fix consecutive repeats in password"""
+    def _fix_no_repeats(self, chars: list[str], pool: str) -> str | None:
         result = list(chars)
         unique_pool = list(set(pool))
         max_attempts = 500
@@ -1196,10 +1094,8 @@ class SecurePassPro(ctk.CTk):
         return None
     
     def _generate(self) -> None:
-        """Generate a new secure password"""
         L = LANGUAGES[self.current_lang]
         
-        # Build character pools
         exclude = set(AMBIGUOUS_CHARS if self.ambig_var.get() else "")
         if self.unambig_var.get():
             exclude.update(set(UNAMBIG_CHARS))
@@ -1228,22 +1124,19 @@ class SecurePassPro(ctk.CTk):
         
         self._play_sound("success")
         
-        # Ensure length meets minimum requirements
         min_len = self._get_min_length()
         length = max(int(self.slider_len.get()), min_len)
         if length != int(self.slider_len.get()):
             self.slider_len.set(length)
             self._update_len_label(length)
         
-        result: List[str] = []
+        result: list[str] = []
         
-        # Add at least one character from each active category
         if self.at_least_var.get():
             for p in [p_upper, p_lower, p_digits, p_symb]:
                 if p:
                     result.append(secrets.choice(p))
         
-        # Fill remaining characters
         if len(result) > length:
             random.shuffle(result)
             result = result[:length]
@@ -1254,12 +1147,10 @@ class SecurePassPro(ctk.CTk):
         random.shuffle(result)
         pwd = "".join(result)
         
-        # Fix consecutive repeats if requested
         if self.no_repeat_var.get():
             fixed_pwd = self._fix_no_repeats(result, full_pool)
             if fixed_pwd is None:
-                CTkMessageBox.warning(self, L.get("err_title", "Error"), 
-                                     L["err_no_repeat"] + L.get("err_no_repeat_fallback", ""))
+                CTkMessageBox.warning(self, L.get("err_title", "Error"), L["err_no_repeat"] + L.get("err_no_repeat_fallback", ""))
             else:
                 pwd = fixed_pwd
         
@@ -1268,7 +1159,6 @@ class SecurePassPro(ctk.CTk):
         
         self._update_strength_meter(pwd)
         
-        # Store in history (masked for security)
         timestamp = datetime.datetime.now().strftime("[%H:%M:%S]")
         if len(pwd) > 4:
             masked = pwd[:2] + "••••" + pwd[-2:]
@@ -1277,7 +1167,6 @@ class SecurePassPro(ctk.CTk):
         self.history.append(f"{timestamp} {masked}")
     
     def _update_strength_meter(self, password: str) -> None:
-        """Update password strength meter display"""
         if not password:
             self.lbl_strength_text.configure(text="")
             self.lbl_strength.configure(text="")
@@ -1287,7 +1176,6 @@ class SecurePassPro(ctk.CTk):
         
         L = LANGUAGES[self.current_lang]
         
-        # Calculate entropy
         pool_size = 0
         if any(c.islower() for c in password):
             pool_size += 26
@@ -1319,7 +1207,6 @@ class SecurePassPro(ctk.CTk):
         self._animate_password_field(strength_type)
     
     def _animate_password_field(self, strength_type: str = "medium") -> None:
-        """Animate password field border on generation"""
         original_bg = self.entry_res.cget("fg_color")
         original_border = self.entry_res.cget("border_color")
         
@@ -1354,42 +1241,45 @@ class SecurePassPro(ctk.CTk):
     # ==================== CLIPBOARD OPERATIONS ====================
     
     def _copy(self) -> None:
-        """Copy password to clipboard with auto-clear"""
         pwd = str(self.entry_res.get())
         if not pwd:
             return
         L = LANGUAGES[self.current_lang]
         self._play_sound("copy")
-        
+
         self.clipboard_clear()
         self.clipboard_append(pwd)
-        
+
         if self._clipboard_timer:
             try:
                 self.after_cancel(self._clipboard_timer)
             except Exception:
                 pass
-        
+
         self._clipboard_timer = self.after(
             self.clipboard_timeout * 1000,
-            lambda: self._clear_clipboard()
+            lambda value=pwd: self._clear_clipboard_if_unchanged(value)
         )
-        
+
         old_text = self.btn_copy.cget("text")
         self.btn_copy.configure(text=L["copied"].format(self.clipboard_timeout))
         self.after(2000, lambda: self.btn_copy.configure(text=old_text))
-    
-    def _clear_clipboard(self) -> None:
-        """Clear clipboard contents"""
+
+    def _clear_clipboard_if_unchanged(self, expected: str) -> None:
+        """
+        Очищает буфер ТОЛЬКО если содержимое не изменилось.
+        Clears clipboard ONLY if content hasn't changed.
+        Очищає буфер ТІЛЬКИ якщо вміст не змінився.
+        """
         try:
-            self.clipboard_clear()
+            if self.clipboard_get() == expected:
+                self.clipboard_clear()
         except Exception:
             pass
         finally:
             self._clipboard_timer = None
     
     def _on_clip_timeout_change(self, val: float) -> None:
-        """Handle clipboard timeout slider change"""
         seconds = int(val)
         self.clipboard_timeout = seconds
         if self._clip_timeout_label_ref and self._clip_timeout_label_ref.winfo_exists():
@@ -1405,7 +1295,6 @@ class SecurePassPro(ctk.CTk):
     # ==================== FILE OPERATIONS ====================
     
     def _verify_pdf(self, path: str) -> bool:
-        """Verify PDF file integrity"""
         try:
             with open(path, "rb") as f:
                 header = f.read(5)
@@ -1414,7 +1303,6 @@ class SecurePassPro(ctk.CTk):
             return False
     
     def _verify_text_file(self, path: str, expected_bytes: bytes) -> bool:
-        """Verify text file integrity using SHA256"""
         expected_hash = hashlib.sha256(expected_bytes).hexdigest()
         sha256_hash = hashlib.sha256()
         try:
@@ -1426,7 +1314,6 @@ class SecurePassPro(ctk.CTk):
             return False
     
     def _save(self) -> None:
-        """Save password to file"""
         L = LANGUAGES[self.current_lang]
         pwd = self.entry_res.get()
         if not pwd:
@@ -1491,7 +1378,6 @@ class SecurePassPro(ctk.CTk):
                 if not self._verify_text_file(path, pwd_bytes):
                     raise IOError(L["err_integrity"])
                 
-                # Save SHA256 hash for integrity verification
                 hash_path = path + HASH_EXTENSION
                 file_hash = hashlib.sha256(pwd_bytes).hexdigest()
                 with open(hash_path, "w", encoding="utf-8") as hf:
@@ -1502,7 +1388,6 @@ class SecurePassPro(ctk.CTk):
             CTkMessageBox.error(self, L.get("err_title", "Error"), L["err_save"].format(e))
     
     def _open(self) -> None:
-        """Open password from file"""
         L = LANGUAGES[self.current_lang]
         supported_str = ";".join(f"*{ext}" for ext in SUPPORTED_EXTENSIONS)
         
@@ -1531,7 +1416,6 @@ class SecurePassPro(ctk.CTk):
                 with open(path, "rb") as f:
                     raw_bytes = f.read()
                 
-                # Verify integrity using SHA256
                 hash_path = path + HASH_EXTENSION
                 if os.path.exists(hash_path):
                     try:
@@ -1565,7 +1449,6 @@ class SecurePassPro(ctk.CTk):
     # ==================== DIALOGS ====================
     
     def _show_qr(self) -> None:
-        """Show QR code for current password"""
         pwd = self.entry_res.get()
         if not pwd:
             return
@@ -1587,7 +1470,6 @@ class SecurePassPro(ctk.CTk):
         self._apply_window_rounding(self.qr_window)
         self.qr_window.protocol("WM_DELETE_WINDOW", self._close_qr)
         
-        # Create QR code image
         resampling_source = getattr(Image, "Resampling", Image)
         resampling_filter = getattr(resampling_source, "LANCZOS", getattr(Image, "NEAREST", 0))
         img = qrcode.make(pwd).resize((280, 280), resampling_filter)
@@ -1597,8 +1479,7 @@ class SecurePassPro(ctk.CTk):
         f.pack(expand=True, fill="both", padx=20, pady=20)
         ctk.CTkLabel(f, text=L["btn_qr"], font=("Segoe UI", 18, "bold")).pack()
         
-        disp = ctk.CTkFrame(f, fg_color="white", corner_radius=self.current_radius,
-                           border_width=2, border_color="gray")
+        disp = ctk.CTkFrame(f, fg_color="white", corner_radius=self.current_radius, border_width=2, border_color="gray")
         disp.pack(pady=10)
         qr_label = ctk.CTkLabel(disp, image=ctk_img, text="")
         qr_label.image = ctk_img
@@ -1608,13 +1489,11 @@ class SecurePassPro(ctk.CTk):
         self.qr_window.focus_force()
     
     def _close_qr(self) -> None:
-        """Close QR window"""
         if self.qr_window:
             self.qr_window.destroy()
             self.qr_window = None
     
     def _show_history(self) -> None:
-        """Show password history window"""
         if self.history_window and self.history_window.winfo_exists():
             self.history_window.lift()
             self.history_window.focus_force()
@@ -1647,30 +1526,26 @@ class SecurePassPro(ctk.CTk):
         
         btn_f = ctk.CTkFrame(f, fg_color="transparent")
         btn_f.pack(fill="x")
-        ctk.CTkButton(btn_f, text=L["btn_clear_hist"], corner_radius=self.current_radius,
-                     fg_color="#d13438", command=lambda: self._clear_history_textbox(txt)).pack(side="left", padx=5)
-        ctk.CTkButton(btn_f, text="OK", corner_radius=self.current_radius,
-                     command=self._close_history).pack(side="right", padx=5)
+        ctk.CTkButton(btn_f, text=L["btn_clear_hist"], corner_radius=self.current_radius, fg_color="#d13438",
+                     command=lambda: self._clear_history_textbox(txt)).pack(side="left", padx=5)
+        ctk.CTkButton(btn_f, text="OK", corner_radius=self.current_radius, command=self._close_history).pack(side="right", padx=5)
         
         self.history_window.focus_force()
         self.history_textbox = txt
     
     def _close_history(self) -> None:
-        """Close history window"""
         if self.history_window:
             self.history_window.destroy()
             self.history_window = None
             self.history_textbox = None
     
     def _clear_history_textbox(self, textbox: ctk.CTkTextbox) -> None:
-        """Clear password history"""
         L = LANGUAGES[self.current_lang]
         self.history.clear()
         textbox.delete("1.0", "end")
         textbox.insert("1.0", L["hist_empty"])
     
     def _show_about(self) -> None:
-        """Show about window"""
         if self.about_window and self.about_window.winfo_exists():
             self.about_window.lift()
             self.about_window.focus_force()
@@ -1692,8 +1567,7 @@ class SecurePassPro(ctk.CTk):
         ctk.CTkLabel(self.about_window, text="Secure Pass Pro", font=("Segoe UI", 22, "bold")).pack(pady=(25, 5))
         ctk.CTkLabel(self.about_window, text="Version 4.0", font=("Segoe UI", 14)).pack(pady=(0, 15))
         ctk.CTkLabel(self.about_window, text=L["about_text"], wraplength=350, font=("Segoe UI", 13)).pack(pady=10)
-        ctk.CTkButton(self.about_window, text="OK", width=120, command=self._close_about,
-                     corner_radius=self.current_radius).pack(pady=(20, 10))
+        ctk.CTkButton(self.about_window, text="OK", width=120, command=self._close_about, corner_radius=self.current_radius).pack(pady=(20, 10))
         
         lbl_wiki = ctk.CTkLabel(self.about_window, text=L.get("wiki_link", "Security Logic Wiki"),
                                font=("Segoe UI", 12, "underline"), text_color="#1f538d", cursor="hand2")
@@ -1703,13 +1577,11 @@ class SecurePassPro(ctk.CTk):
         self.about_window.focus_force()
     
     def _close_about(self) -> None:
-        """Close about window"""
         if self.about_window:
             self.about_window.destroy()
             self.about_window = None
     
     def _show_settings(self) -> None:
-        """Show settings window"""
         if self.settings_window and self.settings_window.winfo_exists():
             self.settings_window.lift()
             self.settings_window.focus_force()
@@ -1727,18 +1599,18 @@ class SecurePassPro(ctk.CTk):
         self.settings_window.resizable(False, False)
         self._set_window_icon(self.settings_window)
         self.settings_window.transient(self)
+        self.settings_window.grab_set()   # grab ДО center чтобы не было flash / grab BEFORE center
+        self._center_window_relative_to_parent(self.settings_window, 420, 640)
+        self._apply_window_rounding(self.settings_window)
         self.settings_window.attributes('-topmost', True)
         self.settings_window.after(100, lambda: self.settings_window.attributes('-topmost', False))
         self.settings_window.focus_force()
-        self.settings_window.grab_set()
-        self._center_window_relative_to_parent(self.settings_window, 420, 640)
-        self._apply_window_rounding(self.settings_window)
         self.settings_window.protocol("WM_DELETE_WINDOW", self._close_settings)
         
         main_frame = ctk.CTkScrollableFrame(self.settings_window, fg_color="transparent")
         main_frame.pack(fill="both", expand=True, padx=10, pady=10)
         
-        # Language selection
+        # Language
         lang_label = ctk.CTkLabel(main_frame, text=L["settings_lang"], font=("Segoe UI", 16, "bold"))
         lang_label.pack(pady=(0, 8))
         lang_frame = ctk.CTkFrame(main_frame, fg_color="transparent")
@@ -1755,7 +1627,7 @@ class SecurePassPro(ctk.CTk):
         
         self._add_separator(main_frame)
         
-        # Theme selection
+        # Theme
         theme_label = ctk.CTkLabel(main_frame, text=L["settings_theme"], font=("Segoe UI", 16, "bold"))
         theme_label.pack(pady=(8, 8))
         theme_frame = ctk.CTkFrame(main_frame, fg_color="transparent")
@@ -1766,13 +1638,11 @@ class SecurePassPro(ctk.CTk):
                                fg_color="#2d6a4f" if self.current_theme == "System" else "#4b4b4b",
                                font=("Segoe UI", 12), corner_radius=self.current_radius)
         sys_btn.pack(side="left", padx=5)
-        
         light_btn = ctk.CTkButton(theme_frame, text=L["theme_light"], width=100, height=35,
                                  command=lambda: self._change_theme("Light"),
                                  fg_color="#2d6a4f" if self.current_theme == "Light" else "#4b4b4b",
                                  font=("Segoe UI", 12), corner_radius=self.current_radius)
         light_btn.pack(side="left", padx=5)
-        
         dark_btn = ctk.CTkButton(theme_frame, text=L["theme_dark"], width=100, height=35,
                                 command=lambda: self._change_theme("Dark"),
                                 fg_color="#2d6a4f" if self.current_theme == "Dark" else "#4b4b4b",
@@ -1783,9 +1653,8 @@ class SecurePassPro(ctk.CTk):
         
         self._add_separator(main_frame)
         
-        # Corner radius
-        radius_label = ctk.CTkLabel(main_frame, text=f"{L['settings_radius']}: {self.current_radius}",
-                                    font=("Segoe UI", 16, "bold"))
+        # Radius
+        radius_label = ctk.CTkLabel(main_frame, text=f"{L['settings_radius']}: {self.current_radius}", font=("Segoe UI", 16, "bold"))
         radius_label.pack(pady=(8, 5))
         self.settings_radius_label = radius_label
         
@@ -1808,13 +1677,11 @@ class SecurePassPro(ctk.CTk):
         self._add_separator(main_frame)
         
         # Clipboard timeout
-        clip_timeout_label = ctk.CTkLabel(main_frame, text=L["clip_timeout"].format(self.clipboard_timeout),
-                                         font=("Segoe UI", 16, "bold"))
+        clip_timeout_label = ctk.CTkLabel(main_frame, text=L["clip_timeout"].format(self.clipboard_timeout), font=("Segoe UI", 16, "bold"))
         clip_timeout_label.pack(pady=(8, 5))
         self._clip_timeout_label_ref = clip_timeout_label
         
-        clip_slider = ctk.CTkSlider(main_frame, from_=10, to=120, number_of_steps=110, width=300,
-                                   command=self._on_clip_timeout_change)
+        clip_slider = ctk.CTkSlider(main_frame, from_=10, to=120, number_of_steps=110, width=300, command=self._on_clip_timeout_change)
         clip_slider.set(self.clipboard_timeout)
         clip_slider.pack(pady=(0, 10))
         
@@ -1868,16 +1735,13 @@ class SecurePassPro(ctk.CTk):
         self._close_btn.pack(pady=(10, 10))
         
         self.settings_labels = {'lang': lang_label, 'theme': theme_label, 'sound': sound_label,
-                                'close_btn': self._close_btn, 'sound_btn': self._sound_btn,
-                                'radius_slider': radius_slider}
+                                'close_btn': self._close_btn, 'sound_btn': self._sound_btn, 'radius_slider': radius_slider}
     
     def _add_separator(self, parent) -> None:
-        """Add separator line"""
         sep = ctk.CTkFrame(parent, height=2, fg_color="gray")
         sep.pack(fill="x", pady=8)
     
     def _on_radius_change(self, val: float) -> None:
-        """Handle radius change from slider"""
         rad = int(val)
         if self.settings_radius_label and self.settings_radius_label.winfo_exists():
             L = LANGUAGES[self.current_lang]
@@ -1885,7 +1749,6 @@ class SecurePassPro(ctk.CTk):
         self._change_radius(rad)
     
     def _close_settings(self) -> None:
-        """Close settings window"""
         if self.settings_window:
             self.settings_window.grab_release()
             self.settings_window.destroy()
@@ -1902,7 +1765,6 @@ class SecurePassPro(ctk.CTk):
             self.settings_radius_label = None
     
     def _toggle_sound_settings(self) -> None:
-        """Toggle sound on/off"""
         self.sound_enabled.set(not self.sound_enabled.get())
         if self._sound_btn and self._sound_btn.winfo_exists():
             L = LANGUAGES[self.current_lang]
@@ -1912,42 +1774,55 @@ class SecurePassPro(ctk.CTk):
         self._save_config({"SOUND": self.sound_enabled.get()})
     
     def _play_sound(self, sound_type: str = "click") -> None:
-        """Play sound effect (Windows only for now)"""
+        """
+        Воспроизводит звук кросс-платформенно.
+        Cross-platform sound playback.
+        Відтворює звук кросплатформенно.
+        """
         if not self.sound_enabled.get():
             return
-        
-        if _IS_WINDOWS:
-            try:
-                base_path = sys._MEIPASS if hasattr(sys, '_MEIPASS') else os.path.dirname(os.path.abspath(__file__))
-                file_name = "Computer Mouse Click.mp3"
-                file_path = os.path.join(base_path, file_name)
-                if os.path.exists(file_path):
-                    winmm = ctypes.windll.winmm
-                    alias = "app_click"
-                    winmm.mciSendStringW(f'close {alias}', None, 0, 0)
-                    winmm.mciSendStringW(f'open "{file_path}" type mpegvideo alias {alias}', None, 0, 0)
-                    winmm.mciSendStringW(f'play {alias} from 0', None, 0, 0)
-                    self.after(1000, lambda: winmm.mciSendStringW(f'close {alias}', None, 0, 0))
-            except Exception:
-                pass
+        try:
+            base_path = sys._MEIPASS if hasattr(sys, '_MEIPASS') else os.path.dirname(os.path.abspath(__file__))
+            file_path = os.path.join(base_path, "Computer Mouse Click.mp3")
+            if not os.path.exists(file_path):
+                return
+            if _IS_WINDOWS:
+                winmm = ctypes.windll.winmm
+                alias = "app_click"
+                winmm.mciSendStringW(f'close {alias}', None, 0, 0)
+                winmm.mciSendStringW(f'open "{file_path}" type mpegvideo alias {alias}', None, 0, 0)
+                winmm.mciSendStringW(f'play {alias} from 0', None, 0, 0)
+                self.after(1000, lambda: winmm.mciSendStringW(f'close {alias}', None, 0, 0))
+            elif _IS_MACOS:
+                import subprocess, shutil
+                if shutil.which("afplay"):
+                    subprocess.Popen(["afplay", file_path],
+                                     stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            else:
+                # Linux: mpg123 или aplay / Linux: mpg123 or aplay
+                import subprocess, shutil
+                if shutil.which("mpg123"):
+                    subprocess.Popen(["mpg123", "-q", file_path],
+                                     stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                elif shutil.which("aplay"):
+                    subprocess.Popen(["aplay", "-q", file_path],
+                                     stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        except Exception:
+            pass
     
     def _toggle_hide(self) -> None:
-        """Toggle password visibility from checkbox"""
         self._sync_eye_to_hide_var()
     
     def _toggle_eye(self) -> None:
-        """Toggle password visibility from eye button"""
         self.hide_var.set(not self.hide_var.get())
         self._sync_eye_to_hide_var()
     
     def _sync_eye_to_hide_var(self) -> None:
-        """Sync eye button state with hide variable"""
         hidden = self.hide_var.get()
         self.entry_res.configure(show="*" if hidden else "")
         self.btn_eye.configure(text="🙈" if hidden else "👁")
     
     def _center_window_relative_to_parent(self, window, width: int, height: int) -> None:
-        """Center child window relative to parent"""
         window.update_idletasks()
         parent_x = self.winfo_x()
         parent_y = self.winfo_y()
@@ -1970,39 +1845,30 @@ class SecurePassPro(ctk.CTk):
     # ==================== MASTER PASSWORD ====================
     
     def _update_master_status_label(self) -> None:
-        """Update master password status display"""
         if self._master_status_label and self._master_status_label.winfo_exists():
             L = LANGUAGES[self.current_lang]
             if MasterPassword.is_set():
-                self._master_status_label.configure(text=f"{L['master_current']} 🔒 {L['master_status_set']}",
-                                                   text_color="#2ECC71")
+                self._master_status_label.configure(text=f"{L['master_current']} 🔒 {L['master_status_set']}", text_color="#2ECC71")
             else:
-                self._master_status_label.configure(text=f"{L['master_current']} 🔓 {L['master_status_not_set']}",
-                                                   text_color="#FFA500")
+                self._master_status_label.configure(text=f"{L['master_current']} 🔓 {L['master_status_not_set']}", text_color="#FFA500")
     
     def _update_master_buttons(self) -> None:
-        """Update master password button text and command"""
         if not self._master_set_btn or not self._master_set_btn.winfo_exists():
             return
-        
         L = LANGUAGES[self.current_lang]
         if MasterPassword.is_set():
             self._master_set_btn.configure(text="🔒 " + L["master_btn_remove"], fg_color="#8b0000",
-                                          command=self._remove_master_password,
-                                          corner_radius=self.current_radius)
+                                          command=self._remove_master_password, corner_radius=self.current_radius)
         else:
             self._master_set_btn.configure(text="🔓 " + L["master_btn_set"], fg_color="#2d6a4f",
-                                          command=self._toggle_master_password,
-                                          corner_radius=self.current_radius)
+                                          command=self._toggle_master_password, corner_radius=self.current_radius)
     
     def _toggle_master_password(self) -> None:
-        """Set or remove master password"""
         L = LANGUAGES[self.current_lang]
         actual_theme = self._get_actual_theme()
         
         if MasterPassword.is_set():
-            current = CTkInputDialog.ask(self, L["master_title"], L["master_prompt"], show="*",
-                                         theme=actual_theme, lang=self.current_lang)
+            current = CTkInputDialog.ask(self, L["master_title"], L["master_prompt"], show="*", theme=actual_theme, lang=self.current_lang)
             if current is None:
                 return
             if not MasterPassword.verify(current):
@@ -2011,13 +1877,10 @@ class SecurePassPro(ctk.CTk):
             MasterPassword.remove()
             CTkMessageBox.info(self, L["master_title"], L["master_removed"])
         else:
-            new_pwd = CTkInputDialog.ask(self, L["master_set_title"], L["master_set_prompt"], show="*",
-                                        theme=actual_theme, lang=self.current_lang)
+            new_pwd = CTkInputDialog.ask(self, L["master_set_title"], L["master_set_prompt"], show="*", theme=actual_theme, lang=self.current_lang)
             if new_pwd is None or new_pwd == "":
                 return
-            
-            confirm = CTkInputDialog.ask(self, L["master_set_title"], L["master_confirm"], show="*",
-                                        theme=actual_theme, lang=self.current_lang)
+            confirm = CTkInputDialog.ask(self, L["master_set_title"], L["master_confirm"], show="*", theme=actual_theme, lang=self.current_lang)
             if confirm is None:
                 return
             if new_pwd != confirm:
@@ -2030,7 +1893,6 @@ class SecurePassPro(ctk.CTk):
         self._update_master_status_label()
     
     def _remove_master_password(self) -> None:
-        """Remove master password with confirmation"""
         L = LANGUAGES[self.current_lang]
         if not MasterPassword.is_set():
             return
@@ -2046,13 +1908,15 @@ if __name__ == "__main__":
     ctk.set_appearance_mode("System")
     ctk.set_default_color_theme("blue")
     
-    # Read saved language and theme for startup prompt
     _startup_lang = "RU"
     _startup_theme = "dark"
     try:
         if os.path.exists(CONFIG_FILE):
             with open(CONFIG_FILE, "r", encoding="utf-8") as _f:
-                _cfg = json.load(_f)
+                try:
+                    _cfg = json.load(_f)
+                except (json.JSONDecodeError, ValueError):
+                    _cfg = {}
                 if "LANG" in _cfg and _cfg["LANG"] in ("RU", "EN", "UA"):
                     _startup_lang = _cfg["LANG"]
                 if "THEME" in _cfg:
@@ -2063,10 +1927,8 @@ if __name__ == "__main__":
     except Exception:
         pass
     
-    # Master password check
     if not MasterPassword.prompt_on_startup(_startup_lang, _startup_theme):
         sys.exit(0)
     
-    # Start application
     app = SecurePassPro()
     app.mainloop()
