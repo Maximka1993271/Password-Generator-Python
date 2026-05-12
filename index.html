@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Secure Pass Pro v4.0 — Профессиональный генератор паролей. Master-пароль (PBKDF2), контроль целостности SHA-256, защита от повторов, настраиваемая очистка буфера (10-120 сек), RGB анимация, Amoled UI с неоновой подсветкой, расчет энтропии, просмотр PDF и криптостойкость. Цветная пульсация пароля: красный (слабый), оранжевый (средний), зелёный (надёжный).">
+    <meta name="description" content="Secure Pass Pro v4.0 — Профессиональный генератор паролей. Master-пароль (PBKDF2), контроль целостности SHA-256, защита от повторов, настраиваемая очистка буфера (10-120 сек), RGB анимация, Amoled UI с неоновой подсветкой, расчет энтропии, просмотр PDF и криптостойкость. Цветная пульсация пароля: красный (слабый), оранжевый (средний), зелёный (надёжный). Кроссплатформенная поддержка Windows, macOS, Linux.">
     <title>Secure Pass Pro v4.0 | Профессиональная защита паролей</title>
     
     <link rel="icon" type="image/png" href="https://github.com/Maximka1993271/Password-Generator-Python/blob/main/app_icon.png?raw=true">
@@ -11,6 +11,202 @@
     
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    
+    <style>
+        /* Дополнительные стили для выпадающего меню */
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+        
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: #0d0d0d;
+            min-width: 260px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.5);
+            border-radius: 12px;
+            border: 1px solid #1a1a1a;
+            z-index: 1000;
+            margin-top: 10px;
+        }
+        
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+        
+        .dropdown-content a,
+        .dropdown-content div {
+            display: block;
+        }
+        
+        .dropdown-content a {
+            color: var(--text-secondary);
+            padding: 12px 20px;
+            text-decoration: none;
+            text-align: left;
+            transition: var(--transition);
+            font-size: 0.9rem;
+        }
+        
+        .dropdown-content a:hover {
+            background-color: rgba(78, 201, 176, 0.1);
+            color: var(--accent-color);
+        }
+        
+        .dropdown > a::after {
+            content: " ▼";
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+        }
+        
+        /* Стили для контента внутри выпадающего меню */
+        .dropdown-item-group {
+            padding: 10px 15px;
+            border-bottom: 1px solid #1a1a1a;
+        }
+        
+        .dropdown-item-group:last-child {
+            border-bottom: none;
+        }
+        
+        .dropdown-item-group strong {
+            color: var(--accent-color);
+            display: block;
+            margin-bottom: 8px;
+            font-size: 0.85rem;
+        }
+        
+        .download-buttons-inline {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .download-btn-small {
+            padding: 8px 15px;
+            border-radius: 8px;
+            text-decoration: none;
+            text-align: center;
+            transition: var(--transition);
+            font-size: 0.8rem;
+            display: block;
+        }
+        
+        .download-btn-v40-small {
+            background: var(--neon-blue);
+            color: white;
+            border: 1px solid #00A2FF;
+        }
+        
+        .download-btn-v20-small {
+            background: #4b4b4b;
+            color: white;
+            border: 1px solid #808080;
+        }
+        
+        .download-btn-small:hover {
+            transform: translateY(-1px);
+        }
+        
+        .submenu-links {
+            margin-top: 8px;
+            padding-left: 5px;
+        }
+        
+        .submenu-links a {
+            display: block;
+            padding: 5px 0;
+            font-size: 0.75rem;
+            color: #888;
+        }
+        
+        .submenu-links a:hover {
+            color: var(--accent-color);
+        }
+        
+        /* Вторая строка навигации */
+        .nav-secondary {
+            background: rgba(0, 0, 0, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 12px 10%;
+            position: fixed;
+            width: 100%;
+            top: 70px;
+            z-index: 1999;
+            border-bottom: 1px solid #1a1a1a;
+        }
+        
+        .nav-secondary ul {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            list-style: none;
+        }
+        
+        .nav-secondary ul li a {
+            text-decoration: none;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            transition: var(--transition);
+        }
+        
+        .nav-secondary ul li a:hover {
+            color: var(--accent-color);
+        }
+        
+        /* Модальное окно */
+        .github-page {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.95);
+            z-index: 10000;
+            padding: 80px 10%;
+            overflow-y: auto;
+        }
+        
+        .github-page.active {
+            display: block;
+        }
+        
+        .github-close {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            font-size: 40px;
+            cursor: pointer;
+            color: var(--text-secondary);
+            transition: var(--transition);
+        }
+        
+        .github-close:hover {
+            color: var(--accent-color);
+        }
+        
+        .github-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            border-radius: 20px;
+            border: 1px solid var(--border-color);
+            padding: 40px;
+        }
+        
+        @media (max-width: 768px) {
+            .nav-secondary {
+                display: none;
+            }
+            .dropdown-content {
+                position: static;
+                margin-top: 5px;
+                margin-left: 15px;
+            }
+        }
+    </style>
 </head>
 <body>
 
@@ -18,27 +214,111 @@
         <nav>
             <div class="logo">🛡️ Secure Pass Pro</div>
             <ul>
-                <li><a href="#v40-section">Возможности v4.0</a></li>
-                <li><a href="#settings-section">Настройки</a></li>
-                <li><a href="#pdf-section">PDF Кириллица</a></li>
-                <li><a href="#animation-section">Анимации</a></li>
-                <li><a href="#rgb-section">RGB Анимация</a></li>
-                <li><a href="#changelog-section">История версий</a></li>
-                <li><a href="#security-audit">Аудит безопасности</a></li>
-                <li><a href="#tech-specs">Тех-стек</a></li>
-                <li><a href="#download-center">Скачать</a></li>
-                <li><a href="https://github.com/Maximka1993271/Password-Generator-Python" target="_blank">GitHub</a></li>
+                <li class="dropdown">
+                    <a href="#">Функции ▼</a>
+                    <div class="dropdown-content">
+                        <a href="#v40-section">🚀 Возможности v4.0</a>
+                        <a href="#settings-section">⚙️ Настройки</a>
+                        <a href="#pdf-section">📄 PDF Кириллица</a>
+                        <a href="#animation-section">🎨 Анимации</a>
+                        <a href="#rgb-section">🌈 RGB Анимация</a>
+                        <a href="#security-audit">🔒 Аудит безопасности</a>
+                        <a href="#tech-specs">💻 Тех-стек</a>
+                    </div>
+                </li>
+                <li><a href="#changelog-section">📋 История версий</a></li>
+                <li class="dropdown">
+                    <a href="#">📥 Скачать ▼</a>
+                    <div class="dropdown-content">
+                        <div class="dropdown-item-group">
+                            <strong>Secure Pass Pro v4.0 (Рекомендуется)</strong>
+                            <div class="download-buttons-inline">
+                                <a href="https://github.com/Maximka1993271/Password-Generator-Python/releases/download/v4.0/SecurePassPro.exe" class="download-btn-small download-btn-v40-small">⬇️ Скачать v4.0 (.EXE)</a>
+                            </div>
+                        </div>
+                        <div class="dropdown-item-group">
+                            <strong>Архивная версия</strong>
+                            <div class="submenu-links">
+                                <a href="https://github.com/Maximka1993271/Password-Generator-Python/releases/download/SecurePassProv2.0.0/SecurePassPro.exe">📦 Secure Pass Pro v2.0.0 (Classic)</a>
+                            </div>
+                        </div>
+                    </div>
+                </li>
+                <li><a href="#" id="about-btn">ℹ️ О нас</a></li>
+                <li><a href="https://github.com/Maximka1993271/Password-Generator-Python" target="_blank">🐙 GitHub ⭐</a></li>
             </ul>
         </nav>
     </header>
+
+    <!-- Вторая строка навигации (быстрые ссылки) -->
+    <div class="nav-secondary">
+        <ul>
+            <li><a href="#v40-section">Возможности</a></li>
+            <li><a href="#settings-section">Настройки</a></li>
+            <li><a href="#pdf-section">PDF</a></li>
+            <li><a href="#animation-section">Анимации</a></li>
+            <li><a href="#rgb-section">RGB</a></li>
+            <li><a href="#changelog-section">История</a></li>
+            <li><a href="#security-audit">Аудит</a></li>
+            <li><a href="#tech-specs">Тех-стек</a></li>
+            <li><a href="#download-center">Скачать</a></li>
+        </ul>
+    </div>
+
+    <!-- Модальное окно "О нас" (GitHub страница) -->
+    <div id="github-modal" class="github-page">
+        <span class="github-close" id="close-modal">&times;</span>
+        <div class="github-container">
+            <div class="github-repo" style="display: flex; align-items: center; gap: 20px; margin-bottom: 30px;">
+                <div class="github-repo-icon" style="font-size: 3rem;">🐙</div>
+                <div>
+                    <h2 style="color: var(--accent-color);">Secure Pass Pro</h2>
+                    <p>Профессиональный генератор паролей с открытым исходным кодом</p>
+                </div>
+            </div>
+            
+            <div class="github-stats" style="display: flex; gap: 20px; margin: 20px 0; flex-wrap: wrap;">
+                <div class="github-stat" style="background: rgba(78, 201, 176, 0.1); padding: 10px 20px; border-radius: 10px;">
+                    <strong>⭐ Stars</strong><br>
+                    <span style="font-size: 1.5rem;">★</span> Поддержи проект звездой
+                </div>
+                <div class="github-stat" style="background: rgba(78, 201, 176, 0.1); padding: 10px 20px; border-radius: 10px;">
+                    <strong>📦 Releases</strong><br>
+                    <span style="font-size: 1.5rem;">v4.0</span> + v2.0.0
+                </div>
+                <div class="github-stat" style="background: rgba(78, 201, 176, 0.1); padding: 10px 20px; border-radius: 10px;">
+                    <strong>🐛 Issues</strong><br>
+                    Сообщай о багах на GitHub
+                </div>
+            </div>
+            
+            <p><strong>Secure Pass Pro</strong> — это современный десктопный генератор паролей, построенный на Python и CustomTkinter. Программа сочетает криптографически стойкую генерацию, многоязычный интерфейс (RU/EN/UA), экспорт QR-кодов, контроль целостности файлов через SHA-256, защиту мастер-паролем (PBKDF2) и стильный Amoled-дизайн с RGB-анимацией.</p>
+            
+            <ul style="margin: 20px 0 20px 20px; color: var(--text-secondary);">
+                <li>🔒 Master Password (PBKDF2, 100,000 итераций)</li>
+                <li>✅ Контроль целостности SHA-256</li>
+                <li>🌈 RGB анимация границ окна</li>
+                <li>⌨️ Горячие клавиши (F5, Ctrl+C/S/O, Esc)</li>
+                <li>🌐 Кроссплатформенность (Windows / macOS / Linux)</li>
+                <li>📄 Полная поддержка кириллицы в PDF</li>
+            </ul>
+            
+            <a href="https://github.com/Maximka1993271/Password-Generator-Python" target="_blank" style="background: #2d6a4f; padding: 12px 25px; border-radius: 10px; display: inline-block; color: white; text-decoration: none; transition: all 0.3s;">🚀 Перейти на GitHub →</a>
+            
+            <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid var(--border-color);">
+                <p style="color: #888;">© 2026 Максим Мельников • MIT License</p>
+                <p style="color: #666; font-size: 0.8rem;">Разработчик: Maxim Melnikov</p>
+            </div>
+        </div>
+    </div>
 
     <section class="hero">
         <div class="hero-content">
             <div class="version-badge">Latest Release v4.0 Stable</div>
             <h1>Безопасность без <br><span class="highlight">компромиссов</span></h1>
-            <p>Профессиональный инструмент на Python 3.9+, объединяющий Neon-Amoled дизайн, мастер-пароль (PBKDF2), контроль целостности файлов, настраиваемую очистку буфера, RGB анимацию и криптостойкий движок для Windows.</p>
+            <p>Профессиональный инструмент на Python 3.9+, объединяющий Neon-Amoled дизайн, мастер-пароль (PBKDF2), контроль целостности файлов, настраиваемую очистку буфера, RGB анимацию и криптостойкий движок для Windows, macOS и Linux.</p>
             <div class="hero-btns">
-                <a href="https://github.com/Maximka1993271/Password-Generator-Python/releases/download/v4.0/SecurePassPro.exe" class="btn-primary">Скачать v4.0 Stable</a>
+                <a href="https://github.com/Maximka1993271/Password-Generator-Python/releases/download/v4.0/SecurePassPro.exe" class="btn-primary">⬇️ Скачать v4.0 Stable</a>
                 <a href="#v40-section" class="btn-secondary">Что нового?</a>
             </div>
         </div>
@@ -50,335 +330,101 @@
     <section id="v40-section" class="features-section">
         <h2 class="section-title">Ключевые нововведения <span class="highlight">v4.0</span></h2>
         <div class="features-grid">
-            <div class="card">
-                <div class="card-icon">🔒</div>
-                <h3>Мастер-пароль (PBKDF2)</h3>
-                <p>Защита доступа к программе мастер-паролем. PBKDF2 хеширование (100,000 итераций, соль 32 байта), 5 попыток входа — при превышении программа блокируется.</p>
-            </div>
-            <div class="card">
-                <div class="card-icon">✅</div>
-                <h3>Контроль целостности</h3>
-                <p>Автоматическое создание SHA-256 контрольных сумм (.sha256) при сохранении и проверка при открытии файлов. Защита от подмены данных.</p>
-            </div>
-            <div class="card">
-                <div class="card-icon">🔄</div>
-                <h3>Защита от повторов</h3>
-                <p>Новая опция "Избегать повторов символов подряд" — исключает появление одинаковых символов (aaa, 111).</p>
-            </div>
-            <div class="card">
-                <div class="card-icon">👁️</div>
-                <h3>Кнопка-глазок</h3>
-                <p>Одним кликом показывайте или скрывайте пароль. Полная синхронизация с чекбоксом "Скрывать символы".</p>
-            </div>
-            <div class="card">
-                <div class="card-icon">⌨️</div>
-                <h3>Горячие клавиши</h3>
-                <p>F5 — генерация, Ctrl+C — копирование, Ctrl+S — сохранить, Ctrl+O — открыть, Esc — закрыть диалоги.</p>
-            </div>
-            <div class="card">
-                <div class="card-icon">🌈</div>
-                <h3>RGB Анимация</h3>
-                <p>Динамическая цветная анимация границ окна с 4 независимыми полосами и синхронизацией заголовка Windows 11. Включается/выключается в настройках.</p>
-            </div>
-            <div class="card">
-                <div class="card-icon">📄</div>
-                <h3>PDF Viewer</h3>
-                <p>Возможность не только экспортировать, но и открывать PDF файлы прямо в приложении с поддержкой кириллицы.</p>
-            </div>
-            <div class="card">
-                <div class="card-icon">🔊</div>
-                <h3>Pro Sound</h3>
-                <p>Реалистичный звук механического клика мыши с возможностью отключения в настройках.</p>
-            </div>
-            <div class="card">
-                <div class="card-icon">📐</div>
-                <h3>Dynamic Radius</h3>
-                <p>Настройка закругления углов элементов (0-25px) в реальном времени, включая неоновые кнопки и поле ввода пароля.</p>
-            </div>
-            <div class="card">
-                <div class="card-icon">⏱️</div>
-                <h3>Очистка буфера</h3>
-                <p>Настраиваемая очистка буфера обмена от 10 до 120 секунд — больше контроля, чем у KeePassXC!</p>
-            </div>
+            <div class="card"><div class="card-icon">🔒</div><h3>Мастер-пароль (PBKDF2)</h3><p>Защита доступа к программе мастер-паролем. PBKDF2 хеширование (100,000 итераций, соль 32 байта), 5 попыток входа — при превышении программа блокируется.</p></div>
+            <div class="card"><div class="card-icon">✅</div><h3>Контроль целостности</h3><p>Автоматическое создание SHA-256 контрольных сумм (.sha256) при сохранении и проверка при открытии файлов. Защита от подмены данных.</p></div>
+            <div class="card"><div class="card-icon">🔄</div><h3>Защита от повторов</h3><p>Новая опция "Избегать повторов символов подряд" — исключает появление одинаковых символов (aaa, 111).</p></div>
+            <div class="card"><div class="card-icon">👁️</div><h3>Кнопка-глазок</h3><p>Одним кликом показывайте или скрывайте пароль. Полная синхронизация с чекбоксом "Скрывать символы".</p></div>
+            <div class="card"><div class="card-icon">⌨️</div><h3>Горячие клавиши</h3><p>F5 — генерация, Ctrl+C — копирование (только когда фокус не в поле пароля), Ctrl+S — сохранить, Ctrl+O — открыть, Esc — закрыть диалоги.</p></div>
+            <div class="card"><div class="card-icon">🌈</div><h3>RGB Анимация</h3><p>Динамическая цветная анимация границ окна с 4 независимыми полосами и синхронизацией заголовка Windows 11. Включается/выключается в настройках.</p></div>
+            <div class="card"><div class="card-icon">📄</div><h3>PDF Viewer</h3><p>Возможность не только экспортировать, но и открывать PDF файлы прямо в приложении с поддержкой кириллицы.</p></div>
+            <div class="card"><div class="card-icon">🔊</div><h3>Pro Sound</h3><p>Реалистичный звук механического клика мыши с кроссплатформенной поддержкой: Windows (MCI), macOS (afplay), Linux (mpg123/aplay).</p></div>
+            <div class="card"><div class="card-icon">📐</div><h3>Dynamic Radius</h3><p>Настройка закругления углов элементов (0-25px) в реальном времени, включая неоновые кнопки и поле ввода пароля.</p></div>
+            <div class="card"><div class="card-icon">⏱️</div><h3>Очистка буфера</h3><p>Настраиваемая очистка буфера обмена от 10 до 120 секунд — больше контроля, чем у KeePassXC! Умная очистка — буфер очищается только если в нём всё ещё ваш пароль.</p></div>
         </div>
     </section>
 
     <section id="settings-section" class="features-section dark-bg">
         <h2 class="section-title">Централизованные <span class="highlight">Настройки</span></h2>
         <div class="features-grid">
-            <div class="card">
-                <div class="card-icon">🌐</div>
-                <h3>Смена языка</h3>
-                <p>Мгновенное переключение между Русским, Английским и Украинским языками без перезапуска программы.</p>
-            </div>
-            <div class="card">
-                <div class="card-icon">🎨</div>
-                <h3>Тема оформления</h3>
-                <p>Выбор между Системной, Светлой и Тёмной темой с плавным переключением без зависаний.</p>
-            </div>
-            <div class="card">
-                <div class="card-icon">🎛️</div>
-                <h3>RGB управление</h3>
-                <p>Кнопки ВКЛ/ВЫКЛ для RGB анимации границ окна. Состояние сохраняется в config.json.</p>
-            </div>
-            <div class="card">
-                <div class="card-icon">🔊</div>
-                <h3>Управление звуком</h3>
-                <p>Включение/выключение звуковых эффектов через удобную кнопку с отображением "ВКЛ"/"ВЫКЛ".</p>
-            </div>
-            <div class="card">
-                <div class="card-icon">📐</div>
-                <h3>Ползунок закругления</h3>
-                <p>Интерактивный слайдер для настройки скругления всех углов интерфейса от 0 до 25 пикселей.</p>
-            </div>
-            <div class="card">
-                <div class="card-icon">🔒</div>
-                <h3>Управление мастер-паролем</h3>
-                <p>Установка и удаление мастер-пароля через окно настроек. Индикатор статуса (🔒 Установлен / 🔓 Не установлен).</p>
-            </div>
-            <div class="card">
-                <div class="card-icon">⏱️</div>
-                <h3>Таймаут буфера</h3>
-                <p>Слайдер от 10 до 120 секунд для настройки времени очистки буфера обмена после копирования.</p>
-            </div>
-            <div class="card">
-                <div class="card-icon">💾</div>
-                <h3>JSON конфигурация</h3>
-                <p>Все настройки сохраняются в config.json в папке пользователя. Надёжное хранение параметров.</p>
-            </div>
+            <div class="card"><div class="card-icon">🌐</div><h3>Смена языка</h3><p>Мгновенное переключение между Русским, Английским и Украинским языками без перезапуска программы.</p></div>
+            <div class="card"><div class="card-icon">🎨</div><h3>Тема оформления</h3><p>Выбор между Системной, Светлой и Тёмной темой с плавным переключением без зависаний.</p></div>
+            <div class="card"><div class="card-icon">🎛️</div><h3>RGB управление</h3><p>Кнопки ВКЛ/ВЫКЛ для RGB анимации границ окна. Состояние сохраняется в config.json.</p></div>
+            <div class="card"><div class="card-icon">🔊</div><h3>Управление звуком</h3><p>Включение/выключение звуковых эффектов через удобную кнопку с отображением "ВКЛ"/"ВЫКЛ".</p></div>
+            <div class="card"><div class="card-icon">📐</div><h3>Ползунок закругления</h3><p>Интерактивный слайдер для настройки скругления всех углов интерфейса от 0 до 25 пикселей.</p></div>
+            <div class="card"><div class="card-icon">🔒</div><h3>Управление мастер-паролем</h3><p>Установка и удаление мастер-пароля через окно настроек. Индикатор статуса (🔒 Установлен / 🔓 Не установлен).</p></div>
+            <div class="card"><div class="card-icon">⏱️</div><h3>Таймаут буфера</h3><p>Слайдер от 10 до 120 секунд для настройки времени очистки буфера обмена после копирования.</p></div>
+            <div class="card"><div class="card-icon">💾</div><h3>JSON конфигурация</h3><p>Все настройки сохраняются в config.json в папке пользователя. Надёжное хранение параметров с защитой от повреждения.</p></div>
         </div>
     </section>
 
     <section id="pdf-section" class="features-section">
         <h2 class="section-title">Полная поддержка <span class="highlight">Кириллицы в PDF</span></h2>
         <div class="features-grid">
-            <div class="card">
-                <div class="card-icon">🖋️</div>
-                <h3>DejaVuSans.ttf</h3>
-                <p>Встроенный шрифт DejaVuSans обеспечивает корректное отображение русских и украинских символов в экспортируемых PDF-файлах.</p>
-            </div>
-            <div class="card">
-                <div class="card-icon">✅</div>
-                <h3>Unicode совместимость</h3>
-                <p>Полная поддержка UTF-8 при экспорте документов. Кириллица отображается без иероглифов.</p>
-            </div>
+            <div class="card"><div class="card-icon">🖋️</div><h3>DejaVuSans.ttf</h3><p>Встроенный шрифт DejaVuSans обеспечивает корректное отображение русских и украинских символов в экспортируемых PDF-файлах.</p></div>
+            <div class="card"><div class="card-icon">✅</div><h3>Unicode совместимость</h3><p>Полная поддержка UTF-8 при экспорте документов. Кириллица отображается без иероглифов.</p></div>
         </div>
     </section>
 
-    <!-- Секция: Цветная пульсация пароля -->
     <section id="animation-section" class="features-section dark-bg">
         <h2 class="section-title">Цветная <span class="highlight">Пульсация</span> пароля</h2>
         <div class="features-grid">
-            <div class="card">
-                <div class="card-icon">🔴</div>
-                <h3>Слабый пароль</h3>
-                <p>При генерации слабого пароля (до 40 бит) поле пароля вспыхивает <strong style="color:#FF4444;">КРАСНЫМ</strong> неоном, предупреждая о низкой криптостойкости.</p>
-            </div>
-            <div class="card">
-                <div class="card-icon">🟠</div>
-                <h3>Средний пароль</h3>
-                <p>Средний уровень сложности (40-79 бит) сопровождается <strong style="color:#FFA500;">ОРАНЖЕВОЙ</strong> вспышкой — рекомендовано увеличить длину.</p>
-            </div>
-            <div class="card">
-                <div class="card-icon">🟢</div>
-                <h3>Надёжный пароль</h3>
-                <p>Надёжный пароль (80+ бит) дарит <strong style="color:#2ECC71;">ЗЕЛЁНУЮ</strong> неоновую пульсацию, сигнализируя о высочайшем уровне защиты.</p>
-            </div>
-            <div class="card">
-                <div class="card-icon">✨</div>
-                <h3>Анимация 0.3 сек</h3>
-                <p>Плавная пульсация длительностью 0.3 секунды создаёт приятный визуальный отклик и усиливает ощущение качества.</p>
-            </div>
+            <div class="card"><div class="card-icon">🔴</div><h3>Слабый пароль</h3><p>При генерации слабого пароля (до 40 бит) поле пароля вспыхивает <strong style="color:#FF4444;">КРАСНЫМ</strong> неоном.</p></div>
+            <div class="card"><div class="card-icon">🟠</div><h3>Средний пароль</h3><p>Средний уровень сложности (40-79 бит) сопровождается <strong style="color:#FFA500;">ОРАНЖЕВОЙ</strong> вспышкой.</p></div>
+            <div class="card"><div class="card-icon">🟢</div><h3>Надёжный пароль</h3><p>Надёжный пароль (80+ бит) дарит <strong style="color:#2ECC71;">ЗЕЛЁНУЮ</strong> неоновую пульсацию.</p></div>
+            <div class="card"><div class="card-icon">✨</div><h3>Анимация 0.3 сек</h3><p>Плавная пульсация длительностью 0.3 секунды создаёт приятный визуальный отклик.</p></div>
         </div>
     </section>
 
-    <!-- Секция: RGB Анимация -->
     <section id="rgb-section" class="features-section">
         <h2 class="section-title"><span class="highlight">RGB Анимация</span> границ окна</h2>
         <div class="features-grid">
-            <div class="card">
-                <div class="card-icon">🌈</div>
-                <h3>4 независимых полосы</h3>
-                <p>Верхняя, нижняя, левая и правая границы окна анимируются с разными цветовыми фазами, создавая эффект непрерывного движения.</p>
-            </div>
-            <div class="card">
-                <div class="card-icon">🪟</div>
-                <h3>Синхронизация заголовка</h3>
-                <p>Цвет заголовка окна Windows 11 меняется синхронно с RGB анимацией (фаза 3.2).</p>
-            </div>
-            <div class="card">
-                <div class="card-icon">🎛️</div>
-                <h3>ON/OFF управление</h3>
-                <p>Кнопки ВКЛ/ВЫКЛ в настройках позволяют включать и выключать RGB анимацию. Состояние сохраняется.</p>
-            </div>
-            <div class="card">
-                <div class="card-icon">⚡</div>
-                <h3>30 FPS анимация</h3>
-                <p>Плавная анимация с частотой обновления 30 кадров в секунду (интервал 30 мс).</p>
-            </div>
+            <div class="card"><div class="card-icon">🌈</div><h3>4 независимых полосы</h3><p>Верхняя, нижняя, левая и правая границы окна анимируются с разными цветовыми фазами.</p></div>
+            <div class="card"><div class="card-icon">🪟</div><h3>Синхронизация заголовка</h3><p>Цвет заголовка окна Windows 11 меняется синхронно с RGB анимацией.</p></div>
+            <div class="card"><div class="card-icon">🎛️</div><h3>ON/OFF управление</h3><p>Кнопки ВКЛ/ВЫКЛ в настройках позволяют включать и выключать RGB анимацию.</p></div>
+            <div class="card"><div class="card-icon">⚡</div><h3>30 FPS анимация</h3><p>Плавная анимация с частотой обновления 30 кадров в секунду.</p></div>
         </div>
     </section>
 
-    <!-- Секция: Полная история версий -->
     <section id="changelog-section" class="features-section dark-bg">
         <h2 class="section-title">Полная история <span class="highlight">изменений v4.0</span></h2>
-        
         <div class="features-grid">
-            <div class="card">
-                <div class="card-icon">🪟</div>
-                <h3>Окна мастер-пароля</h3>
-                <ul style="margin-top: 10px; padding-left: 20px; color: #ccc;">
-                    <li>✅ Исправлен перевод на все 3 языка (RU/EN/UA)</li>
-                    <li>✅ Исправлены цвета окон под выбранную тему</li>
-                    <li>✅ Полный редизайн с закруглением углов</li>
-                    <li>✅ Добавлена кнопка "Установить мастер-пароль"</li>
-                    <li>✅ Добавлена кнопка "Удалить мастер-пароль" с подтверждением</li>
-                </ul>
-            </div>
-            <div class="card">
-                <div class="card-icon">🎨</div>
-                <h3>Чекбоксы и визуал</h3>
-                <ul style="margin-top: 10px; padding-left: 20px; color: #ccc;">
-                    <li>✅ Улучшен внешний вид чекбоксов</li>
-                    <li>✅ Синхронизация стилей чекбоксов с темой</li>
-                    <li>✅ Правильные отступы между элементами</li>
-                    <li>✅ Цветовой акцент в зависимости от темы</li>
-                </ul>
-            </div>
-            <div class="card">
-                <div class="card-icon">⚙️</div>
-                <h3>Редизайн настроек</h3>
-                <ul style="margin-top: 10px; padding-left: 20px; color: #ccc;">
-                    <li>✅ Полностью новое окно с прокруткой</li>
-                    <li>✅ Слайдеры для радиуса и таймаута буфера</li>
-                    <li>✅ Кнопка звука с визуальным отображением</li>
-                    <li>✅ Секция мастер-пароля с индикатором</li>
-                    <li>✅ Кнопки управления RGB анимацией</li>
-                    <li>✅ Разделительные линии между группами</li>
-                </ul>
-            </div>
-            <div class="card">
-                <div class="card-icon">🔧</div>
-                <h3>Критические исправления</h3>
-                <ul style="margin-top: 10px; padding-left: 20px; color: #ccc;">
-                    <li>🔧 Исправлен winreg import на Linux/macOS</li>
-                    <li>🔧 Исправлен AttributeError settings_labels</li>
-                    <li>🔧 Исправлен AttributeError history_textbox</li>
-                    <li>🔧 Исправлены 8 отсутствующих атрибутов виджетов</li>
-                    <li>🔧 Исправлено форматирование tt_copy tooltip</li>
-                    <li>🔧 Исправлен перевод всех диалогов мастер-пароля</li>
-                    <li>🔧 Исправлена цветовая схема popup диалогов</li>
-                </ul>
-            </div>
-            <div class="card">
-                <div class="card-icon">🧹</div>
-                <h3>Удаление мёртвого кода</h3>
-                <ul style="margin-top: 10px; padding-left: 20px; color: #ccc;">
-                    <li>🗑️ Удалён self._settings_buttons (никогда не использовался)</li>
-                    <li>🗑️ Удалён self._settings_widgets (никогда не использовался)</li>
-                    <li>🗑️ Удалены все hasattr() проверки для инициализированных атрибутов</li>
-                </ul>
-            </div>
-            <div class="card">
-                <div class="card-icon">📐</div>
-                <h3>Скругление углов</h3>
-                <ul style="margin-top: 10px; padding-left: 20px; color: #ccc;">
-                    <li>✅ Динамическое скругление для ВСЕХ окон</li>
-                    <li>✅ Изменение радиуса в реальном времени без перезапуска</li>
-                    <li>✅ Глобальная синхронизация через set_global_radius()</li>
-                    <li>✅ Единый стиль для кнопок, рамок и полей ввода</li>
-                </ul>
-            </div>
+            <div class="card"><div class="card-icon">🪟</div><h3>Окна мастер-пароля</h3><ul><li>✅ Исправлен перевод на все 3 языка</li><li>✅ Исправлены цвета окон под выбранную тему</li><li>✅ Полный редизайн с закруглением углов</li><li>✅ Добавлена кнопка "Установить мастер-пароль"</li></ul></div>
+            <div class="card"><div class="card-icon">🎨</div><h3>Чекбоксы и визуал</h3><ul><li>✅ Улучшен внешний вид чекбоксов</li><li>✅ Синхронизация стилей чекбоксов с темой</li><li>✅ Правильные отступы между элементами</li><li>✅ Все чекбоксы запускаются снятыми</li></ul></div>
+            <div class="card"><div class="card-icon">⚙️</div><h3>Редизайн настроек</h3><ul><li>✅ Полностью новое окно с прокруткой</li><li>✅ Слайдеры для радиуса и таймаута буфера</li><li>✅ Кнопка звука с визуальным отображением</li><li>✅ Кнопки управления RGB анимацией</li></ul></div>
+            <div class="card"><div class="card-icon">🔧</div><h3>Критические исправления</h3><ul><li>🔧 Исправлен winreg import на Linux/macOS</li><li>🔧 Исправлен AttributeError settings_labels</li><li>🔧 Исправлены 8 отсутствующих атрибутов</li><li>🔧 Исправлен конфликт Ctrl+C</li></ul></div>
+            <div class="card"><div class="card-icon">💻</div><h3>Кроссплатформенность</h3><ul><li>✅ Windows — полная поддержка с MCI звуком</li><li>✅ macOS — нативные шрифты и звук afplay</li><li>✅ Linux — шрифты DejaVu Sans и звук mpg123</li><li>✅ Автоматический выбор шрифтов</li></ul></div>
+            <div class="card"><div class="card-icon">🛡️</div><h3>Умная очистка буфера</h3><ul><li>✅ Проверка содержимого перед очисткой</li><li>✅ Не трогает чужие данные</li><li>✅ Безопасная работа с буфером</li></ul></div>
         </div>
-        
-        <!-- Статистика версии 4.0 -->
-        <div style="text-align: center; margin-top: 40px;">
-            <div style="display: flex; justify-content: center; gap: 30px; flex-wrap: wrap;">
-                <div style="background: rgba(76, 201, 176, 0.1); padding: 20px 35px; border-radius: 15px; border: 1px solid #4EC9B0;">
-                    <div style="font-size: 2.5rem; font-weight: 800; color: #4EC9B0;">15+</div>
-                    <div style="color: #888;">Новых функций</div>
-                </div>
-                <div style="background: rgba(76, 201, 176, 0.1); padding: 20px 35px; border-radius: 15px; border: 1px solid #4EC9B0;">
-                    <div style="font-size: 2.5rem; font-weight: 800; color: #4EC9B0;">12+</div>
-                    <div style="color: #888;">Исправленных багов</div>
-                </div>
-                <div style="background: rgba(76, 201, 176, 0.1); padding: 20px 35px; border-radius: 15px; border: 1px solid #4EC9B0;">
-                    <div style="font-size: 2.5rem; font-weight: 800; color: #4EC9B0;">~600</div>
-                    <div style="color: #888;">Новых строк кода</div>
-                </div>
-                <div style="background: rgba(76, 201, 176, 0.1); padding: 20px 35px; border-radius: 15px; border: 1px solid #4EC9B0;">
-                    <div style="font-size: 2.5rem; font-weight: 800; color: #4EC9B0;">3</div>
-                    <div style="color: #888;">Языка интерфейса</div>
-                </div>
-            </div>
+        <div style="display: flex; justify-content: center; gap: 30px; flex-wrap: wrap; margin-top: 40px;">
+            <div style="background: rgba(76, 201, 176, 0.1); padding: 20px 35px; border-radius: 15px; border: 1px solid #4EC9B0; text-align: center;"><div style="font-size: 2.5rem; font-weight: 800; color: #4EC9B0;">18+</div><div style="color: #888;">Новых функций</div></div>
+            <div style="background: rgba(76, 201, 176, 0.1); padding: 20px 35px; border-radius: 15px; border: 1px solid #4EC9B0; text-align: center;"><div style="font-size: 2.5rem; font-weight: 800; color: #4EC9B0;">15+</div><div style="color: #888;">Исправленных багов</div></div>
+            <div style="background: rgba(76, 201, 176, 0.1); padding: 20px 35px; border-radius: 15px; border: 1px solid #4EC9B0; text-align: center;"><div style="font-size: 2.5rem; font-weight: 800; color: #4EC9B0;">~650</div><div style="color: #888;">Новых строк кода</div></div>
+            <div style="background: rgba(76, 201, 176, 0.1); padding: 20px 35px; border-radius: 15px; border: 1px solid #4EC9B0; text-align: center;"><div style="font-size: 2.5rem; font-weight: 800; color: #4EC9B0;">3</div><div style="color: #888;">Платформы</div></div>
         </div>
     </section>
 
     <section id="security-audit" class="features-section">
         <h2 class="section-title">Аудит <span class="highlight">безопасности</span></h2>
         <div class="features-grid">
-            <div class="card">
-                <div class="card-icon">🔢</div>
-                <h3>Энтропия</h3>
-                <p>Точный математический расчет сложности пароля в битах для оценки криптостойкости.</p>
-            </div>
-            <div class="card">
-                <div class="card-icon">⏳</div>
-                <h3>Time-to-Crack</h3>
-                <p>Оценка времени взлома методом Brute-force: от "мгновенно" до "столетий".</p>
-            </div>
-            <div class="card">
-                <div class="card-icon">⭐</div>
-                <h3>Visual Rating</h3>
-                <p>Пятизвездочный рейтинг надежности и 3-уровневая цветовая шкала (Red/Orange/Green).</p>
-            </div>
-            <div class="card">
-                <div class="card-icon">🛡️</div>
-                <h3>SHA-256 верификация</h3>
-                <p>Контроль целостности сохранённых файлов через SHA-256 хеширование.</p>
-            </div>
+            <div class="card"><div class="card-icon">🔢</div><h3>Энтропия</h3><p>Точный математический расчет сложности пароля в битах для оценки криптостойкости.</p></div>
+            <div class="card"><div class="card-icon">⏳</div><h3>Time-to-Crack</h3><p>Оценка времени взлома методом Brute-force: от "мгновенно" до "столетий".</p></div>
+            <div class="card"><div class="card-icon">⭐</div><h3>Visual Rating</h3><p>Пятизвездочный рейтинг надежности и 3-уровневая цветовая шкала.</p></div>
+            <div class="card"><div class="card-icon">🛡️</div><h3>SHA-256 верификация</h3><p>Контроль целостности сохранённых файлов через SHA-256 хеширование.</p></div>
         </div>
     </section>
 
     <section id="tech-section" class="tech-stack features-section dark-bg">
         <h2 class="section-title">Цветовая <span class="highlight">Дифференциация</span></h2>
         <div class="tech-grid">
-            <div class="tech-item">
-                <h4>🔵 Синий (Neon)</h4>
-                <p>Генерация пароля</p>
-            </div>
-            <div class="tech-item">
-                <h4>🟢 Зеленый (Neon)</h4>
-                <p>Копирование в буфер</p>
-            </div>
-            <div class="tech-item">
-                <h4>🔵 Бирюзовый (Neon)</h4>
-                <p>Работа с PDF/Файлами</p>
-            </div>
-            <div class="tech-item">
-                <h4>🟣 Фиолетовый (Neon)</h4>
-                <p>Создание QR-кода</p>
-            </div>
-            <div class="tech-item">
-                <h4>🟢 Зеленый (Neon)</h4>
-                <p>Кнопка Настройки</p>
-            </div>
-            <div class="tech-item">
-                <h4>🔴 Красный (Neon)</h4>
-                <p>Слабый пароль 🔴</p>
-            </div>
-            <div class="tech-item">
-                <h4>🟠 Оранжевый (Neon)</h4>
-                <p>Средний пароль 🟠</p>
-            </div>
-            <div class="tech-item">
-                <h4>🟢 Зеленый (Neon)</h4>
-                <p>Надёжный пароль 🟢</p>
-            </div>
-            <div class="tech-item">
-                <h4>🌈 RGB (Neon)</h4>
-                <p>Анимация границ окна</p>
-            </div>
+            <div class="tech-item"><h4>🔵 Синий</h4><p>Генерация пароля</p></div>
+            <div class="tech-item"><h4>🟢 Зеленый</h4><p>Копирование в буфер</p></div>
+            <div class="tech-item"><h4>🔵 Бирюзовый</h4><p>Работа с PDF</p></div>
+            <div class="tech-item"><h4>🟣 Фиолетовый</h4><p>QR-код</p></div>
+            <div class="tech-item"><h4>🟢 Зеленый</h4><p>Настройки</p></div>
+            <div class="tech-item"><h4>🔴 Красный</h4><p>Слабый пароль</p></div>
+            <div class="tech-item"><h4>🟠 Оранжевый</h4><p>Средний пароль</p></div>
+            <div class="tech-item"><h4>🟢 Зеленый</h4><p>Надёжный пароль</p></div>
+            <div class="tech-item"><h4>🌈 RGB</h4><p>Анимация границ</p></div>
         </div>
     </section>
 
@@ -390,19 +436,16 @@
                 <li><strong>Версия:</strong> 4.0 Stable (12.05.2026)</li>
                 <li><strong>Ядро:</strong> Python 3.9+ (CSPRNG Secrets)</li>
                 <li><strong>Защита:</strong> Мастер-пароль (PBKDF2, 100,000 итераций) + Контроль целостности (.sha256)</li>
-                <li><strong>Очистка буфера:</strong> Настраиваемая 10-120 секунд (слайдер в настройках)</li>
-                <li><strong>Аудио:</strong> WinMM API (Custom Click) с возможностью отключения</li>
-                <li><strong>Анимации:</strong> Цветная пульсация (красный/оранжевый/зелёный) + RGB границ окна</li>
-                <li><strong>Горячие клавиши:</strong> F5, Ctrl+C, Ctrl+S, Ctrl+O, Esc</li>
-                <li><strong>Шрифт PDF:</strong> DejaVuSans.ttf (Полная поддержка кириллицы)</li>
-                <li><strong>Конфигурация:</strong> JSON формат (~/.securepasspro/config.json)</li>
-                <li><strong>Сборка:</strong> Windows 10/11 Optimized</li>
+                <li><strong>Очистка буфера:</strong> Настраиваемая 10-120 секунд + умная проверка содержимого</li>
+                <li><strong>Аудио:</strong> Кроссплатформенный (Windows MCI / macOS afplay / Linux mpg123/aplay)</li>
+                <li><strong>Шрифты:</strong> Кроссплатформенные (_FONT_UI, _FONT_MONO, _FONT_BTN)</li>
+                <li><strong>Анимации:</strong> Цветная пульсация + RGB границ окна</li>
+                <li><strong>Горячие клавиши:</strong> F5, Ctrl+C (без конфликта), Ctrl+S, Ctrl+O, Esc</li>
+                <li><strong>Платформы:</strong> Windows 10/11, macOS, Linux</li>
             </ul>
             <div class="build-command">
                 <p class="command-label">// Команда сборки v4.0 (Full Package)</p>
-                <code class="command-code">
-                    pyinstaller --noconfirm --onefile --windowed --clean --icon="icon.ico" --add-data "icon.ico;." --add-data "Computer Mouse Click.mp3;." --add-data "DejaVuSans.ttf;." --collect-all qrcode --collect-all customtkinter --hidden-import="PIL._tkinter_finder" --name "SecurePassPro" Secure_Pass_Pro.pyw
-                </code>
+                <code class="command-code">pyinstaller --noconfirm --onefile --windowed --clean --icon="icon.ico" --add-data "icon.ico;." --add-data "Computer Mouse Click.mp3;." --add-data "DejaVuSans.ttf;." --collect-all qrcode --collect-all customtkinter --hidden-import="PIL._tkinter_finder" --name "SecurePassPro" Secure_Pass_Pro.pyw</code>
             </div>
         </div>
     </section>
@@ -413,14 +456,9 @@
             <div class="download-card highlight-card">
                 <div class="card-icon">🏆</div>
                 <h3>Secure Pass Pro v4.0</h3>
-                <p><b>Рекомендуется.</b> Мастер-пароль (PBKDF2), контроль целостности SHA-256, защита от повторов, кнопка-глазок, горячие клавиши, <b>настраиваемая очистка буфера (10-120 сек)</b>, <b>RGB анимация границ окна</b>, Neon UI, поддержка PDF с кириллицей (DejaVuSans), звук клика, цветная пульсация пароля (красный/оранжевый/зелёный) и высокая криптостойкость.</p>
-                <a href="https://github.com/Maximka1993271/Password-Generator-Python/releases/download/v4.0/SecurePassPro.exe" class="btn-primary full-width">Скачать v4.0 (.EXE)</a>
-            </div>
-            <div class="download-card">
-                <div class="card-icon">📁</div>
-                <h3>Secure Pass Pro v2.0.0</h3>
-                <p>Классическая версия. Стабильность и простота для слабых ПК без лишних эффектов.</p>
-                <a href="https://github.com/Maximka1993271/Password-Generator-Python/releases/download/SecurePassProv2.0.0/SecurePassPro.exe" class="btn-secondary full-width">Скачать v2.0.0 (.EXE)</a>
+                <p><b>Рекомендуется.</b> Мастер-пароль (PBKDF2), контроль целостности SHA-256, защита от повторов, кнопка-глазок, горячие клавиши, <b>настраиваемая умная очистка буфера (10-120 сек)</b>, <b>RGB анимация границ окна</b>, Neon UI, поддержка PDF с кириллицей, кроссплатформенный звук, цветная пульсация пароля и высокая криптостойкость.</p>
+                <a href="https://github.com/Maximka1993271/Password-Generator-Python/releases/download/v4.0/SecurePassPro.exe" class="btn-primary full-width">⬇️ Скачать v4.0 (.EXE)</a>
+                <div style="margin-top: 15px;"><a href="https://github.com/Maximka1993271/Password-Generator-Python/releases/download/SecurePassProv2.0.0/SecurePassPro.exe" style="color: #888; font-size: 0.8rem;">📦 Архивная версия v2.0.0 →</a></div>
             </div>
         </div>
     </section>
@@ -432,29 +470,14 @@
                 <span class="badge">Python 3.9+</span>
                 <span class="badge">Neon-Amoled UX</span>
                 <span class="badge">CSPRNG Secrets</span>
-                <span class="badge">Master Password PBKDF2</span>
-                <span class="badge">SHA-256 Integrity</span>
-                <span class="badge">Hotkeys Support</span>
-                <span class="badge">Clipboard Timeout 10-120s</span>
-                <span class="badge">RGB Border Animation</span>
-                <span class="badge">Win 10/11 Optimized</span>
-                <span class="badge">Triple Localization</span>
-                <span class="badge">Corner Radius Control</span>
-                <span class="badge">DejaVuSans PDF</span>
-                <span class="badge">Cyrillic Support</span>
-                <span class="badge">Color Pulsation</span>
-                <span class="badge">Red/Orange/Green Glow</span>
-                <span class="badge">JSON Config</span>
+                <span class="badge">PBKDF2</span>
+                <span class="badge">SHA-256</span>
+                <span class="badge">RGB Animation</span>
+                <span class="badge">Cross-Platform</span>
+                <span class="badge">Win/Mac/Linux</span>
+                <span class="badge">RU/EN/UA</span>
             </div>
-            <p class="footer-description">
-                Локализация: RU, EN, UA. Программа гарантирует полную приватность данных. Генерация происходит локально, 
-                поддержка PDF и звукового сопровождения интегрирована нативно. В версии 4.0 добавлены: мастер-пароль PBKDF2 (100,000 итераций) для защиты доступа, 
-                контроль целостности файлов через SHA-256, опция "Избегать повторов символов подряд", кнопка-глазок для показа/скрытия пароля, 
-                горячие клавиши (F5, Ctrl+C, Ctrl+S, Ctrl+O, Esc), <strong>настраиваемая очистка буфера обмена (10-120 секунд)</strong>, 
-                <strong>RGB анимация границ окна с 4 независимыми полосами</strong>, централизованная панель настроек с управлением языком, темой, звуком, закруглением углов, RGB и таймаутом буфера. 
-                PDF-экспорт использует шрифт DejaVuSans.ttf для корректного отображения кириллицы. <strong>Новинка: цветная неоновая пульсация</strong> — красный (слабый), 
-                оранжевый (средний), зелёный (надёжный) пароль. Конфигурация сохраняется в JSON формате. Все критические баги исправлены, мёртвый код удалён.
-            </p>
+            <p class="footer-description">Локализация: RU, EN, UA. Программа гарантирует полную приватность данных. Генерация происходит локально. Кроссплатформенная поддержка Windows, macOS, Linux. Все критические баги исправлены, мёртвый код удалён, добавлена умная очистка буфера.</p>
         </div>
     </footer>
 
