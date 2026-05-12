@@ -1,6 +1,6 @@
 # 🛡️ Secure Pass Pro v4.0
 
-**🔐 Secure password generator with a multilingual Python GUI for Windows**
+**🔐 Secure password generator with a multilingual Python GUI for Windows, macOS, and Linux**
 
 Secure Pass Pro is a modern desktop password generator built with Python and CustomTkinter.
 It combines cryptographically secure password generation, multilingual interface, QR-code export, privacy controls, and a polished dark UI.
@@ -29,6 +29,7 @@ It combines cryptographically secure password generation, multilingual interface
 
 - **Privacy and safety**
   - Configurable clipboard auto-cleanup **(10-120 seconds, adjustable in settings)** – better than KeePassXC's fixed 30 seconds!
+  - Smart clipboard clearing – buffer cleared only if still contains your password
   - Local password history with one-click clearing.
   - Text export integrity check via **SHA-256**.
   - Protection against too-small character pools.
@@ -63,7 +64,7 @@ One-click **eye button** to show/hide the password, synced with the "Hide symbol
 
 ### ⌨️ Hotkeys Support
 - **F5** – Generate new password
-- **Ctrl+C** – Copy to clipboard
+- **Ctrl+C** – Copy to clipboard (only when focus is NOT in password field – no conflict with system copy)
 - **Ctrl+S** – Save to file
 - **Ctrl+O** – Open file
 - **Esc** – Close settings dialog
@@ -76,12 +77,12 @@ Quickly switch between **Русский**, **English**, and **Українськ
 
 ### 🎨 Theme Selector
 Choose your preferred appearance:
-- **System** – follows your Windows theme
+- **System** – follows your system theme
 - **Light** – bright and clean interface
 - **Dark** – comfortable for night use
 
 ### 🔊 Sound Control
-Toggle UI sound effects on/off with a single click. When enabled, mechanical mouse click sounds provide satisfying feedback.
+Toggle UI sound effects on/off with a single click. **Cross-platform audio support** – Windows (MCI), macOS (afplay), Linux (mpg123/aplay).
 
 ### 📐 Corner Radius Control
 A new slider allows you to customize the roundness of all UI elements from **0 to 25 pixels** – make it perfectly square or beautifully rounded.
@@ -100,6 +101,7 @@ Dynamic color-cycling border around the main window with:
 - **RGB under titlebar** – Additional strip below the window title bar
 - **Windows 11 titlebar color sync** – Titlebar changes color along with animation
 - **ON/OFF toggle buttons** – Enable/disable from settings, preference saved
+- **Float overflow protection** – Safe for extended runtime
 
 ### 🎨 Color Pulsation Animation (New!)
 The password field now features a **0.3-second neon glow animation** after each generation, with colors indicating password strength:
@@ -112,6 +114,12 @@ The password field now features a **0.3-second neon glow animation** after each 
 
 This provides **instant visual feedback** about password quality without needing to read the rating text.
 
+### 💻 Cross-Platform Support (New!)
+- **Windows** – Full support with native audio and titlebar RGB sync
+- **macOS** – Native font (SF Pro Display) and audio (afplay) support
+- **Linux** – DejaVu Sans font and audio (mpg123/aplay) support
+- **Cross-platform fonts** – Automatic font selection per OS
+
 ### Additional Improvements
 - Redesigned interface with balanced layout and **neon color-coded action buttons**
 - Added entropy-based strength calculation with SHA-256 verification
@@ -121,8 +129,11 @@ This provides **instant visual feedback** about password quality without needing
 - Fixed PDF export for Cyrillic and Ukrainian text using DejaVuSans font
 - Removed deprecated progress bar for cleaner interface
 - **Improved checkbox appearance** – Better looking checkmark indicators
+- **All checkboxes start unchecked** – Clean state on first launch
 - **Master Password section in Settings** – Status indicator and management buttons
 - **Fixed translation for all master password dialogs** – Proper RU/EN/UA support
+- **JSON configuration format** – More reliable settings storage
+- **Improved error handling** – Graceful fallback if config.json is corrupted
 
 **[📥 Download Secure Pass Pro v4.0 (.exe)](https://github.com/Maximka1993271/Password-Generator-Python/releases/download/v4.0/SecurePassPro.exe)**
 
@@ -134,11 +145,12 @@ This provides **instant visual feedback** about password quality without needing
 
 - **Language**: Python 3.9+
 - **GUI**: `customtkinter`
-- **Audio**: `Windows Multimedia API (winmm)`
+- **Audio**: Cross-platform (Windows MCI / macOS afplay / Linux mpg123 or aplay)
 - **Libraries**: `Pillow`, `qrcode`, `fpdf`
 - **PDF Font**: `DejaVuSans.ttf` (embedded, full Cyrillic support)
 - **Security**: `secrets`, `hashlib`, `random.SystemRandom`, `PBKDF2`
 - **Animations**: Color-coded neon pulsation (Red/Orange/Green), RGB border cycling
+- **Cross-platform fonts**: `_FONT_UI`, `_FONT_MONO`, `_FONT_BTN` – automatic selection per OS
 
 ### Changelog v4.0 (2026-05-12)
 
@@ -161,6 +173,10 @@ This provides **instant visual feedback** about password quality without needing
 - Added **Tooltips** for all buttons including the eye button
 - Added **"Set Master Password"** and **"Remove Master Password"** buttons in Settings
 - Added **Master Password status indicator** (🔒 Set / 🔓 Not set)
+- Added **Cross-platform font support** – automatic selection for Windows/macOS/Linux
+- Added **Cross-platform audio** – macOS (afplay) and Linux (mpg123/aplay) support
+- Added **Smart clipboard clearing** – clears only if buffer still contains your password
+- Added **Float overflow protection** for RGB animation
 
 **Fixes:**
 - Fixed checkbox/eye button synchronization
@@ -177,6 +193,11 @@ This provides **instant visual feedback** about password quality without needing
 - Fixed `tt_copy` tooltip formatting – timeout value now displays correctly
 - Fixed translation for all master password dialogs (RU/EN/UA)
 - Fixed color scheme for all popup dialogs
+- Fixed `Segoe UI Variable` font error – replaced with cross-platform font constants
+- Fixed `tahoma` font in ToolTips – replaced with `_FONT_UI`
+- Fixed window flash in settings – `grab_set()` moved before centering
+- Fixed `json.JSONDecodeError` – graceful fallback if config.json is corrupted
+- Fixed `Ctrl+C` conflict – now copies password only when focus is NOT in password field
 
 **Improvements:**
 - Removed deprecated theme buttons from bottom panel
@@ -189,12 +210,15 @@ This provides **instant visual feedback** about password quality without needing
 - **Redesigned Settings window** – scrollable frame with separator lines and better organization
 - **Improved checkbox appearance** – better checkmark indicators with proper spacing
 - **JSON configuration format** – replaced `.txt` with `.json` for more reliable settings storage
+- **All checkboxes start unchecked** – clean state on first launch
+- **Better error handling** – JSONDecodeError caught, program starts with defaults
 
 **Removed:**
 - Removed deprecated progress bar for cleaner interface
 - Removed duplicate controls from main window
 - Removed dead code: `self._settings_buttons`, `self._settings_widgets`
 - Removed unnecessary `hasattr()` checks
+- Removed Windows-only hardcoded fonts (`Segoe UI Variable`, `tahoma`)
 
 ---
 
@@ -230,6 +254,7 @@ The **Classic branch** is a lightweight, stable version built with standard **Tk
 | Master password | ❌ No |
 | Configurable clipboard timeout | ❌ No |
 | RGB animation | ❌ No |
+| Cross-platform audio | ❌ No |
 
 ### 🛠️ Tech Stack (v2.0.0)
 
