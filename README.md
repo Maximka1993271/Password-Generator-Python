@@ -6,6 +6,8 @@ Secure Pass Pro — это современный десктопный гене�
 
 ![v4.0 Preview](https://github.com/Maximka1993271/Password-Generator-Python/raw/main/Secure_Pass_MainWindow40.jpg)
 
+![v2.0.0 Preview](https://github.com/Maximka1993271/Password-Generator-Python/raw/main/Secure_Pass_MainWindow.png)
+
 ---
 
 ## 📋 О программе
@@ -94,8 +96,6 @@ Secure Pass Pro v4.0 — это полностью переработанная 
 ## 📜 Версия 2.0.0 (Classic)
 
 Версия 2.0.0 — это классическая лёгкая версия, построенная на стандартной библиотеке `tkinter` (без внешних зависимостей). Идеально подходит для пользователей, которые ценят минимализм и стабильность.
-
-![v2.0.0 Preview](https://github.com/Maximka1993271/Password-Generator-Python/raw/main/Secure_Pass_MainWindow.png)
 
 ### Ключевые особенности v2.0.0
 
