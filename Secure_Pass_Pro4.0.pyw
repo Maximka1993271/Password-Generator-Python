@@ -14,6 +14,7 @@ Keep comments in 3 languages.
 from __future__ import annotations
 from collections import deque
 import hashlib
+import hmac
 import math
 import platform
 import random
@@ -23,11 +24,14 @@ import sys
 import os
 import webbrowser
 import datetime
+import shutil
+import subprocess
+import tempfile
 import tkinter as tk
 from tkinter import filedialog
 import ctypes
 import json
-from typing import Any
+from typing import Optional, Dict, Any, List
 
 
 def _show_startup_error(title: str, text: str) -> None:
@@ -41,12 +45,8 @@ def _show_startup_error(title: str, text: str) -> None:
 
 
 _IS_WINDOWS = platform.system() == "Windows"
-_IS_MACOS   = platform.system() == "Darwin"
-
-# Кросс-платформенные шрифты / Cross-platform fonts / Кросплатформенні шрифти
-_FONT_UI   = "Segoe UI"  if _IS_WINDOWS else ("SF Pro Display" if _IS_MACOS else "DejaVu Sans")
-_FONT_MONO = "Consolas"  if _IS_WINDOWS else ("Menlo"          if _IS_MACOS else "DejaVu Sans Mono")
-_FONT_BTN  = "Segoe UI"  if _IS_WINDOWS else ("SF Pro Display" if _IS_MACOS else "DejaVu Sans")
+_IS_MACOS = platform.system() == "Darwin"
+_IS_LINUX = platform.system() == "Linux"
 
 if sys.version_info < (3, 9):
     _show_startup_error("Error", "Python 3.9+ required!")
@@ -66,7 +66,6 @@ HISTORY_MAX = 50
 AMBIGUOUS_CHARS = "il1Lo0O"
 UNAMBIG_CHARS = "{}[]()/\\'\"`~,;:.<>"
 UPD_URL = "https://github.com/Maximka1993271/Password-Generator-Python/releases"
-SUPPORTED_EXTENSIONS = [".txt", ".log", ".key", ".pdf"]
 HASH_EXTENSION = ".sha256"
 CONFIG_DIR = os.path.join(os.path.expanduser("~"), ".securepasspro")
 CONFIG_FILE = os.path.join(CONFIG_DIR, "config.json")
@@ -91,11 +90,10 @@ def _get_resource_path(filename: str) -> str:
 
 
 def _center_screen(win: tk.Tk | ctk.CTkToplevel, width: int, height: int) -> None:
-    """Center window on screen (absolute center of display)"""
     screen_w = win.winfo_screenwidth()
     screen_h = win.winfo_screenheight()
-    x = (screen_w - width) // 2
-    y = (screen_h - height) // 2
+    x = max(0, (screen_w - width) // 2)
+    y = max(0, (screen_h - height) // 2)
     win.geometry(f"{width}x{height}+{x}+{y}")
 
 
@@ -122,12 +120,15 @@ class MasterPassword:
                 salt = f.read(cls.SALT_SIZE)
                 stored_hash = f.read()
             derived = cls._derive_key(password, salt)
-            return derived == stored_hash
+            # Use constant-time comparison to prevent timing attacks
+            return hmac.compare_digest(derived, stored_hash)
         except Exception:
             return False
     
     @classmethod
     def set_password(cls, password: str) -> None:
+        if not password:
+            raise ValueError("Master password must not be empty")
         os.makedirs(CONFIG_DIR, exist_ok=True)
         salt = secrets.token_bytes(cls.SALT_SIZE)
         derived = cls._derive_key(password, salt)
@@ -188,13 +189,13 @@ class CTkMessageBox:
         cls._current_lang = lang
     
     @staticmethod
-    def _get_colors(theme: str) -> dict[str, str]:
+    def _get_colors(theme: str) -> Dict[str, str]:
         if theme == "light":
             return {"bg": "#F3F3F3", "fg": "#000000", "button_fg": "#1f538d", "button_text": "#FFFFFF", "label_text": "#000000", "entry_bg": "#FFFFFF"}
         return {"bg": "#1d1e1e", "fg": "#FFFFFF", "button_fg": "#1f538d", "button_text": "#FFFFFF", "label_text": "#FFFFFF", "entry_bg": "#2b2b2b"}
     
     @staticmethod
-    def _show(parent, title: str, message: str, button_text: str = "OK", icon: str = "ℹ️", icon_color: str = "#4EC9B0", button_color: str = "#1f538d", is_question: bool = False) -> str | None:
+    def _show(parent, title: str, message: str, button_text: str = "OK", icon: str = "ℹ️", icon_color: str = "#4EC9B0", button_color: str = "#1f538d", is_question: bool = False) -> Optional[str]:
         win = ctk.CTkToplevel(parent)
         win.title(title)
         win.resizable(False, False)
@@ -254,7 +255,7 @@ class CTkMessageBox:
 
 class CTkInputDialog:
     def __init__(self, parent, title: str, prompt: str, show: str = "", theme: str = "dark", lang: str = "RU"):
-        self.result: str | None = None
+        self.result: Optional[str] = None
         self.win = ctk.CTkToplevel(parent)
         self.win.title(title)
         self.win.resizable(False, False)
@@ -299,7 +300,7 @@ class CTkInputDialog:
         self.win.destroy()
     
     @staticmethod
-    def ask(parent, title: str, prompt: str, show: str = "", theme: str = "dark", lang: str = "RU") -> str | None:
+    def ask(parent, title: str, prompt: str, show: str = "", theme: str = "dark", lang: str = "RU") -> Optional[str]:
         return CTkInputDialog(parent, title, prompt, show, theme, lang).result
 
 
@@ -317,12 +318,17 @@ class ToolTip:
     def show_tip(self, event=None) -> None:
         if self.tip_window or not self.text:
             return
+        try:
+            if not self.widget.winfo_exists():
+                return
+        except Exception:
+            return
         x = self.widget.winfo_rootx() + 25
         y = self.widget.winfo_rooty() + self.widget.winfo_height() + 5
         self.tip_window = tw = tk.Toplevel(self.widget)
         tw.wm_overrideredirect(True)
         tw.wm_geometry(f"+{x}+{y}")
-        tk.Label(tw, text=self.text, justify='left', background="#ffffe0", relief='solid', borderwidth=1, font=(_FONT_UI, 9, "normal")).pack(ipadx=1)
+        tk.Label(tw, text=self.text, justify='left', background="#ffffe0", relief='solid', borderwidth=1, font=("Segoe UI", 9, "normal")).pack(ipadx=1)
     
     def hide_tip(self, event=None) -> None:
         if self.tip_window:
@@ -331,27 +337,12 @@ class ToolTip:
 
 
 class UTF8PDF(FPDF):
-    def __init__(self):
-        super().__init__()
-        self.dejavu_loaded = False
-    
-    def load_dejavu_font(self, font_path: str) -> bool:
-        try:
-            if os.path.exists(font_path):
-                self.add_font('DejaVu', '', font_path, uni=True)
-                self.dejavu_loaded = True
-                return True
-        except Exception:
-            pass
-        return False
-    
-    def draw_text(self, text: str) -> None:
-        self.set_font('DejaVu' if self.dejavu_loaded else 'Arial', size=12)
-        self.cell(200, 10, txt=text, ln=True, align='C')
+    """FPDF subclass used for PDF password export."""
+    pass
 
 
 # ==================== LANGUAGES ====================
-LANGUAGES: dict[str, dict[str, str]] = {
+LANGUAGES: Dict[str, Dict[str, str]] = {
     "RU": {
         "win_title": "Secure Pass Pro v4.0", "menu_title": "Меню", "len": "Длина",
         "author": "Автор: Максим Мельников", "upper": "Заглавные буквы", "lower": "Строчные буквы",
@@ -497,14 +488,14 @@ class SecurePassPro(ctk.CTk):
         self.current_theme = "System"
         self.current_radius = 10
         self.clipboard_timeout = 60
-        self._clipboard_timer: str | None = None
-        self._rgb_anim_id: str | None = None
-        self._pulse_animation_id: str | None = None
+        self._clipboard_timer: Optional[str] = None
+        self._rgb_anim_id: Optional[str] = None
+        self._pulse_animation_id: Optional[str] = None
         
         # Set global radius for dialogs
         set_global_radius(self.current_radius)
         
-        # UI state — разумные дефолты / sensible defaults / розумні дефолти
+        # UI state - ВСЕ ГАЛОЧКИ СБРОШЕНЫ
         self.upper_var = tk.BooleanVar(value=False)
         self.lower_var = tk.BooleanVar(value=False)
         self.digits_var = tk.BooleanVar(value=False)
@@ -522,34 +513,34 @@ class SecurePassPro(ctk.CTk):
         self._rgb_t = 0.0
         
         # Window references
-        self.settings_window: ctk.CTkToplevel | None = None
-        self.about_window: ctk.CTkToplevel | None = None
-        self.history_window: ctk.CTkToplevel | None = None
-        self.qr_window: ctk.CTkToplevel | None = None
+        self.settings_window: Optional[ctk.CTkToplevel] = None
+        self.about_window: Optional[ctk.CTkToplevel] = None
+        self.history_window: Optional[ctk.CTkToplevel] = None
+        self.qr_window: Optional[ctk.CTkToplevel] = None
         
         # Widget references
-        self._tooltips: dict[str, ToolTip] = {}
-        self.lang_buttons: dict[str, ctk.CTkButton] = {}
-        self.theme_buttons: dict[str, ctk.CTkButton] = {}
-        self.settings_labels: dict[str, Any] = {}
-        self.history_textbox: ctk.CTkTextbox | None = None
-        self.settings_radius_label: ctk.CTkLabel | None = None
-        self._master_set_btn: ctk.CTkButton | None = None
-        self._master_status_label: ctk.CTkLabel | None = None
-        self._sound_btn: ctk.CTkButton | None = None
-        self._close_btn: ctk.CTkButton | None = None
-        self._clip_timeout_label_ref: ctk.CTkLabel | None = None
-        self._rgb_on_btn_ref: ctk.CTkButton | None = None
-        self._rgb_off_btn_ref: ctk.CTkButton | None = None
+        self._tooltips: Dict[str, ToolTip] = {}
+        self.lang_buttons: Dict[str, ctk.CTkButton] = {}
+        self.theme_buttons: Dict[str, ctk.CTkButton] = {}
+        self.settings_labels: Dict[str, Any] = {}
+        self.history_textbox: Optional[ctk.CTkTextbox] = None
+        self.settings_radius_label: Optional[ctk.CTkLabel] = None
+        self._master_set_btn: Optional[ctk.CTkButton] = None
+        self._master_status_label: Optional[ctk.CTkLabel] = None
+        self._sound_btn: Optional[ctk.CTkButton] = None
+        self._close_btn: Optional[ctk.CTkButton] = None
+        self._clip_timeout_label_ref: Optional[ctk.CTkLabel] = None
+        self._rgb_on_btn_ref: Optional[ctk.CTkButton] = None
+        self._rgb_off_btn_ref: Optional[ctk.CTkButton] = None
         
         # RGB canvases
-        self._rgb_c_top: tk.Canvas | None = None
-        self._rgb_c_bottom: tk.Canvas | None = None
-        self._rgb_c_left: tk.Canvas | None = None
-        self._rgb_c_right: tk.Canvas | None = None
+        self._rgb_c_top: Optional[tk.Canvas] = None
+        self._rgb_c_bottom: Optional[tk.Canvas] = None
+        self._rgb_c_left: Optional[tk.Canvas] = None
+        self._rgb_c_right: Optional[tk.Canvas] = None
         
         # Icons and resources
-        self._icon_image: tk.PhotoImage | None = None
+        self._icon_image: Optional[tk.PhotoImage] = None
         self._pdf_font_path = _get_resource_path("DejaVuSans.ttf")
         
         # Setup
@@ -566,14 +557,11 @@ class SecurePassPro(ctk.CTk):
         self._center_main_window()
         self._apply_window_rounding(self)
         
-        self.bind('<F5>',         lambda e: self._generate())
-        self.bind('<Control-s>',  lambda e: self._save())
-        self.bind('<Control-o>',  lambda e: self._open())
-        self.bind('<Escape>',     lambda e: self._close_settings() if self.settings_window else None)
-        # Ctrl+C только если фокус НЕ в entry — иначе конфликт с системным копированием
-        # Ctrl+C only if focus NOT in entry — else conflicts with system copy
-        # Ctrl+C тільки якщо фокус НЕ в entry — інакше конфлікт з системним копіюванням
-        self.bind('<Control-c>',  lambda e: self._copy() if self.focus_get() is not self.entry_res else None)
+        self.bind('<F5>', lambda e: self._generate())
+        self.bind('<Control-c>', lambda e: self._copy() if self.focus_get() is not self.entry_res else None)
+        self.bind('<Control-s>', lambda e: self._save())
+        self.bind('<Control-o>', lambda e: self._open())
+        self.bind('<Escape>', lambda e: self._close_settings() if self.settings_window else None)
         
         self.after(50, self._load_all_settings)
         self.protocol("WM_DELETE_WINDOW", self._on_closing)
@@ -590,9 +578,27 @@ class SecurePassPro(ctk.CTk):
     def _on_closing(self) -> None:
         self._stop_rgb()
         if self._pulse_animation_id:
-            self.after_cancel(self._pulse_animation_id)
+            try:
+                self.after_cancel(self._pulse_animation_id)
+            except Exception:
+                pass
         if self._clipboard_timer:
-            self.after_cancel(self._clipboard_timer)
+            try:
+                self.after_cancel(self._clipboard_timer)
+            except Exception:
+                pass
+        # Close all child windows gracefully before exit
+        for win_attr in ("settings_window", "about_window", "history_window", "qr_window"):
+            win = getattr(self, win_attr, None)
+            if win is not None:
+                try:
+                    win.grab_release()
+                except Exception:
+                    pass
+                try:
+                    win.destroy()
+                except Exception:
+                    pass
         self.destroy()
     
     def _get_actual_theme(self) -> str:
@@ -611,13 +617,16 @@ class SecurePassPro(ctk.CTk):
                 pass
         return "dark"
     
-    def _save_config(self, updates: dict[str, Any]) -> None:
+    def _save_config(self, updates: Dict[str, Any]) -> None:
         try:
             os.makedirs(CONFIG_DIR, exist_ok=True)
-            existing: dict[str, Any] = {}
+            existing: Dict[str, Any] = {}
             if os.path.exists(CONFIG_FILE):
-                with open(CONFIG_FILE, "r", encoding="utf-8") as f:
-                    existing = json.load(f)
+                try:
+                    with open(CONFIG_FILE, "r", encoding="utf-8") as f:
+                        existing = json.load(f)
+                except (json.JSONDecodeError, ValueError):
+                    existing = {}  # reset corrupted config
             existing.update(updates)
             with open(CONFIG_FILE, "w", encoding="utf-8") as f:
                 json.dump(existing, f, indent=2)
@@ -632,8 +641,7 @@ class SecurePassPro(ctk.CTk):
                 try:
                     config = json.load(f)
                 except (json.JSONDecodeError, ValueError):
-                    # Файл повреждён — начинаем с дефолтов / Corrupt file — start with defaults
-                    return
+                    return  # corrupted config – skip silently
             
             if "THEME" in config and config["THEME"] in ("System", "Light", "Dark"):
                 self.current_theme = config["THEME"]
@@ -688,33 +696,33 @@ class SecurePassPro(ctk.CTk):
         self.slider_len.set(20)
         self.slider_len.pack(pady=5)
         
-        # Checkboxes - увеличены отступы между чекбоксами
+        # Checkboxes
         self.cb_frame = ctk.CTkFrame(self.left_panel, fg_color="transparent")
-        self.cb_frame.pack(pady=10)  # увеличен отступ сверху и снизу
+        self.cb_frame.pack(pady=10)
         
         self.cb_upper = ctk.CTkCheckBox(self.cb_frame, text="", variable=self.upper_var)
-        self.cb_upper.grid(row=0, column=1, padx=(70, 20), pady=6, sticky="w")  # pady 6 вместо 2
+        self.cb_upper.grid(row=0, column=1, padx=(70, 20), pady=6, sticky="w")
         self.cb_lower = ctk.CTkCheckBox(self.cb_frame, text="", variable=self.lower_var)
-        self.cb_lower.grid(row=0, column=0, padx=(20, 70), pady=6, sticky="w")   # pady 6 вместо 2
+        self.cb_lower.grid(row=0, column=0, padx=(20, 70), pady=6, sticky="w")
         self.cb_digits = ctk.CTkCheckBox(self.cb_frame, text="", variable=self.digits_var)
-        self.cb_digits.grid(row=1, column=1, padx=(70, 20), pady=6, sticky="w")   # pady 6 вместо 2
+        self.cb_digits.grid(row=1, column=1, padx=(70, 20), pady=6, sticky="w")
         self.cb_symb = ctk.CTkCheckBox(self.cb_frame, text="", variable=self.symb_var)
-        self.cb_symb.grid(row=1, column=0, padx=(20, 70), pady=6, sticky="w")     # pady 6 вместо 2
+        self.cb_symb.grid(row=1, column=0, padx=(20, 70), pady=6, sticky="w")
         self.cb_ambig = ctk.CTkCheckBox(self.cb_frame, text="", variable=self.ambig_var)
-        self.cb_ambig.grid(row=2, column=0, columnspan=2, padx=20, pady=8, sticky="w")  # pady 8
+        self.cb_ambig.grid(row=2, column=0, columnspan=2, padx=20, pady=8, sticky="w")
         self.cb_unambig = ctk.CTkCheckBox(self.cb_frame, text="", variable=self.unambig_var)
-        self.cb_unambig.grid(row=3, column=0, columnspan=2, padx=20, pady=8, sticky="w")  # pady 8
+        self.cb_unambig.grid(row=3, column=0, columnspan=2, padx=20, pady=8, sticky="w")
         self.cb_at_least = ctk.CTkCheckBox(self.cb_frame, text="", variable=self.at_least_var)
-        self.cb_at_least.grid(row=4, column=0, columnspan=2, padx=20, pady=8, sticky="w")  # pady 8
+        self.cb_at_least.grid(row=4, column=0, columnspan=2, padx=20, pady=8, sticky="w")
         self.cb_hide = ctk.CTkCheckBox(self.cb_frame, text="", variable=self.hide_var, command=self._toggle_hide)
-        self.cb_hide.grid(row=5, column=0, columnspan=2, padx=20, pady=8, sticky="w")      # pady 8
+        self.cb_hide.grid(row=5, column=0, columnspan=2, padx=20, pady=8, sticky="w")
         self.cb_no_repeat = ctk.CTkCheckBox(self.cb_frame, text="", variable=self.no_repeat_var)
-        self.cb_no_repeat.grid(row=6, column=0, columnspan=2, padx=20, pady=8, sticky="w")  # pady 8
+        self.cb_no_repeat.grid(row=6, column=0, columnspan=2, padx=20, pady=8, sticky="w")
         
         # Password entry
         self.entry_frame = ctk.CTkFrame(self.left_panel, fg_color="transparent")
-        self.entry_frame.pack(pady=15, padx=40, fill="x")  # увеличен отступ
-        self.entry_res = ctk.CTkEntry(self.entry_frame, height=50, font=("Consolas", 22), justify="center")
+        self.entry_frame.pack(pady=15, padx=40, fill="x")
+        self.entry_res = ctk.CTkEntry(self.entry_frame, height=50, font=("Consolas", 22), justify="center", corner_radius=self.current_radius)
         self.entry_res.pack(side="left", fill="x", expand=True)
         
         self.btn_eye = ctk.CTkButton(self.entry_frame, text="👁", width=50, height=50, 
@@ -766,7 +774,7 @@ class SecurePassPro(ctk.CTk):
         neon_color = colors_map.get(color, color)
         btn = ctk.CTkButton(parent, text="", command=lambda: self._run_menu_command(cmd),
                             fg_color=color, height=45, border_width=2, border_color=neon_color,
-                            font=(_FONT_BTN, 13, "bold"), hover_color=neon_color,
+                            font=("Segoe UI", 13, "bold"), hover_color=neon_color,
                             corner_radius=self.current_radius)
         btn.pack(pady=6, padx=15, fill="x")
         btn.lang_key = lang_key
@@ -826,6 +834,8 @@ class SecurePassPro(ctk.CTk):
         
         self.bottom_frame.configure(corner_radius=rad)
         self.right_panel.configure(corner_radius=rad)
+        self.entry_res.configure(corner_radius=rad)
+        self.entry_frame.configure(corner_radius=rad)
         
         if self.settings_radius_label and self.settings_radius_label.winfo_exists():
             L = LANGUAGES[self.current_lang]
@@ -932,8 +942,7 @@ class SecurePassPro(ctk.CTk):
                 btn.configure(fg_color="#2d6a4f" if l == lang else "#4b4b4b", corner_radius=self.current_radius)
         
         if self.settings_window and self.settings_window.winfo_exists():
-            self.settings_window.destroy()
-            self.settings_window = None
+            self._close_settings()   # releases grab before destroy
         
         if self.entry_res.get():
             self._update_strength_meter(self.entry_res.get())
@@ -1015,7 +1024,7 @@ class SecurePassPro(ctk.CTk):
         if self._rgb_c_left:
             self._rgb_c_left.configure(bg=self._rgb_color(2.4))
         self._set_titlebar_color(self._rgb_color(3.2))
-        self._rgb_t = (self._rgb_t + 0.08) % (2 * math.pi)  # сброс чтобы не было float overflow
+        self._rgb_t = (self._rgb_t + 0.08) % (2 * math.pi)
         if self._rgb_anim_id:
             self.after_cancel(self._rgb_anim_id)
         self._rgb_anim_id = self.after(30, self._animate_rgb)
@@ -1066,19 +1075,24 @@ class SecurePassPro(ctk.CTk):
         count = sum([self.upper_var.get(), self.lower_var.get(), self.digits_var.get(), self.symb_var.get()])
         return max(4, count)
     
-    def _fix_no_repeats(self, chars: list[str], pool: str) -> str | None:
+    def _fix_no_repeats(self, chars: List[str], pool: str) -> Optional[str]:
         result = list(chars)
         unique_pool = list(set(pool))
         max_attempts = 500
         
+        def _secure_shuffle(lst: list) -> None:
+            for i in range(len(lst) - 1, 0, -1):
+                j = secrets.randbelow(i + 1)
+                lst[i], lst[j] = lst[j], lst[i]
+
         for _ in range(max_attempts):
-            random.shuffle(result)
+            _secure_shuffle(result)
             has_repeat = any(result[i] == result[i + 1] for i in range(len(result) - 1))
             if not has_repeat:
                 return "".join(result)
         
         result = list(chars)
-        random.shuffle(result)
+        _secure_shuffle(result)
         for attempt in range(max_attempts):
             fixed = False
             for i in range(len(result) - 1):
@@ -1130,7 +1144,7 @@ class SecurePassPro(ctk.CTk):
             self.slider_len.set(length)
             self._update_len_label(length)
         
-        result: list[str] = []
+        result: List[str] = []
         
         if self.at_least_var.get():
             for p in [p_upper, p_lower, p_digits, p_symb]:
@@ -1144,7 +1158,10 @@ class SecurePassPro(ctk.CTk):
             while len(result) < length:
                 result.append(secrets.choice(full_pool))
         
-        random.shuffle(result)
+        # Cryptographically secure shuffle (Fisher-Yates with secrets)
+        for i in range(len(result) - 1, 0, -1):
+            j = secrets.randbelow(i + 1)
+            result[i], result[j] = result[j], result[i]
         pwd = "".join(result)
         
         if self.no_repeat_var.get():
@@ -1207,7 +1224,6 @@ class SecurePassPro(ctk.CTk):
         self._animate_password_field(strength_type)
     
     def _animate_password_field(self, strength_type: str = "medium") -> None:
-        original_bg = self.entry_res.cget("fg_color")
         original_border = self.entry_res.cget("border_color")
         
         if strength_type == "weak":
@@ -1241,7 +1257,7 @@ class SecurePassPro(ctk.CTk):
     # ==================== CLIPBOARD OPERATIONS ====================
     
     def _copy(self) -> None:
-        pwd = str(self.entry_res.get())
+        pwd = self.entry_res.get().strip()
         if not pwd:
             return
         L = LANGUAGES[self.current_lang]
@@ -1266,11 +1282,6 @@ class SecurePassPro(ctk.CTk):
         self.after(2000, lambda: self.btn_copy.configure(text=old_text))
 
     def _clear_clipboard_if_unchanged(self, expected: str) -> None:
-        """
-        Очищает буфер ТОЛЬКО если содержимое не изменилось.
-        Clears clipboard ONLY if content hasn't changed.
-        Очищає буфер ТІЛЬКИ якщо вміст не змінився.
-        """
         try:
             if self.clipboard_get() == expected:
                 self.clipboard_clear()
@@ -1314,17 +1325,20 @@ class SecurePassPro(ctk.CTk):
             return False
     
     def _save(self) -> None:
+        """Save password to file – one file, no extra sidecar files."""
         L = LANGUAGES[self.current_lang]
-        pwd = self.entry_res.get()
+        pwd = self.entry_res.get().strip()
         if not pwd:
             return
         
         path = filedialog.asksaveasfilename(
             defaultextension=".txt",
             filetypes=[
-                ("Supported Files", " ".join(f"*{ext}" for ext in SUPPORTED_EXTENSIONS)),
-                ("Text File", "*.txt"), ("Password File", "*.key"),
-                ("Log File", "*.log"), ("PDF File", "*.pdf"), ("All Files", "*.*")
+                ("Text Files", "*.txt"),
+                ("Password Files", "*.key"),
+                ("Log Files", "*.log"),
+                ("PDF Files", "*.pdf"),
+                ("All Files", "*.*")
             ]
         )
         
@@ -1333,9 +1347,8 @@ class SecurePassPro(ctk.CTk):
         
         try:
             ext = os.path.splitext(path)[1].lower()
-            if ext not in SUPPORTED_EXTENSIONS:
-                raise ValueError(L["err_unsupported"].format(ext))
             
+            # PDF files
             if ext == ".pdf":
                 pdf = UTF8PDF()
                 pdf.set_author("Maxim Melnikov")
@@ -1344,58 +1357,84 @@ class SecurePassPro(ctk.CTk):
                 pdf.add_page()
                 
                 dejavu_loaded = False
+                _tmpdir = None
                 if os.path.exists(self._pdf_font_path):
                     try:
-                        pdf.add_font('DejaVu', '', self._pdf_font_path, uni=True)
+                        # Copy font to a temp dir so fpdf caches (.pkl) are
+                        # created there and NOT in the application folder
+                        _tmpdir = tempfile.mkdtemp()
+                        _tmp_font = os.path.join(_tmpdir, 'DejaVuSans.ttf')
+                        shutil.copy2(self._pdf_font_path, _tmp_font)
+                        pdf.add_font('DejaVu', '', _tmp_font, uni=True)
                         dejavu_loaded = True
                     except Exception:
                         pass
                 
+                def _latin1(text: str) -> str:
+                    """Encode text to latin-1 safely, replacing unsupported chars."""
+                    return text.encode('latin-1', errors='replace').decode('latin-1')
+
                 if dejavu_loaded:
                     pdf.set_font('DejaVu', '', 16)
+                    lbl_title  = "Secure Pass Pro v4.0"
+                    lbl_date   = f"{L['pdf_date']}: {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
+                    lbl_pass   = f"{L['pdf_pass']}: {pwd}"
                 else:
+                    # DejaVu unavailable — fall back to Arial (latin-1 only)
+                    # Use English labels and sanitize all text including password
                     pdf.set_font('Arial', 'B', 16)
-                
-                pdf.cell(200, 10, txt="Secure Pass Pro v4.0", ln=True, align='C')
-                
+                    lbl_title  = "Secure Pass Pro v4.0"
+                    lbl_date   = _latin1(f"Date: {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+                    lbl_pass   = _latin1(f"Password: {pwd}")
+
+                pdf.cell(200, 10, txt=lbl_title, ln=True, align='C')
+
                 if dejavu_loaded:
                     pdf.set_font('DejaVu', '', 12)
                 else:
                     pdf.set_font('Arial', '', 12)
-                
+
                 pdf.ln(10)
-                date_val = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-                pdf.cell(200, 10, txt=f"{L['pdf_date']}: {date_val}", ln=True)
-                pdf.cell(200, 10, txt=f"{L['pdf_pass']}: {pwd}", ln=True)
+                pdf.cell(200, 10, txt=lbl_date, ln=True)
+                pdf.cell(200, 10, txt=lbl_pass, ln=True)
                 
-                pdf.output(path)
+                try:
+                    pdf.output(path)
+                finally:
+                    # Always clean up temp font dir (removes .pkl cache files)
+                    if _tmpdir and os.path.exists(_tmpdir):
+                        shutil.rmtree(_tmpdir, ignore_errors=True)
                 if not self._verify_pdf(path):
                     raise IOError(L["err_integrity"])
             else:
+                # Save password to text file
                 pwd_bytes = pwd.encode("utf-8")
                 with open(path, "wb") as f:
                     f.write(pwd_bytes)
+                
+                # Verify integrity (in-memory only, no separate .sha256 file)
                 if not self._verify_text_file(path, pwd_bytes):
                     raise IOError(L["err_integrity"])
-                
-                hash_path = path + HASH_EXTENSION
-                file_hash = hashlib.sha256(pwd_bytes).hexdigest()
-                with open(hash_path, "w", encoding="utf-8") as hf:
-                    hf.write(file_hash)
             
             self._play_sound("success")
+            fname = os.path.basename(path)
+            self.title(f"✅ {fname}")
+            self.after(3000, lambda: self.title(L["win_title"]))
         except Exception as e:
             CTkMessageBox.error(self, L.get("err_title", "Error"), L["err_save"].format(e))
     
     def _open(self) -> None:
+        """Open password from file - opens ALL file types"""
         L = LANGUAGES[self.current_lang]
-        supported_str = ";".join(f"*{ext}" for ext in SUPPORTED_EXTENSIONS)
         
         path = filedialog.askopenfilename(
+            title="Select password file",
             filetypes=[
-                ("Supported Files", supported_str),
-                ("Password File", "*.key"), ("Log File", "*.log"),
-                ("Text File", "*.txt"), ("PDF File", "*.pdf"), ("All Files", "*.*")
+                ("All Files", "*.*"),
+                ("Text Files", "*.txt"),
+                ("Password Files", "*.key"),
+                ("Log Files", "*.log"),
+                ("PDF Files", "*.pdf")
             ]
         )
         
@@ -1404,47 +1443,87 @@ class SecurePassPro(ctk.CTk):
         
         try:
             ext = os.path.splitext(path)[1].lower()
-            if ext not in SUPPORTED_EXTENSIONS:
-                raise ValueError(L["err_unsupported"].format(ext))
-            
+
+            # Guard: refuse to open a .sha256 sidecar as a password
+            if path.lower().endswith(HASH_EXTENSION):
+                CTkMessageBox.error(self, L.get("err_title", "Error"),
+                                    L["err_unsupported"].format(HASH_EXTENSION))
+                return
+
+            # PDF files - open with external viewer (no shell=True to avoid injection)
             if ext == ".pdf":
                 if _IS_WINDOWS:
                     os.startfile(path)
+                elif _IS_MACOS:
+                    subprocess.run(["open", path], check=False)
                 else:
-                    webbrowser.open(f"file://{path}")
-            else:
-                with open(path, "rb") as f:
-                    raw_bytes = f.read()
-                
-                hash_path = path + HASH_EXTENSION
-                if os.path.exists(hash_path):
-                    try:
-                        with open(hash_path, "r", encoding="utf-8") as hf:
-                            stored_hash = hf.read().strip()
-                        actual_hash = hashlib.sha256(raw_bytes).hexdigest()
-                        if actual_hash != stored_hash:
-                            self._play_sound("error")
-                            CTkMessageBox.error(self, L.get("err_title", "Error"), L["integrity_fail"])
-                            return
-                        self.title(L["integrity_ok"])
-                        self.after(3000, lambda: self.title(L["win_title"]))
-                    except Exception:
-                        pass
-                else:
-                    proceed = CTkMessageBox.question(self, L.get("err_title", "Warning"), L["integrity_warn"])
-                    if not proceed:
-                        return
-                
-                file_content = raw_bytes.decode("utf-8", errors="replace").strip()
-                self.entry_res.delete(0, "end")
-                self.entry_res.insert(0, file_content)
-                self._update_strength_meter(file_content)
+                    subprocess.run(["xdg-open", path], check=False)
+                self._play_sound("success")
+                return
             
+            # Text files - read content
+            content = None
+
+            # Refuse oversized files (10 KB limit – passwords don't need more)
+            try:
+                file_size = os.path.getsize(path)
+                if file_size > 10_240:
+                    CTkMessageBox.error(self, L.get("err_title", "Error"),
+                                        L["err_open"].format("File too large (max 10 KB)"))
+                    return
+            except OSError:
+                pass
+
+            # Try different encodings
+            encodings = ['utf-8', 'cp1251', 'latin-1', 'cp866', 'koi8-r', 'utf-16', 'utf-32']
+            
+            for encoding in encodings:
+                try:
+                    with open(path, 'r', encoding=encoding) as f:
+                        content = f.read().strip()
+                    break
+                except (UnicodeDecodeError, UnicodeError, UnicodeEncodeError):
+                    continue
+            
+            # Fallback: read as binary
+            if content is None:
+                try:
+                    with open(path, 'rb') as f:
+                        raw_bytes = f.read()
+                        content = raw_bytes.decode('utf-8', errors='replace').strip()
+                except Exception:
+                    content = None
+            
+            if not content:
+                raise ValueError("File is empty or contains no readable text")
+            
+            # SHA-256 integrity check (if .sha256 file exists)
+            hash_path = path + HASH_EXTENSION
+            if os.path.exists(hash_path):
+                try:
+                    with open(hash_path, 'r', encoding='utf-8') as hf:
+                        stored_hash = hf.read().strip()
+                    with open(path, 'rb') as f:
+                        raw_bytes = f.read()
+                    actual_hash = hashlib.sha256(raw_bytes).hexdigest()
+                    if actual_hash != stored_hash:
+                        self._play_sound("error")
+                        CTkMessageBox.error(self, L.get("err_title", "Error"), L["integrity_fail"])
+                        return
+                    self.title(L["integrity_ok"])
+                    self.after(3000, lambda: self.title(L["win_title"]))
+                except Exception:
+                    pass
+            # No .sha256 file — open silently without warning
+
+            # Insert content into password field
+            self.entry_res.delete(0, "end")
+            self.entry_res.insert(0, content)
+            self._update_strength_meter(content)
             self._play_sound("success")
-        except ValueError as ve:
-            CTkMessageBox.warning(self, L.get("err_title", "Error"), str(ve))
+            
         except Exception as e:
-            CTkMessageBox.error(self, L.get("err_title", "Error"), L["err_open"].format(e))
+            CTkMessageBox.error(self, L.get("err_title", "Error"), L["err_open"].format(str(e)))
     
     # ==================== DIALOGS ====================
     
@@ -1490,7 +1569,10 @@ class SecurePassPro(ctk.CTk):
     
     def _close_qr(self) -> None:
         if self.qr_window:
-            self.qr_window.destroy()
+            try:
+                self.qr_window.destroy()
+            except Exception:
+                pass
             self.qr_window = None
     
     def _show_history(self) -> None:
@@ -1523,6 +1605,7 @@ class SecurePassPro(ctk.CTk):
         else:
             history_snapshot = list(reversed(self.history))
             txt.insert("1.0", "\n".join(history_snapshot))
+        txt.configure(state="disabled")  # read-only
         
         btn_f = ctk.CTkFrame(f, fg_color="transparent")
         btn_f.pack(fill="x")
@@ -1535,15 +1618,20 @@ class SecurePassPro(ctk.CTk):
     
     def _close_history(self) -> None:
         if self.history_window:
-            self.history_window.destroy()
+            try:
+                self.history_window.destroy()
+            except Exception:
+                pass
             self.history_window = None
             self.history_textbox = None
     
     def _clear_history_textbox(self, textbox: ctk.CTkTextbox) -> None:
         L = LANGUAGES[self.current_lang]
         self.history.clear()
+        textbox.configure(state="normal")
         textbox.delete("1.0", "end")
         textbox.insert("1.0", L["hist_empty"])
+        textbox.configure(state="disabled")
     
     def _show_about(self) -> None:
         if self.about_window and self.about_window.winfo_exists():
@@ -1578,7 +1666,10 @@ class SecurePassPro(ctk.CTk):
     
     def _close_about(self) -> None:
         if self.about_window:
-            self.about_window.destroy()
+            try:
+                self.about_window.destroy()
+            except Exception:
+                pass
             self.about_window = None
     
     def _show_settings(self) -> None:
@@ -1599,7 +1690,7 @@ class SecurePassPro(ctk.CTk):
         self.settings_window.resizable(False, False)
         self._set_window_icon(self.settings_window)
         self.settings_window.transient(self)
-        self.settings_window.grab_set()   # grab ДО center чтобы не было flash / grab BEFORE center
+        self.settings_window.grab_set()
         self._center_window_relative_to_parent(self.settings_window, 420, 640)
         self._apply_window_rounding(self.settings_window)
         self.settings_window.attributes('-topmost', True)
@@ -1763,6 +1854,7 @@ class SecurePassPro(ctk.CTk):
             self._rgb_on_btn_ref = None
             self._rgb_off_btn_ref = None
             self.settings_radius_label = None
+            self._clip_timeout_label_ref = None
     
     def _toggle_sound_settings(self) -> None:
         self.sound_enabled.set(not self.sound_enabled.get())
@@ -1774,11 +1866,6 @@ class SecurePassPro(ctk.CTk):
         self._save_config({"SOUND": self.sound_enabled.get()})
     
     def _play_sound(self, sound_type: str = "click") -> None:
-        """
-        Воспроизводит звук кросс-платформенно.
-        Cross-platform sound playback.
-        Відтворює звук кросплатформенно.
-        """
         if not self.sound_enabled.get():
             return
         try:
@@ -1794,19 +1881,17 @@ class SecurePassPro(ctk.CTk):
                 winmm.mciSendStringW(f'play {alias} from 0', None, 0, 0)
                 self.after(1000, lambda: winmm.mciSendStringW(f'close {alias}', None, 0, 0))
             elif _IS_MACOS:
-                import subprocess, shutil
                 if shutil.which("afplay"):
                     subprocess.Popen(["afplay", file_path],
                                      stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
             else:
-                # Linux: mpg123 или aplay / Linux: mpg123 or aplay
-                import subprocess, shutil
                 if shutil.which("mpg123"):
                     subprocess.Popen(["mpg123", "-q", file_path],
                                      stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-                elif shutil.which("aplay"):
-                    subprocess.Popen(["aplay", "-q", file_path],
+                elif shutil.which("ffplay"):
+                    subprocess.Popen(["ffplay", "-nodisp", "-autoexit", "-loglevel", "quiet", file_path],
                                      stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                # aplay removed: it supports WAV only, not MP3
         except Exception:
             pass
     
