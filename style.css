@@ -93,11 +93,11 @@ nav ul li a:hover {
 .dropdown-content {
     display: none;
     position: absolute;
-    background-color: #0d0d0d;
-    min-width: 220px;
-    box-shadow: 0 8px 16px rgba(0,0,0,0.5);
+    background: #0d1117;
+    min-width: 260px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.5);
     border-radius: 12px;
-    border: 1px solid #1a1a1a;
+    border: 1px solid rgba(78, 201, 176, 0.3);
     z-index: 1000;
     margin-top: 10px;
 }
@@ -113,7 +113,7 @@ nav ul li a:hover {
 }
 
 .dropdown-content a:hover {
-    background-color: rgba(78, 201, 176, 0.1);
+    background: rgba(78, 201, 176, 0.1);
     color: var(--accent-color);
 }
 
@@ -125,6 +125,72 @@ nav ul li a:hover {
     content: " ▼";
     font-size: 0.7rem;
     color: var(--text-secondary);
+}
+
+.dropdown-item-group {
+    padding: 10px 15px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.dropdown-item-group:last-child {
+    border-bottom: none;
+}
+
+.dropdown-item-group strong {
+    color: var(--accent-color);
+    display: block;
+    margin-bottom: 8px;
+    font-size: 0.85rem;
+}
+
+.download-buttons-inline {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.download-btn-small {
+    padding: 8px 15px;
+    border-radius: 8px;
+    text-decoration: none;
+    text-align: center;
+    font-size: 0.8rem;
+    transition: var(--transition);
+    display: inline-block;
+}
+
+.download-btn-v40-small {
+    background: var(--neon-blue);
+    color: white;
+    border: 1px solid #00A2FF;
+}
+
+.download-btn-v40-small:hover {
+    background: #00A2FF;
+    transform: translateY(-2px);
+}
+
+.download-btn-v20-small {
+    background: #4b4b4b;
+    color: white;
+    border: 1px solid #808080;
+}
+
+.download-btn-v20-small:hover {
+    background: #6b6b6b;
+    transform: translateY(-2px);
+}
+
+.submenu-links a {
+    display: block;
+    padding: 5px 0;
+    font-size: 0.75rem;
+    color: #888;
+    text-decoration: none;
+}
+
+.submenu-links a:hover {
+    color: var(--accent-color);
 }
 
 /* --- ВТОРАЯ СТРОКА НАВИГАЦИИ --- */
@@ -333,6 +399,8 @@ nav ul li a:hover {
 .card:nth-child(8) { animation-delay: 0.40s; }
 .card:nth-child(9) { animation-delay: 0.45s; }
 .card:nth-child(10) { animation-delay: 0.50s; }
+.card:nth-child(11) { animation-delay: 0.55s; }
+.card:nth-child(12) { animation-delay: 0.60s; }
 
 .card:hover { 
     border-color: var(--accent-color); 
@@ -583,7 +651,8 @@ nav ul li a:hover {
     font-size: 3rem;
 }
 
-.github-repo h3 {
+.github-repo h2 {
+    color: var(--accent-color);
     margin-bottom: 5px;
 }
 
@@ -600,6 +669,11 @@ nav ul li a:hover {
     border-radius: 10px;
 }
 
+.github-stat strong {
+    display: block;
+    margin-bottom: 5px;
+}
+
 .github-btn {
     background: #2d6a4f;
     padding: 12px 25px;
@@ -614,56 +688,6 @@ nav ul li a:hover {
 .github-btn:hover {
     background: #40916c;
     transform: translateY(-2px);
-}
-
-/* --- КНОПКИ ЗАГРУЗКИ --- */
-.download-buttons {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    margin-top: 20px;
-}
-
-.download-btn {
-    padding: 12px 20px;
-    border-radius: 10px;
-    text-decoration: none;
-    text-align: center;
-    transition: var(--transition);
-}
-
-.download-btn-v40 {
-    background: var(--neon-blue);
-    color: white;
-    border: 1px solid #00A2FF;
-}
-
-.download-btn-v20 {
-    background: #4b4b4b;
-    color: white;
-    border: 1px solid #808080;
-}
-
-.download-btn:hover {
-    transform: translateY(-2px);
-}
-
-.submenu {
-    font-size: 0.8rem;
-    color: var(--text-secondary);
-    padding-left: 20px;
-    margin-top: 5px;
-}
-
-.submenu a {
-    display: block;
-    padding: 5px 0;
-    color: var(--text-secondary);
-    text-decoration: none;
-}
-
-.submenu a:hover {
-    color: var(--accent-color);
 }
 
 /* --- ПОДВАЛ --- */
@@ -702,15 +726,6 @@ footer {
 .badge:hover {
     border-color: var(--accent-color);
     color: var(--accent-color);
-}
-
-.badge-clipboard {
-    border-color: #FFA500;
-    color: #FFA500;
-}
-
-.badge-clipboard:hover {
-    background: rgba(255, 165, 0, 0.1);
 }
 
 .footer-description {
@@ -987,7 +1002,7 @@ footer {
 
 /* --- КРОССПЛАТФОРМЕННЫЕ ШРИФТЫ --- */
 @supports (font: -apple-system-body) {
-    body, .card, .btn-primary, .btn-secondary, .badge, .dropdown-content a {
+    body, .card, .btn-primary, .btn-secondary, .badge, .dropdown-content a, .download-card p, .tech-item {
         font-family: -apple-system, 'SF Pro Display', 'SF Pro Text', 'Inter', sans-serif;
     }
     .command-code, .command-label {
@@ -996,7 +1011,7 @@ footer {
 }
 
 @supports not (font: -apple-system-body) {
-    body, .card, .btn-primary, .btn-secondary, .badge, .dropdown-content a {
+    body, .card, .btn-primary, .btn-secondary, .badge, .dropdown-content a, .download-card p, .tech-item {
         font-family: 'DejaVu Sans', 'Inter', sans-serif;
     }
     .command-code, .command-label {
@@ -1005,7 +1020,7 @@ footer {
 }
 
 @media all and (-ms-high-contrast: none), (-ms-high-contrast: active) {
-    body, .card, .btn-primary, .btn-secondary, .badge, .dropdown-content a {
+    body, .card, .btn-primary, .btn-secondary, .badge, .dropdown-content a, .download-card p, .tech-item {
         font-family: 'Segoe UI', 'Inter', sans-serif;
     }
 }

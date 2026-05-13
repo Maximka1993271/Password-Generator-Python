@@ -1,6 +1,7 @@
 // Secure Pass Pro v4.0 - Premium UI Animations
 // Анимации при прокрутке, плавное появление элементов
 // Выпадающее меню, модальное окно "О нас", подсветка активного пункта
+// Полная совместимость с обновлённым HTML и CSS
 
 document.addEventListener("DOMContentLoaded", () => {
     
@@ -279,13 +280,21 @@ document.addEventListener("DOMContentLoaded", () => {
     document.head.appendChild(fadeAnimation);
 
     console.log("Secure Pass Pro v4.0 Web: UI Animations initialized. Выпадающее меню работает корректно!");
+    console.log("Secure Pass Pro v4.0 Web: Всего исправлений 29+, критических безопасности 6");
 
     // --- ДОБАВЛЯЕМ ТУЛТИПЫ ДЛЯ БЕЙДЖЕЙ ---
     const tooltipMap = {
-        'Clipboard Timeout 10-120s': 'Очистка буфера: 10-120 секунд (настраивается)',
+        'Python 3.9+': 'Python 3.9 или выше для запуска',
+        'Neon-Amoled UX': 'Тёмный Amoled интерфейс с неоновой подсветкой',
         'CSPRNG Secrets': 'Криптографически стойкий генератор',
-        'Master Password PBKDF2': 'PBKDF2 хеширование, 100,000 итераций, 5 попыток',
-        'SHA-256 Integrity': 'Контроль целостности файлов SHA-256'
+        'PBKDF2': 'PBKDF2 хеширование, 100,000 итераций, соль 32 байта',
+        'SHA-256': 'Контроль целостности файлов SHA-256',
+        'HMAC': 'Защита от timing-атак через hmac.compare_digest()',
+        'RGB Animation': 'Динамическая RGB анимация границ окна',
+        'Cross-Platform': 'Полная поддержка Windows, macOS, Linux',
+        'Win/Mac/Linux': 'Кроссплатформенная поддержка',
+        'RU/EN/UA': 'Русский, Английский, Украинский язык интерфейса',
+        '29+ Fixes': 'Более 29 исправлений, включая 6 критических безопасности'
     };
     
     document.querySelectorAll('.badge').forEach(badge => {
@@ -344,6 +353,11 @@ document.addEventListener("DOMContentLoaded", () => {
             width: 300px;
             height: 300px;
         }
+        
+        /* Плавное появление страницы */
+        .hero-content, .hero-image, .card, .download-card, .tech-item {
+            will-change: transform, opacity;
+        }
     `;
     document.head.appendChild(tooltipStyle);
 });
@@ -356,11 +370,13 @@ window.addEventListener('load', () => {
         document.body.classList.add('loaded');
     }, 100);
     
-    console.log("%c✨ Secure Pass Pro v4.0 ✨\n%cНовинка: Настраиваемая очистка буфера обмена (10-120 секунд)!\n%cНовинка: RGB анимация границ окна!\n%cНовинка: Кроссплатформенный звук (Windows/Mac/Linux)!", 
+    console.log("%c✨ Secure Pass Pro v4.0 ✨\n%c📋 Всего исправлений: 29+\n%c🔐 Критических исправлений безопасности: 6\n%c🎨 UI/UX улучшений: 4\n%c🛡️ Исправлений стабильности: 16\n%c🧹 Удалено мёртвого кода: 3", 
                 "color: #4EC9B0; font-size: 14px; font-weight: bold;",
-                "color: #FFA500; font-size: 12px;",
                 "color: #00AAFF; font-size: 12px;",
-                "color: #2ECC71; font-size: 12px;");
+                "color: #FF4444; font-size: 12px;",
+                "color: #4EC9B0; font-size: 12px;",
+                "color: #4EC9B0; font-size: 12px;",
+                "color: #888; font-size: 12px;");
 });
 
 // Стили для body
@@ -372,6 +388,32 @@ pageStyle.textContent = `
     }
     body.loaded {
         visibility: visible;
+    }
+    
+    /* Дополнительные анимации для карточек с исправлениями */
+    .card ul li {
+        animation: slideInRight 0.3s ease forwards;
+        opacity: 0;
+    }
+    
+    .card ul li:nth-child(1) { animation-delay: 0.05s; }
+    .card ul li:nth-child(2) { animation-delay: 0.10s; }
+    .card ul li:nth-child(3) { animation-delay: 0.15s; }
+    .card ul li:nth-child(4) { animation-delay: 0.20s; }
+    .card ul li:nth-child(5) { animation-delay: 0.25s; }
+    .card ul li:nth-child(6) { animation-delay: 0.30s; }
+    .card ul li:nth-child(7) { animation-delay: 0.35s; }
+    .card ul li:nth-child(8) { animation-delay: 0.40s; }
+    
+    @keyframes slideInRight {
+        from {
+            opacity: 0;
+            transform: translateX(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
     }
 `;
 document.head.appendChild(pageStyle);
