@@ -60,8 +60,6 @@ Secure Pass Pro создан для тех, кто ценит безопасно
 
 ## 🚀 Версия 4.0 (текущая)
 
-![Secure Pass Pro v4.0 Main Window](https://github.com/Maximka1993271/Password-Generator-Python/raw/main/Secure_Pass_MainWindow40.jpg)
-
 Secure Pass Pro v4.0 — это полностью переработанная версия с новым дизайном, улучшенной безопасностью и расширенной функциональностью.
 
 ### Ключевые особенности v4.0
