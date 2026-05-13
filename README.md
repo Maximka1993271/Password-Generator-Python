@@ -1,270 +1,143 @@
-# 🛡️ Secure Pass Pro v4.0
+# 🛡️ Secure Pass Pro
 
-**🔐 Secure password generator with a multilingual Python GUI for Windows, macOS, and Linux**
+**🔐 Профессиональный генератор паролей с открытым исходным кодом для Windows, macOS и Linux**
 
-Secure Pass Pro is a modern desktop password generator built with Python and CustomTkinter.
-It combines cryptographically secure password generation, multilingual interface, QR-code export, privacy controls, and a polished dark UI.
+Secure Pass Pro — это современный десктопный генератор паролей, построенный на Python и CustomTkinter. Программа сочетает криптографически стойкую генерацию, многоязычный интерфейс, экспорт QR-кодов, контроль целостности файлов, защиту мастер-паролем и стильный Amoled-дизайн с RGB-анимацией.
 
 ![v4.0 Preview](https://github.com/Maximka1993271/Password-Generator-Python/raw/main/Secure_Pass_MainWindow40.jpg)
 
 ---
 
-## ✨ Main Features v4.0
+## 📋 О программе
 
-- **Cryptographically secure generation**
-  Uses Python `secrets` module and system CSPRNG for unpredictable password generation.
+Secure Pass Pro создан для тех, кто ценит безопасность и удобство. Программа генерирует криптостойкие пароли, оценивает их надёжность, сохраняет в файлы различных форматов и позволяет быстро передать пароль через QR-код.
 
-- **Multilingual interface**
-  Instant switching between **RU**, **EN**, and **UA** interface languages.
+### Основные возможности
 
-- **Password strength audit**
-  - Entropy-based strength evaluation.
-  - Estimated crack-time category.
-  - Five-star visual strength indicator.
-
-- **Color-coded password field pulsation** ⚡
-  - 🔴 **Red pulse** – Weak password (under 40 bits)
-  - 🟠 **Orange pulse** – Medium password (40-79 bits)
-  - 🟢 **Green pulse** – Strong password (80+ bits)
-
-- **Privacy and safety**
-  - Configurable clipboard auto-cleanup **(10-120 seconds, adjustable in settings)** – better than KeePassXC's fixed 30 seconds!
-  - Smart clipboard clearing – buffer cleared only if still contains your password
-  - Local password history with one-click clearing.
-  - Text export integrity check via **SHA-256**.
-  - Protection against too-small character pools.
-
-- **Modern dark GUI**
-  - AMOLED-style dark interface.
-  - High-DPI friendly layout.
-  - Adjustable corner radius for UI elements in real time.
-  - **New Neon-Glow effects for side menu buttons.**
-  - **New dedicated Settings button** with green accent color.
-
-- **Export and sharing**
-  - Save and **Open** passwords as `.txt`, `.log`, `.key`, or `.pdf`.
-  - **Full Cyrillic support in PDF exports** using embedded DejaVuSans.ttf font.
-  - QR-code generation for quick transfer to mobile devices.
+| Функция | Описание |
+|---------|----------|
+| 🔐 **Генерация паролей** | Криптостойкая генерация с использованием модуля `secrets` и CSPRNG |
+| 📊 **Оценка стойкости** | Расчёт энтропии в битах, время взлома, 5-звёздочный рейтинг |
+| 🎨 **Цветная пульсация** | Визуальная индикация силы пароля: 🔴 слабый / 🟠 средний / 🟢 надёжный |
+| 🌈 **RGB анимация** | Динамическая цветная анимация границ окна (4 независимые полосы) |
+| 🔒 **Мастер-пароль** | Защита доступа к программе с PBKDF2 (100,000 итераций, соль 32 байта) |
+| ✅ **Контроль целостности** | SHA-256 проверка файлов при открытии |
+| 📄 **Экспорт в PDF** | Полная поддержка кириллицы через шрифт DejaVuSans |
+| 📱 **QR-код** | Быстрая передача пароля на мобильные устройства |
+| 📜 **История паролей** | Сохранение последних 50 паролей (маскированных) |
+| 🌐 **Мультиязычность** | Интерфейс на русском, английском и украинском языках |
+| 🎨 **Темы оформления** | Системная, светлая, тёмная |
+| ⏱️ **Умная очистка буфера** | Автоматическая очистка через 10-120 секунд (настраивается) |
+| ⌨️ **Горячие клавиши** | F5, Ctrl+C, Ctrl+S, Ctrl+O, Esc |
+| 📐 **Скругление углов** | Настройка радиуса всех элементов интерфейса от 0 до 25 пикселей |
+| 💻 **Кроссплатформенность** | Полная поддержка Windows, macOS и Linux |
 
 ---
 
-## 🚀 What's New in v4.0
+## 🚀 Версия 4.0 (текущая)
 
-### 🔒 Master Password Protection
-Set a **master password** to protect access to the entire program. PBKDF2 hashed (100,000 iterations, 32-byte salt) with 5 attempts before lockout.
+Secure Pass Pro v4.0 — это полностью переработанная версия с новым дизайном, улучшенной безопасностью и расширенной функциональностью.
 
-### ✅ File Integrity Verification
-Automatic `.sha256` checksum creation when saving files and verification when opening them. Prevents tampering.
+### Ключевые особенности v4.0
 
-### 🔄 No Consecutive Repeats
-New option to avoid repeated characters in a row (e.g., `aaa`, `111`).
+- **Мастер-пароль (PBKDF2)** — защита доступа к программе с 5 попытками входа
+- **RGB анимация границ окна** — динамическая подсветка с 4 независимыми полосами
+- **Цветная пульсация пароля** — визуальная индикация силы (красный/оранжевый/зелёный)
+- **Умная очистка буфера** — настраиваемый таймаут от 10 до 120 секунд
+- **PDF экспорт с кириллицей** — полная поддержка русского и украинского языков
+- **Кроссплатформенный звук** — Windows (MCI), macOS (afplay), Linux (mpg123/ffplay)
+- **JSON конфигурация** — сохранение всех настроек с защитой от повреждения
+- **Горячие клавиши** — F5, Ctrl+C, Ctrl+S, Ctrl+O, Esc
+- **Мгновенное переключение языка** — русский, английский, украинский без перезапуска
 
-### 👁️ Password Visibility Toggle
-One-click **eye button** to show/hide the password, synced with the "Hide symbols" checkbox.
+### Интерфейс v4.0
 
-### ⌨️ Hotkeys Support
-- **F5** – Generate new password
-- **Ctrl+C** – Copy to clipboard (only when focus is NOT in password field – no conflict with system copy)
-- **Ctrl+S** – Save to file
-- **Ctrl+O** – Open file
-- **Esc** – Close settings dialog
+Интерфейс разделён на две панели:
 
-### 🎛️ Centralized Settings Panel
-A brand new **Settings window** has been added, accessible via the **Settings** button in the main menu. All customization options are now conveniently located in one place.
+**Левая панель (настройки пароля):**
+- Ползунок длины пароля (4-64 символа)
+- Выбор типов символов (заглавные/строчные буквы, цифры, спецсимволы)
+- Исключение похожих символов (i, l, 1, I, O, 0)
+- Исключение неоднозначных символов
+- Защита от повторов символов подряд
+- Поле пароля с кнопкой показа/скрытия
+- Индикатор стойкости пароля
 
-### 🌐 Language Switcher
-Quickly switch between **Русский**, **English**, and **Українська** directly from the settings panel. Interface language updates instantly without restart.
-
-### 🎨 Theme Selector
-Choose your preferred appearance:
-- **System** – follows your system theme
-- **Light** – bright and clean interface
-- **Dark** – comfortable for night use
-
-### 🔊 Sound Control
-Toggle UI sound effects on/off with a single click. **Cross-platform audio support** – Windows (MCI), macOS (afplay), Linux (mpg123/aplay).
-
-### 📐 Corner Radius Control
-A new slider allows you to customize the roundness of all UI elements from **0 to 25 pixels** – make it perfectly square or beautifully rounded.
-
-### ⏱️ Configurable Clipboard Timeout (New!)
-Adjust the clipboard auto-clear delay from **10 to 120 seconds** using a slider in settings. The setting is saved to `config.json` and persists between sessions. This gives you more control than KeePassXC's fixed 30 seconds!
-
-### 📄 Enhanced PDF Export
-- **Full Unicode support** for Cyrillic characters (Russian & Ukrainian)
-- **Embedded DejaVuSans.ttf** font for professional PDF output
-- No more garbled text or missing characters in exported documents
-
-### 🌈 RGB Animation (New!)
-Dynamic color-cycling border around the main window with:
-- **Four independent RGB strips** – Different phases for top/bottom/left/right borders
-- **RGB under titlebar** – Additional strip below the window title bar
-- **Windows 11 titlebar color sync** – Titlebar changes color along with animation
-- **ON/OFF toggle buttons** – Enable/disable from settings, preference saved
-- **Float overflow protection** – Safe for extended runtime
-
-### 🎨 Color Pulsation Animation (New!)
-The password field now features a **0.3-second neon glow animation** after each generation, with colors indicating password strength:
-
-| Strength | Entropy | Color | Effect |
-|----------|---------|-------|--------|
-| Weak | < 40 bits | 🔴 Red | Warning glow |
-| Medium | 40–79 bits | 🟠 Orange | Caution glow |
-| Strong | 80+ bits | 🟢 Green | Security glow |
-
-This provides **instant visual feedback** about password quality without needing to read the rating text.
-
-### 💻 Cross-Platform Support (New!)
-- **Windows** – Full support with native audio and titlebar RGB sync
-- **macOS** – Native font (SF Pro Display) and audio (afplay) support
-- **Linux** – DejaVu Sans font and audio (mpg123/aplay) support
-- **Cross-platform fonts** – Automatic font selection per OS
-
-### Additional Improvements
-- Redesigned interface with balanced layout and **neon color-coded action buttons**
-- Added entropy-based strength calculation with SHA-256 verification
-- Smart character filtering to exclude similar characters (i, l, 1, o, O, 0)
-- Enhanced mechanical mouse click sound (replaced standard winsound Beeps)
-- Extended export & viewing support for `.txt`, `.log`, `.key`, and `.pdf` formats
-- Fixed PDF export for Cyrillic and Ukrainian text using DejaVuSans font
-- Removed deprecated progress bar for cleaner interface
-- **Improved checkbox appearance** – Better looking checkmark indicators
-- **All checkboxes start unchecked** – Clean state on first launch
-- **Master Password section in Settings** – Status indicator and management buttons
-- **Fixed translation for all master password dialogs** – Proper RU/EN/UA support
-- **JSON configuration format** – More reliable settings storage
-- **Improved error handling** – Graceful fallback if config.json is corrupted
-
-**[📥 Download Secure Pass Pro v4.0 (.exe)](https://github.com/Maximka1993271/Password-Generator-Python/releases/download/v4.0/SecurePassPro.exe)**
+**Правая панель (меню):**
+- Генерация пароля
+- Копирование в буфер
+- Сохранение в файл
+- Открытие файла
+- QR-код
+- История паролей
+- Обновление программы
+- Настройки
+- О программе
 
 ---
 
-## ⚙️ Developer Information
+## 📜 Версия 2.0.0 (Classic)
 
-### Technology Stack
-
-- **Language**: Python 3.9+
-- **GUI**: `customtkinter`
-- **Audio**: Cross-platform (Windows MCI / macOS afplay / Linux mpg123 or aplay)
-- **Libraries**: `Pillow`, `qrcode`, `fpdf`
-- **PDF Font**: `DejaVuSans.ttf` (embedded, full Cyrillic support)
-- **Security**: `secrets`, `hashlib`, `random.SystemRandom`, `PBKDF2`
-- **Animations**: Color-coded neon pulsation (Red/Orange/Green), RGB border cycling
-- **Cross-platform fonts**: `_FONT_UI`, `_FONT_MONO`, `_FONT_BTN` – automatic selection per OS
-
-### Changelog v4.0 (2026-05-12)
-
-**New Features:**
-- Added **Master Password** protection with PBKDF2 hashing (100,000 iterations, 32-byte salt, 5 attempts limit)
-- Added **File Integrity Verification** (`.sha256` checksums)
-- Added **No Consecutive Repeats** option for password generation
-- Added **Password Visibility Toggle** (eye button) with checkbox sync
-- Added **Hotkeys support** (F5, Ctrl+C, Ctrl+S, Ctrl+O, Esc)
-- Added **Settings window** with language, theme, sound, corner radius, clipboard timeout, RGB, and master password controls
-- Added **Language Switcher** (RU/EN/UA) with instant UI translation
-- Added **Theme Selector** (System/Light/Dark) with safe theme switching
-- Added **Sound Toggle** with mechanical click feedback
-- Added **Corner Radius Slider** (0-25px) for UI customization
-- Added **Configurable Clipboard Timeout** (10-120 seconds slider, saves to config.json)
-- Added **RGB Animation** – 4 independent border strips + titlebar color sync with ON/OFF toggle
-- Added **DejaVuSans.ttf font** for proper Cyrillic display in PDF exports
-- Added **dedicated Settings button** in the main menu with green neon color
-- Added **Color-coded password field pulsation** (Red/Orange/Green based on entropy)
-- Added **Tooltips** for all buttons including the eye button
-- Added **"Set Master Password"** and **"Remove Master Password"** buttons in Settings
-- Added **Master Password status indicator** (🔒 Set / 🔓 Not set)
-- Added **Cross-platform font support** – automatic selection for Windows/macOS/Linux
-- Added **Cross-platform audio** – macOS (afplay) and Linux (mpg123/aplay) support
-- Added **Smart clipboard clearing** – clears only if buffer still contains your password
-- Added **Float overflow protection** for RGB animation
-
-**Fixes:**
-- Fixed checkbox/eye button synchronization
-- Added fallback when password without repeats cannot be generated
-- Fixed clipboard clearing timer issues
-- Fixed theme change freezing issues
-- Fixed PDF export for Cyrillic and Ukrainian text using DejaVuSans font
-- Fixed Ukrainian author name spelling (Максим Мельніков)
-- Fixed duplicate code in build commands
-- Fixed `winreg` import error on Linux/macOS – proper platform detection
-- Fixed `self.settings_labels` AttributeError when pressing Escape before opening settings
-- Fixed `self.history_textbox` AttributeError in `_close_history`
-- Fixed 8 missing widget attributes in `__init__` – all settings widgets now properly initialized
-- Fixed `tt_copy` tooltip formatting – timeout value now displays correctly
-- Fixed translation for all master password dialogs (RU/EN/UA)
-- Fixed color scheme for all popup dialogs
-- Fixed `Segoe UI Variable` font error – replaced with cross-platform font constants
-- Fixed `tahoma` font in ToolTips – replaced with `_FONT_UI`
-- Fixed window flash in settings – `grab_set()` moved before centering
-- Fixed `json.JSONDecodeError` – graceful fallback if config.json is corrupted
-- Fixed `Ctrl+C` conflict – now copies password only when focus is NOT in password field
-
-**Improvements:**
-- Removed deprecated theme buttons from bottom panel
-- Optimized window rendering for better performance
-- Improved button highlighting for active theme/language selection
-- Enhanced clipboard auto-cleanup mechanism with configurable timeout
-- Updated strength indicator with 5-star rating system
-- **Full Unicode/UTF-8 support for PDF documents**
-- **Added visual feedback with color-coded password field animation**
-- **Redesigned Settings window** – scrollable frame with separator lines and better organization
-- **Improved checkbox appearance** – better checkmark indicators with proper spacing
-- **JSON configuration format** – replaced `.txt` with `.json` for more reliable settings storage
-- **All checkboxes start unchecked** – clean state on first launch
-- **Better error handling** – JSONDecodeError caught, program starts with defaults
-
-**Removed:**
-- Removed deprecated progress bar for cleaner interface
-- Removed duplicate controls from main window
-- Removed dead code: `self._settings_buttons`, `self._settings_widgets`
-- Removed unnecessary `hasattr()` checks
-- Removed Windows-only hardcoded fonts (`Segoe UI Variable`, `tahoma`)
-
----
-
-## 📜 Classic Branch: v2.0.0
+Версия 2.0.0 — это классическая лёгкая версия, построенная на стандартной библиотеке `tkinter` (без внешних зависимостей). Идеально подходит для пользователей, которые ценят минимализм и стабильность.
 
 ![v2.0.0 Preview](https://github.com/Maximka1993271/Password-Generator-Python/raw/main/Secure_Pass_MainWindow.png)
 
-### About v2.0.0 Classic
+### Ключевые особенности v2.0.0
 
-The **Classic branch** is a lightweight, stable version built with standard **Tkinter** (no external dependencies). It's perfect for users who:
-- Prefer a minimal interface without animations
-- Use older Windows systems with limited resources
-- Want just the core password generation features
+- **Криптостойкая генерация** — использование модуля `secrets`
+- **Оценка стойкости пароля** — расчёт энтропии и времени взлома
+- **QR-код** — быстрая передача пароля
+- **История паролей** — последние 5 паролей
+- **Сохранение в .txt** — экспорт паролей в текстовый файл
+- **Мультиязычность** — русский, английский, украинский
+- **Темы оформления** — системная, светлая, тёмная
+- **Горячие клавиши** — Ctrl+G, Ctrl+S, Ctrl+O
+- **Звук** — системный `winsound.Beep()`
 
-### ✨ v2.0.0 Features
+### Сравнение версий
 
-| Feature | v2.0.0 Classic |
-|---------|----------------|
-| Cryptographic generation (secrets) | ✅ Yes |
-| Password strength meter | ✅ Entropy-based |
-| Crack time estimation (MD5) | ✅ Yes |
-| QR code generation | ✅ Yes |
-| Password history | ✅ Yes (last 5) |
-| File export (`.txt`) | ✅ Save & Open |
-| Multi-language (RU/EN/UA) | ✅ Yes |
-| Light/Dark/System themes | ✅ Yes |
-| Hotkeys (Ctrl+G, Ctrl+S, Ctrl+O) | ✅ Yes |
-| SHA-256 integrity check | ❌ No |
-| PDF export | ❌ No |
-| Color pulsation animation | ❌ No |
-| Corner radius control | ❌ No |
-| Settings window | ❌ No |
-| Master password | ❌ No |
-| Configurable clipboard timeout | ❌ No |
-| RGB animation | ❌ No |
-| Cross-platform audio | ❌ No |
+| Функция | v2.0.0 Classic | v4.0 |
+|---------|:--------------:|:----:|
+| Генерация паролей (secrets) | ✅ | ✅ |
+| Оценка стойкости (энтропия) | ✅ | ✅ |
+| QR-код | ✅ | ✅ |
+| История паролей | ✅ (5) | ✅ (50) |
+| Сохранение в .txt | ✅ | ✅ |
+| Сохранение в .key/.log | ❌ | ✅ |
+| PDF экспорт | ❌ | ✅ |
+| Мастер-пароль (PBKDF2) | ❌ | ✅ |
+| RGB анимация | ❌ | ✅ |
+| Цветная пульсация | ❌ | ✅ |
+| Настраиваемая очистка буфера | ❌ | ✅ |
+| Скругление углов | ❌ | ✅ |
+| JSON конфигурация | ❌ | ✅ |
+| Кроссплатформенный звук | ❌ | ✅ |
+| Внешние зависимости | отсутствуют | customtkinter, qrcode, pillow, fpdf |
 
-### 🛠️ Tech Stack (v2.0.0)
+---
 
-- **Language**: Python 3.9+
-- **GUI**: `tkinter` (built-in)
-- **Libraries**: `Pillow`, `qrcode`
-- **Security**: `secrets`, `hashlib`
-- **Sound**: `winsound.Beep()`
+## 📦 Установка и запуск
 
-### 📦 v2.0.0 Build Command
+### Windows (рекомендуется для v4.0)
+
+1. Скачайте `SecurePassPro.exe` из раздела [Releases](https://github.com/Maximka1993271/Password-Generator-Python/releases)
+2. Запустите файл — установка не требуется
+3. При первом запуске можно установить мастер-пароль
+
+### macOS и Linux (из исходного кода)
 
 ```bash
-pyinstaller --noconfirm --onefile --windowed --icon="app_icon.ico" --add-data "app_icon.ico;." --name "SecurePassPro" Secure_Pass_Pro.pyw
+# Клонирование репозитория
+git clone https://github.com/Maximka1993271/Password-Generator-Python.git
+cd Password-Generator-Python
+
+# Создание виртуального окружения (рекомендуется)
+python3 -m venv venv
+source venv/bin/activate  # Linux/macOS
+# venv\Scripts\activate   # Windows
+
+# Установка зависимостей
+pip install customtkinter qrcode[pil] pillow fpdf
+
+# Запуск v4.0
+python3 Secure_Pass_Pro.pyw
