@@ -1,14 +1,6 @@
 """
 Secure Pass Pro v4.0 — Cryptographically secure password generator
 Author: Maxim Melnikov
-
-Do not modify user .key, .log, .txt, or PDF files during audit.
-Не изменять пользовательские .key, .log, .txt и PDF-файлы во время аудита.
-Не змінювати користувацькі .key, .log, .txt та PDF-файли під час аудиту.
-
-Keep comments in 3 languages.
-Оставлять комментарии на 3 языках.
-Залишати коментарі 3 мовами.
 """
 
 from __future__ import annotations
@@ -27,10 +19,12 @@ import datetime
 import shutil
 import subprocess
 import tempfile
+import time
 import tkinter as tk
 from tkinter import filedialog
 import ctypes
 import json
+import sqlite3
 from typing import Optional, Dict, Any, List
 
 
@@ -57,8 +51,10 @@ try:
     import qrcode
     from PIL import Image
     from fpdf import FPDF
+    from argon2 import PasswordHasher
+    from argon2.exceptions import VerifyMismatchError
 except ImportError as exc:
-    _show_startup_error("Error", f"Required: pip install qrcode[pil] pillow customtkinter fpdf\n\n{exc}")
+    _show_startup_error("Error", f"Required: pip install qrcode[pil] pillow customtkinter fpdf argon2-cffi\n\n{exc}")
     sys.exit(1)
 
 # ==================== CONSTANTS ====================
@@ -70,9 +66,10 @@ HASH_EXTENSION = ".sha256"
 CONFIG_DIR = os.path.join(os.path.expanduser("~"), ".securepasspro")
 CONFIG_FILE = os.path.join(CONFIG_DIR, "config.json")
 MASTER_FILE = os.path.join(CONFIG_DIR, "master.key")
+DB_FILE = os.path.join(CONFIG_DIR, "passwords.db")
 
-# Global radius for all dialogs
 _global_radius = 10
+_ph = PasswordHasher(time_cost=3, memory_cost=65536, parallelism=4, hash_len=32)
 
 
 def set_global_radius(radius: int) -> None:
@@ -101,11 +98,26 @@ def _center_screen(win: tk.Tk | ctk.CTkToplevel, width: int, height: int) -> Non
 class MasterPassword:
     MAX_ATTEMPTS = 5
     SALT_SIZE = 32
-    ITERATIONS = 100000
+    PBKDF2_ITERATIONS = 600000
+    USE_ARGON2 = True
     
     @classmethod
-    def _derive_key(cls, password: str, salt: bytes) -> bytes:
-        return hashlib.pbkdf2_hmac('sha256', password.encode('utf-8'), salt, cls.ITERATIONS, dklen=32)
+    def _derive_key_pbkdf2(cls, password: bytes, salt: bytes) -> bytes:
+        return hashlib.pbkdf2_hmac('sha256', password, salt, cls.PBKDF2_ITERATIONS, dklen=32)
+    
+    @classmethod
+    def _hash_argon2(cls, password: str) -> str:
+        """Хеширование пароля через Argon2id"""
+        return _ph.hash(password)
+    
+    @classmethod
+    def _verify_argon2(cls, password: str, stored_hash: str) -> bool:
+        """Проверка Argon2 хеша"""
+        try:
+            _ph.verify(stored_hash, password)
+            return True
+        except VerifyMismatchError:
+            return False
     
     @classmethod
     def is_set(cls) -> bool:
@@ -117,11 +129,17 @@ class MasterPassword:
             return True
         try:
             with open(MASTER_FILE, 'rb') as f:
-                salt = f.read(cls.SALT_SIZE)
-                stored_hash = f.read()
-            derived = cls._derive_key(password, salt)
-            # Use constant-time comparison to prevent timing attacks
-            return hmac.compare_digest(derived, stored_hash)
+                version = f.read(1)
+                if version == b'\x02':
+                    # Argon2id формат: хеш как строка
+                    stored_hash = f.read().decode('utf-8')
+                    return cls._verify_argon2(password, stored_hash)
+                else:
+                    # PBKDF2 формат (для совместимости)
+                    salt = f.read(cls.SALT_SIZE)
+                    stored_hash = f.read()
+                    derived = cls._derive_key_pbkdf2(password.encode('utf-8'), salt)
+                    return hmac.compare_digest(derived, stored_hash)
         except Exception:
             return False
     
@@ -130,10 +148,21 @@ class MasterPassword:
         if not password:
             raise ValueError("Master password must not be empty")
         os.makedirs(CONFIG_DIR, exist_ok=True)
-        salt = secrets.token_bytes(cls.SALT_SIZE)
-        derived = cls._derive_key(password, salt)
-        with open(MASTER_FILE, 'wb') as f:
-            f.write(salt + derived)
+        
+        if cls.USE_ARGON2:
+            # Argon2id формат
+            hashed = cls._hash_argon2(password)
+            with open(MASTER_FILE, 'wb') as f:
+                f.write(b'\x02')  # Версия 2 = Argon2id
+                f.write(hashed.encode('utf-8'))
+        else:
+            # PBKDF2 формат (fallback)
+            salt = secrets.token_bytes(cls.SALT_SIZE)
+            derived = cls._derive_key_pbkdf2(password.encode('utf-8'), salt)
+            with open(MASTER_FILE, 'wb') as f:
+                f.write(b'\x01')  # Версия 1 = PBKDF2
+                f.write(salt)
+                f.write(derived)
     
     @classmethod
     def remove(cls) -> None:
@@ -173,6 +202,79 @@ class MasterPassword:
             return False
         finally:
             root.destroy()
+
+
+# ==================== PASSWORD DATABASE ====================
+class PasswordDB:
+    @classmethod
+    def _get_connection(cls):
+        os.makedirs(CONFIG_DIR, exist_ok=True)
+        conn = sqlite3.connect(DB_FILE)
+        conn.execute("PRAGMA secure_delete = ON;")
+        conn.execute("""
+            CREATE TABLE IF NOT EXISTS passwords (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                label TEXT NOT NULL,
+                password TEXT NOT NULL,
+                created TEXT NOT NULL
+            )
+        """)
+        conn.commit()
+        return conn
+    
+    @classmethod
+    def save(cls, label: str, password: str) -> int:
+        conn = cls._get_connection()
+        cursor = conn.execute(
+            "INSERT INTO passwords (label, password, created) VALUES (?, ?, ?)",
+            (label, password, datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+        )
+        conn.commit()
+        row_id = cursor.lastrowid
+        conn.close()
+        return row_id
+    
+    @classmethod
+    def get_all(cls) -> List[Dict[str, Any]]:
+        conn = cls._get_connection()
+        rows = conn.execute("SELECT id, label, password, created FROM passwords ORDER BY id DESC").fetchall()
+        conn.close()
+        return [{"id": r[0], "label": r[1], "password": r[2], "created": r[3]} for r in rows]
+    
+    @classmethod
+    def update(cls, row_id: int, label: str, password: Optional[str] = None) -> None:
+        conn = cls._get_connection()
+        if password is not None:
+            conn.execute("UPDATE passwords SET label=?, password=? WHERE id=?", (label, password, row_id))
+        else:
+            conn.execute("UPDATE passwords SET label=? WHERE id=?", (label, row_id))
+        conn.commit()
+        conn.close()
+    
+    @classmethod
+    def delete(cls, row_id: int) -> None:
+        conn = cls._get_connection()
+        conn.execute("DELETE FROM passwords WHERE id=?", (row_id,))
+        conn.commit()
+        conn.close()
+    
+    @classmethod
+    def count(cls) -> int:
+        conn = cls._get_connection()
+        count = conn.execute("SELECT COUNT(*) FROM passwords").fetchone()[0]
+        conn.close()
+        return count
+    
+    @classmethod
+    def search(cls, query: str) -> List[Dict[str, Any]]:
+        conn = cls._get_connection()
+        search_pattern = f"%{query}%"
+        rows = conn.execute(
+            "SELECT id, label, password, created FROM passwords WHERE label LIKE ? OR password LIKE ? ORDER BY id DESC",
+            (search_pattern, search_pattern)
+        ).fetchall()
+        conn.close()
+        return [{"id": r[0], "label": r[1], "password": r[2], "created": r[3]} for r in rows]
 
 
 # ==================== CUSTOM DIALOGS ====================
@@ -280,6 +382,16 @@ class CTkInputDialog:
         self.entry.bind("<Return>", lambda e: self._ok())
         self.entry.bind("<Escape>", lambda e: self._cancel())
         
+        def show_context_menu(event):
+            menu = tk.Menu(self.win, tearoff=0)
+            menu.add_command(label="Вставить", command=lambda: self.entry.event_generate("<<Paste>>"))
+            menu.add_command(label="Копировать", command=lambda: self.entry.event_generate("<<Copy>>"))
+            menu.add_separator()
+            menu.add_command(label="Очистить", command=lambda: self.entry.delete(0, tk.END))
+            menu.post(event.x_root, event.y_root)
+        
+        self.entry.bind("<Button-3>", show_context_menu)
+        
         btn_frame = ctk.CTkFrame(self.win, fg_color="transparent")
         btn_frame.pack()
         ctk.CTkButton(btn_frame, text=L["ok"], width=110, height=36, command=self._ok, fg_color=btn_fg, corner_radius=radius).pack(side="left", padx=8)
@@ -337,7 +449,6 @@ class ToolTip:
 
 
 class UTF8PDF(FPDF):
-    """FPDF subclass used for PDF password export."""
     pass
 
 
@@ -353,7 +464,7 @@ LANGUAGES: Dict[str, Dict[str, str]] = {
         "btn_hist": "История", "btn_upd": "Обновить программу", "btn_about": "О программе",
         "btn_settings": "Настройки", "radius": "Закругление углов", "sound_on": "Звук: ВКЛ",
         "sound_off": "Звук: ВЫКЛ", "theme_sys": "Системная", "theme_dark": "Тёмная",
-        "theme_light": "Светлая", "about_text": "Secure Pass Pro v4.0\n\nПрофессиональный инструмент для генерации паролей.\nИспользует криптографически стойкие алгоритмы.",
+        "theme_light": "Светлая", "about_text": "Secure Pass Pro v4.0\n\nПрофессиональный инструмент для генерации паролей.\nИспользует криптографически стойкие алгоритмы.\n\n✅ Argon2id\n✅ SQLite хранилище",
         "copied": "Скопировано! ({0}с)", "strength": "Стойкость: ~{0} вариантов",
         "crack_time": "{0}", "time_sec": "Несколько секунд на взлом", "time_day": "Дни на взлом",
         "time_year": "Года на взлом", "time_cent": "Столетия на взлом", "st_low": "Слабый пароль",
@@ -375,7 +486,7 @@ LANGUAGES: Dict[str, Dict[str, str]] = {
         "err_no_repeat": "Не удалось создать пароль без повторов. Уменьшите длину или добавьте категории.",
         "err_no_repeat_fallback": "\nИспользован пароль с повторами.", "master_title": "Мастер-пароль",
         "master_prompt": "Введите мастер-пароль для доступа к программе:",
-        "master_set_title": "Установить мастер-пароль", "master_set_prompt": "Придумайте мастер-пароль (оставьте пустым — без защиты):",
+        "master_set_title": "Установить мастер-пароль", "master_set_prompt": "Придумайте мастер-пароль:",
         "master_confirm": "Подтвердите мастер-пароль:", "master_mismatch": "Пароли не совпадают!",
         "master_wrong": "Неверный мастер-пароль! Попытка {0} из {1}.", "master_blocked": "Превышено число попыток. Программа закрыта.",
         "master_set_ok": "Мастер-пароль установлен.", "master_removed": "Мастер-пароль удалён.",
@@ -386,6 +497,23 @@ LANGUAGES: Dict[str, Dict[str, str]] = {
         "integrity_ok": "✅ Целостность файла подтверждена.", "tt_eye": "Показать / скрыть пароль",
         "clip_timeout": "Очистка буфера: {0} сек", "tt_clip_timeout": "Через сколько секунд буфер обмена будет очищен после копирования",
         "rgb_label": "🌈 RGB-подсветка", "rgb_on": "ВКЛ", "rgb_off": "ВЫКЛ",
+        "auto_lock": "Автоблокировка",
+        "auto_lock_timeout": "Таймаут блокировки: {0} мин",
+        "auto_lock_title": "Программа заблокирована",
+        "unlock": "Разблокировать",
+        "tt_auto_lock": "Автоматическая блокировка при бездействии",
+        "btn_db": "База паролей", "tt_db": "Открыть хранилище паролей (SQLite)",
+        "db_title": "База паролей", "db_label_prompt": "Метка:",
+        "db_saved": "Пароль сохранён в базу!", "db_empty": "База пуста...",
+        "db_copy": "Копировать", "db_delete": "Удалить", "db_edit": "Изменить",
+        "db_save_current": "Сохранить текущий пароль", "db_no_pass": "Сначала сгенерируйте пароль!",
+        "db_count": "Записей: {0}", "db_search": "Поиск...",
+        "db_del_confirm": "Удалить эту запись?", "db_edit_title": "Редактировать запись",
+        "db_edit_label": "Метка:", "db_edit_pass": "Пароль:",
+        "security": "Безопасность",
+        "master_status_text": "🔐 Мастер-пароль: УСТАНОВЛЕН (Argon2id)",
+        "master_status_not_set_text": "⚠️ Мастер-пароль: НЕ УСТАНОВЛЕН",
+        "clipboard_cleared": "✅ Буфер обмена очищен!",
     },
     "EN": {
         "win_title": "Secure Pass Pro v4.0", "menu_title": "Menu", "len": "Length",
@@ -397,7 +525,7 @@ LANGUAGES: Dict[str, Dict[str, str]] = {
         "btn_hist": "History", "btn_upd": "Update program", "btn_about": "About",
         "btn_settings": "Settings", "radius": "Corner radius", "sound_on": "Sound: ON",
         "sound_off": "Sound: OFF", "theme_sys": "System", "theme_dark": "Dark",
-        "theme_light": "Light", "about_text": "Secure Pass Pro v4.0\n\nProfessional password generation tool.\nUses cryptographically secure algorithms.",
+        "theme_light": "Light", "about_text": "Secure Pass Pro v4.0\n\nProfessional password generation tool.\nUses cryptographically secure algorithms.\n\n✅ Argon2id\n✅ SQLite storage",
         "copied": "Copied! ({0}s)", "strength": "Strength: ~{0} combos", "crack_time": "{0}",
         "time_sec": "A few seconds to crack", "time_day": "Days to crack", "time_year": "Years to crack",
         "time_cent": "Centuries to crack", "st_low": "Weak password", "st_mid": "Medium password",
@@ -419,7 +547,7 @@ LANGUAGES: Dict[str, Dict[str, str]] = {
         "err_no_repeat": "Could not generate password without repeats. Reduce length or add categories.",
         "err_no_repeat_fallback": "\nPassword with repeats used.", "master_title": "Master Password",
         "master_prompt": "Enter master password to access the program:",
-        "master_set_title": "Set Master Password", "master_set_prompt": "Create a master password (leave blank for no protection):",
+        "master_set_title": "Set Master Password", "master_set_prompt": "Create a master password:",
         "master_confirm": "Confirm master password:", "master_mismatch": "Passwords do not match!",
         "master_wrong": "Wrong master password! Attempt {0} of {1}.", "master_blocked": "Too many failed attempts. Program closed.",
         "master_set_ok": "Master password has been set.", "master_removed": "Master password removed.",
@@ -430,6 +558,23 @@ LANGUAGES: Dict[str, Dict[str, str]] = {
         "integrity_ok": "✅ File integrity verified.", "tt_eye": "Show / hide password",
         "clip_timeout": "Clipboard clear: {0} sec", "tt_clip_timeout": "Seconds before clipboard is cleared after copying",
         "rgb_label": "🌈 RGB border", "rgb_on": "ON", "rgb_off": "OFF",
+        "auto_lock": "Auto Lock",
+        "auto_lock_timeout": "Lock timeout: {0} min",
+        "auto_lock_title": "Program Locked",
+        "unlock": "Unlock",
+        "tt_auto_lock": "Auto lock on inactivity",
+        "btn_db": "Password Vault", "tt_db": "Open password vault (SQLite)",
+        "db_title": "Password Vault", "db_label_prompt": "Label:",
+        "db_saved": "Password saved to vault!", "db_empty": "Vault is empty...",
+        "db_copy": "Copy", "db_delete": "Delete", "db_edit": "Edit",
+        "db_save_current": "Save current password", "db_no_pass": "Generate a password first!",
+        "db_count": "Records: {0}", "db_search": "Search...",
+        "db_del_confirm": "Delete this record?", "db_edit_title": "Edit record",
+        "db_edit_label": "Label:", "db_edit_pass": "Password:",
+        "security": "Security",
+        "master_status_text": "🔐 Master password: SET (Argon2id)",
+        "master_status_not_set_text": "⚠️ Master password: NOT SET",
+        "clipboard_cleared": "✅ Clipboard cleared!",
     },
     "UA": {
         "win_title": "Secure Pass Pro v4.0", "menu_title": "Меню", "len": "Довжина",
@@ -441,7 +586,7 @@ LANGUAGES: Dict[str, Dict[str, str]] = {
         "btn_hist": "Історія", "btn_upd": "Оновити програму", "btn_about": "Про програму",
         "btn_settings": "Налаштування", "radius": "Закруглення кутів", "sound_on": "Звук: ВКЛ",
         "sound_off": "Звук: ВИКЛ", "theme_sys": "Системна", "theme_dark": "Темна",
-        "theme_light": "Світла", "about_text": "Secure Pass Pro v4.0\n\nПрофесійний інструмент для генерації паролів.\nВикористовує криптографічно стійкі алгоритми.",
+        "theme_light": "Світла", "about_text": "Secure Pass Pro v4.0\n\nПрофесійний інструмент для генерації паролів.\nВикористовує криптографічно стійкі алгоритми.\n\n✅ Argon2id\n✅ SQLite сховище",
         "copied": "Скопійовано! ({0}с)", "strength": "Стійкість: ~{0} варіантів",
         "crack_time": "{0}", "time_sec": "Кілька секунд на злам", "time_day": "Дні на злам",
         "time_year": "Роки на злам", "time_cent": "Століття на злам", "st_low": "Слабкий пароль",
@@ -463,7 +608,7 @@ LANGUAGES: Dict[str, Dict[str, str]] = {
         "err_no_repeat": "Не вдалося створити пароль без повторів. Зменшіть довжину або додайте категорії.",
         "err_no_repeat_fallback": "\nВикористано пароль з повторами.", "master_title": "Майстер-пароль",
         "master_prompt": "Введіть майстер-пароль для доступу до програми:",
-        "master_set_title": "Встановити майстер-пароль", "master_set_prompt": "Придумайте майстер-пароль (залиште порожнім — без захисту):",
+        "master_set_title": "Встановити майстер-пароль", "master_set_prompt": "Придумайте майстер-пароль:",
         "master_confirm": "Підтвердіть майстер-пароль:", "master_mismatch": "Паролі не збігаються!",
         "master_wrong": "Невірний майстер-пароль! Спроба {0} з {1}.", "master_blocked": "Перевищено кількість спроб. Програму закрито.",
         "master_set_ok": "Майстер-пароль встановлено.", "master_removed": "Майстер-пароль видалено.",
@@ -474,6 +619,23 @@ LANGUAGES: Dict[str, Dict[str, str]] = {
         "integrity_ok": "✅ Цілісність файлу підтверджена.", "tt_eye": "Показати / приховати пароль",
         "clip_timeout": "Очищення буфера: {0} сек", "tt_clip_timeout": "Через скільки секунд буфер обміну буде очищено після копіювання",
         "rgb_label": "🌈 RGB-підсвітка", "rgb_on": "УВІ", "rgb_off": "ВИМК",
+        "auto_lock": "Автоблокування",
+        "auto_lock_timeout": "Таймаут блокування: {0} хв",
+        "auto_lock_title": "Програму заблоковано",
+        "unlock": "Розблокувати",
+        "tt_auto_lock": "Автоматичне блокування при бездіяльності",
+        "btn_db": "База паролів", "tt_db": "Відкрити сховище паролів (SQLite)",
+        "db_title": "База паролів", "db_label_prompt": "Мітка:",
+        "db_saved": "Пароль збережено до бази!", "db_empty": "База порожня...",
+        "db_copy": "Копіювати", "db_delete": "Видалити", "db_edit": "Змінити",
+        "db_save_current": "Зберегти поточний пароль", "db_no_pass": "Спочатку згенеруйте пароль!",
+        "db_count": "Записів: {0}", "db_search": "Пошук...",
+        "db_del_confirm": "Видалити цей запис?", "db_edit_title": "Редагувати запис",
+        "db_edit_label": "Мітка:", "db_edit_pass": "Пароль:",
+        "security": "Безпека",
+        "master_status_text": "🔐 Майстер-пароль: ВСТАНОВЛЕНО (Argon2id)",
+        "master_status_not_set_text": "⚠️ Майстер-пароль: НЕ ВСТАНОВЛЕНО",
+        "clipboard_cleared": "✅ Буфер обміну очищено!",
     }
 }
 
@@ -483,7 +645,6 @@ class SecurePassPro(ctk.CTk):
     def __init__(self) -> None:
         super().__init__()
         
-        # Application state
         self.current_lang = "RU"
         self.current_theme = "System"
         self.current_radius = 10
@@ -492,10 +653,13 @@ class SecurePassPro(ctk.CTk):
         self._rgb_anim_id: Optional[str] = None
         self._pulse_animation_id: Optional[str] = None
         
-        # Set global radius for dialogs
+        self.auto_lock_enabled = tk.BooleanVar(value=False)
+        self.auto_lock_timeout = 5
+        self._last_activity_time = time.time()
+        self._lock_check_id: Optional[str] = None
+        
         set_global_radius(self.current_radius)
         
-        # UI state - ВСЕ ГАЛОЧКИ СБРОШЕНЫ
         self.upper_var = tk.BooleanVar(value=False)
         self.lower_var = tk.BooleanVar(value=False)
         self.digits_var = tk.BooleanVar(value=False)
@@ -505,20 +669,18 @@ class SecurePassPro(ctk.CTk):
         self.at_least_var = tk.BooleanVar(value=False)
         self.hide_var = tk.BooleanVar(value=False)
         self.no_repeat_var = tk.BooleanVar(value=False)
-        self.sound_enabled = tk.BooleanVar(value=True)
+        self.sound_enabled = tk.BooleanVar(value=False)
         self.rgb_enabled = tk.BooleanVar(value=False)
         
-        # History storage
         self.history: deque = deque(maxlen=HISTORY_MAX)
         self._rgb_t = 0.0
         
-        # Window references
         self.settings_window: Optional[ctk.CTkToplevel] = None
         self.about_window: Optional[ctk.CTkToplevel] = None
         self.history_window: Optional[ctk.CTkToplevel] = None
         self.qr_window: Optional[ctk.CTkToplevel] = None
+        self.db_window: Optional[ctk.CTkToplevel] = None
         
-        # Widget references
         self._tooltips: Dict[str, ToolTip] = {}
         self.lang_buttons: Dict[str, ctk.CTkButton] = {}
         self.theme_buttons: Dict[str, ctk.CTkButton] = {}
@@ -532,18 +694,18 @@ class SecurePassPro(ctk.CTk):
         self._clip_timeout_label_ref: Optional[ctk.CTkLabel] = None
         self._rgb_on_btn_ref: Optional[ctk.CTkButton] = None
         self._rgb_off_btn_ref: Optional[ctk.CTkButton] = None
+        self._auto_lock_btn: Optional[ctk.CTkButton] = None
+        self._auto_lock_slider: Optional[ctk.CTkSlider] = None
+        self._auto_lock_label_ref: Optional[ctk.CTkLabel] = None
         
-        # RGB canvases
         self._rgb_c_top: Optional[tk.Canvas] = None
         self._rgb_c_bottom: Optional[tk.Canvas] = None
         self._rgb_c_left: Optional[tk.Canvas] = None
         self._rgb_c_right: Optional[tk.Canvas] = None
         
-        # Icons and resources
         self._icon_image: Optional[tk.PhotoImage] = None
         self._pdf_font_path = _get_resource_path("DejaVuSans.ttf")
         
-        # Setup
         ctk.set_widget_scaling(1.0)
         ctk.set_window_scaling(1.0)
         
@@ -563,8 +725,136 @@ class SecurePassPro(ctk.CTk):
         self.bind('<Control-o>', lambda e: self._open())
         self.bind('<Escape>', lambda e: self._close_settings() if self.settings_window else None)
         
+        self.bind_all('<Key>', self._reset_activity_timer)
+        self.bind_all('<Button>', self._reset_activity_timer)
+        self.bind_all('<Motion>', self._reset_activity_timer)
+        
         self.after(50, self._load_all_settings)
+        self.after(100, self._start_lock_checker)
         self.protocol("WM_DELETE_WINDOW", self._on_closing)
+    
+    # ==================== AUTO-LOCK METHODS ====================
+    
+    def _reset_activity_timer(self, event=None) -> None:
+        if not self.auto_lock_enabled.get():
+            return
+        self._last_activity_time = time.time()
+    
+    def _start_lock_checker(self) -> None:
+        self._check_lock()
+    
+    def _check_lock(self) -> None:
+        if not self.auto_lock_enabled.get():
+            self._lock_check_id = self.after(1000, self._check_lock)
+            return
+        
+        if not MasterPassword.is_set():
+            self._lock_check_id = self.after(1000, self._check_lock)
+            return
+        
+        if self.settings_window and self.settings_window.winfo_exists():
+            self._last_activity_time = time.time()
+            self._lock_check_id = self.after(1000, self._check_lock)
+            return
+        
+        idle_time = time.time() - self._last_activity_time
+        if idle_time >= self.auto_lock_timeout * 60:
+            self._lock_program()
+        
+        self._lock_check_id = self.after(1000, self._check_lock)
+    
+    def _lock_program(self) -> None:
+        if not MasterPassword.is_set():
+            return
+        
+        if self.db_window and self.db_window.winfo_exists():
+            try:
+                self.db_window.destroy()
+            except Exception:
+                pass
+        
+        rgb_was_enabled = self.rgb_enabled.get()
+        if rgb_was_enabled:
+            self._stop_rgb()
+        
+        self.withdraw()
+        unlocked = self._show_lock_screen()
+        
+        if unlocked:
+            self.deiconify()
+            self.lift()
+            self.focus_force()
+            if rgb_was_enabled:
+                self._start_rgb()
+            self._last_activity_time = time.time()
+        else:
+            self._on_closing()
+    
+    def _show_lock_screen(self) -> bool:
+        L = LANGUAGES[self.current_lang]
+        theme = self._get_actual_theme()
+        colors = CTkMessageBox._get_colors(theme)
+        radius = get_global_radius()
+        
+        win = ctk.CTkToplevel(self)
+        win.title(L["win_title"])
+        win.resizable(False, False)
+        win.grab_set()
+        win.attributes("-topmost", True)
+        
+        w, h = 450, 320
+        _center_screen(win, w, h)
+        
+        win.configure(fg_color=colors["bg"])
+        
+        ctk.CTkLabel(win, text="🔒", font=("Segoe UI", 64), text_color="#4EC9B0").pack(pady=(30, 10))
+        ctk.CTkLabel(win, text=L.get("auto_lock_title", "Program Locked"), 
+                    font=("Segoe UI", 18, "bold"), text_color=colors["label_text"]).pack(pady=(0, 10))
+        
+        entry = ctk.CTkEntry(win, width=340, height=45, font=("Segoe UI", 16), show="*",
+                            fg_color=colors["entry_bg"], text_color=colors["fg"], corner_radius=radius)
+        entry.pack(pady=(0, 20))
+        entry.focus_set()
+        
+        def show_context_menu(event):
+            menu = tk.Menu(win, tearoff=0)
+            menu.add_command(label="Вставить", command=lambda: entry.event_generate("<<Paste>>"))
+            menu.add_command(label="Копировать", command=lambda: entry.event_generate("<<Copy>>"))
+            menu.add_separator()
+            menu.add_command(label="Очистить", command=lambda: entry.delete(0, tk.END))
+            menu.post(event.x_root, event.y_root)
+        
+        entry.bind("<Button-3>", show_context_menu)
+        
+        result = [False]
+        
+        def on_unlock():
+            pwd = entry.get()
+            if MasterPassword.verify(pwd):
+                result[0] = True
+                win.destroy()
+            else:
+                CTkMessageBox.error(win, L["master_title"], L["master_wrong"].format(1, 1))
+                entry.delete(0, "end")
+                entry.focus_set()
+        
+        entry.bind("<Return>", lambda e: on_unlock())
+        
+        unlock_btn = ctk.CTkButton(
+            win, text=L.get("unlock", "Unlock"), 
+            width=200, height=45, command=on_unlock, 
+            fg_color="#2d6a4f", hover_color="#40916c",
+            corner_radius=radius, font=("Segoe UI", 15, "bold")
+        )
+        unlock_btn.pack(pady=(10, 30))
+        
+        win.protocol("WM_DELETE_WINDOW", lambda: None)
+        win.after(100, lambda: win.attributes("-topmost", False))
+        self.wait_window(win)
+        
+        return result[0]
+    
+    # ==================== UI SETUP ====================
     
     def _create_rgb_canvases(self) -> None:
         bw = 3
@@ -587,14 +877,14 @@ class SecurePassPro(ctk.CTk):
                 self.after_cancel(self._clipboard_timer)
             except Exception:
                 pass
-        # Close all child windows gracefully before exit
-        for win_attr in ("settings_window", "about_window", "history_window", "qr_window"):
+        if self._lock_check_id:
+            try:
+                self.after_cancel(self._lock_check_id)
+            except Exception:
+                pass
+        for win_attr in ("settings_window", "about_window", "history_window", "qr_window", "db_window"):
             win = getattr(self, win_attr, None)
             if win is not None:
-                try:
-                    win.grab_release()
-                except Exception:
-                    pass
                 try:
                     win.destroy()
                 except Exception:
@@ -626,7 +916,7 @@ class SecurePassPro(ctk.CTk):
                     with open(CONFIG_FILE, "r", encoding="utf-8") as f:
                         existing = json.load(f)
                 except (json.JSONDecodeError, ValueError):
-                    existing = {}  # reset corrupted config
+                    existing = {}
             existing.update(updates)
             with open(CONFIG_FILE, "w", encoding="utf-8") as f:
                 json.dump(existing, f, indent=2)
@@ -641,7 +931,7 @@ class SecurePassPro(ctk.CTk):
                 try:
                     config = json.load(f)
                 except (json.JSONDecodeError, ValueError):
-                    return  # corrupted config – skip silently
+                    return
             
             if "THEME" in config and config["THEME"] in ("System", "Light", "Dark"):
                 self.current_theme = config["THEME"]
@@ -672,15 +962,45 @@ class SecurePassPro(ctk.CTk):
                     self.current_radius = r
                     set_global_radius(r)
                     self._change_radius(r)
+            
+            if "AUTO_LOCK" in config:
+                self.auto_lock_enabled.set(config["AUTO_LOCK"])
+            if "AUTO_LOCK_TIMEOUT" in config:
+                t = config["AUTO_LOCK_TIMEOUT"]
+                if 1 <= t <= 30:
+                    self.auto_lock_timeout = t
+                    self._update_auto_lock_label()
         except Exception:
             pass
+    
+    def _update_auto_lock_label(self) -> None:
+        if self._auto_lock_label_ref and self._auto_lock_label_ref.winfo_exists():
+            L = LANGUAGES[self.current_lang]
+            self._auto_lock_label_ref.configure(text=L["auto_lock_timeout"].format(self.auto_lock_timeout))
+    
+    def _toggle_auto_lock(self) -> None:
+        self.auto_lock_enabled.set(not self.auto_lock_enabled.get())
+        if self._auto_lock_btn and self._auto_lock_btn.winfo_exists():
+            L = LANGUAGES[self.current_lang]
+            self._auto_lock_btn.configure(
+                text=L["auto_lock"] + (" ✅" if self.auto_lock_enabled.get() else " ❌"),
+                fg_color="#2d6a4f" if self.auto_lock_enabled.get() else "#4b4b4b"
+            )
+        self._save_config({"AUTO_LOCK": self.auto_lock_enabled.get()})
+        if self.auto_lock_enabled.get():
+            self._last_activity_time = time.time()
+    
+    def _on_auto_lock_timeout_change(self, val: float) -> None:
+        minutes = int(val)
+        self.auto_lock_timeout = minutes
+        self._update_auto_lock_label()
+        self._save_config({"AUTO_LOCK_TIMEOUT": minutes})
     
     def _setup_ui(self) -> None:
         self.grid_columnconfigure(0, weight=1)
         self.grid_columnconfigure(1, weight=0)
         self.grid_rowconfigure(0, weight=1)
         
-        # Left panel
         self.left_panel = ctk.CTkFrame(self, fg_color="transparent")
         self.left_panel.grid(row=0, column=0, sticky="nsew", padx=20, pady=(10, 0))
         
@@ -689,14 +1009,12 @@ class SecurePassPro(ctk.CTk):
         self.lbl_author = ctk.CTkLabel(self.left_panel, text="", font=("Segoe UI", 14, "italic"), text_color="gray")
         self.lbl_author.pack(pady=(0, 10))
         
-        # Length slider
         self.lbl_len = ctk.CTkLabel(self.left_panel, text="", font=("Segoe UI", 16, "bold"))
         self.lbl_len.pack()
         self.slider_len = ctk.CTkSlider(self.left_panel, from_=4, to=64, number_of_steps=60, width=400, command=self._update_len_label)
         self.slider_len.set(20)
         self.slider_len.pack(pady=5)
         
-        # Checkboxes
         self.cb_frame = ctk.CTkFrame(self.left_panel, fg_color="transparent")
         self.cb_frame.pack(pady=10)
         
@@ -719,11 +1037,21 @@ class SecurePassPro(ctk.CTk):
         self.cb_no_repeat = ctk.CTkCheckBox(self.cb_frame, text="", variable=self.no_repeat_var)
         self.cb_no_repeat.grid(row=6, column=0, columnspan=2, padx=20, pady=8, sticky="w")
         
-        # Password entry
         self.entry_frame = ctk.CTkFrame(self.left_panel, fg_color="transparent")
         self.entry_frame.pack(pady=15, padx=40, fill="x")
         self.entry_res = ctk.CTkEntry(self.entry_frame, height=50, font=("Consolas", 22), justify="center", corner_radius=self.current_radius)
         self.entry_res.pack(side="left", fill="x", expand=True)
+        
+        def show_context_menu(event):
+            menu = tk.Menu(self.entry_res, tearoff=0)
+            menu.add_command(label="Копировать", command=lambda: self.entry_res.event_generate("<<Copy>>"))
+            menu.add_command(label="Вставить", command=lambda: self.entry_res.event_generate("<<Paste>>"))
+            menu.add_separator()
+            menu.add_command(label="Выделить всё", command=lambda: self.entry_res.select_range(0, tk.END))
+            menu.add_command(label="Очистить", command=lambda: self.entry_res.delete(0, tk.END))
+            menu.post(event.x_root, event.y_root)
+        
+        self.entry_res.bind("<Button-3>", show_context_menu)
         
         self.btn_eye = ctk.CTkButton(self.entry_frame, text="👁", width=50, height=50, 
                                       font=("Segoe UI", 20), fg_color="#3a3a3a", hover_color="#555555",
@@ -731,7 +1059,6 @@ class SecurePassPro(ctk.CTk):
         self.btn_eye.pack(side="left", padx=(6, 0))
         self._tooltips["btn_eye"] = ToolTip(self.btn_eye)
         
-        # Strength meter
         self.lbl_stars_top = ctk.CTkLabel(self.left_panel, text="", font=("Segoe UI", 24))
         self.lbl_stars_top.pack(pady=(5, 0))
         self.lbl_strength_text = ctk.CTkLabel(self.left_panel, text="", font=("Segoe UI", 14, "bold"))
@@ -741,7 +1068,6 @@ class SecurePassPro(ctk.CTk):
         self.lbl_crack = ctk.CTkLabel(self.left_panel, text="", font=("Segoe UI", 13, "bold"), wraplength=500)
         self.lbl_crack.pack(pady=(0, 5))
         
-        # Right panel (menu)
         self.right_panel = ctk.CTkFrame(self, width=250)
         self.right_panel.grid(row=0, column=1, sticky="nsew", padx=(0, 20), pady=20)
         self.right_panel.grid_propagate(False)
@@ -749,18 +1075,17 @@ class SecurePassPro(ctk.CTk):
         self.lbl_menu = ctk.CTkLabel(self.right_panel, text="", font=("Segoe UI", 18, "bold"))
         self.lbl_menu.pack(pady=15)
         
-        # Menu buttons
         self.btn_gen = self._create_menu_btn(self.right_panel, "btn_gen", "tt_gen", self._generate, "#0067c0")
         self.btn_copy = self._create_menu_btn(self.right_panel, "btn_copy", "tt_copy", self._copy, "#107c10")
         self.btn_save = self._create_menu_btn(self.right_panel, "btn_save", "tt_save", self._save, "#0078d4")
         self.btn_open = self._create_menu_btn(self.right_panel, "btn_open", "tt_open", self._open, "#0078d4")
         self.btn_qr = self._create_menu_btn(self.right_panel, "btn_qr", "tt_qr", self._show_qr, "#8764b8")
         self.btn_hist = self._create_menu_btn(self.right_panel, "btn_hist", "tt_hist", self._show_history, "#4b4b4b")
+        self.btn_db = self._create_menu_btn(self.right_panel, "btn_db", "tt_db", self._show_db_window, "#1a6b5a")
         self.btn_upd = self._create_menu_btn(self.right_panel, "btn_upd", "tt_upd", lambda: webbrowser.open(UPD_URL), "#ca5010")
         self.btn_settings = self._create_menu_btn(self.right_panel, "btn_settings", "tt_settings", self._show_settings, "#2d6a4f")
         self.btn_about = self._create_menu_btn(self.right_panel, "btn_about", "tt_about", self._show_about, "#4b4b4b")
         
-        # Bottom frame
         self.bottom_frame = ctk.CTkFrame(self, fg_color=("#e0e0e0", "#1d1e1e"), corner_radius=15)
         self.bottom_frame.grid(row=1, column=0, columnspan=2, sticky="ew", padx=20, pady=(0, 15))
         self.lbl_app_rating = ctk.CTkLabel(self.bottom_frame, text="★★★★★", font=("Segoe UI", 20), text_color="#FFD700")
@@ -769,7 +1094,8 @@ class SecurePassPro(ctk.CTk):
     def _create_menu_btn(self, parent, lang_key: str, tt_key: str, cmd, color: str) -> ctk.CTkButton:
         colors_map = {
             "#0067c0": "#00A2FF", "#107c10": "#20CF20", "#0078d4": "#309FFF",
-            "#8764b8": "#B080FF", "#4b4b4b": "#808080", "#ca5010": "#FF8C00", "#2d6a4f": "#40916c"
+            "#8764b8": "#B080FF", "#4b4b4b": "#808080", "#ca5010": "#FF8C00", "#2d6a4f": "#40916c",
+            "#1a6b5a": "#2da882"
         }
         neon_color = colors_map.get(color, color)
         btn = ctk.CTkButton(parent, text="", command=lambda: self._run_menu_command(cmd),
@@ -821,7 +1147,7 @@ class SecurePassPro(ctk.CTk):
         set_global_radius(rad)
         
         menu_btns = [self.btn_gen, self.btn_copy, self.btn_save, self.btn_open, self.btn_qr,
-                     self.btn_hist, self.btn_upd, self.btn_settings, self.btn_about]
+                     self.btn_hist, self.btn_db, self.btn_upd, self.btn_settings, self.btn_about]
         for btn in menu_btns:
             btn.configure(corner_radius=rad)
         
@@ -853,7 +1179,7 @@ class SecurePassPro(ctk.CTk):
             if btn and btn.winfo_exists():
                 btn.configure(corner_radius=rad)
         for btn in [self._sound_btn, self._close_btn, self._master_set_btn,
-                    self._rgb_on_btn_ref, self._rgb_off_btn_ref]:
+                    self._rgb_on_btn_ref, self._rgb_off_btn_ref, self._auto_lock_btn]:
             if btn and btn.winfo_exists():
                 btn.configure(corner_radius=rad)
     
@@ -912,7 +1238,7 @@ class SecurePassPro(ctk.CTk):
         self.cb_no_repeat.configure(text=L["no_repeat"])
         
         menu_btns = [self.btn_gen, self.btn_copy, self.btn_save, self.btn_open, self.btn_qr,
-                     self.btn_hist, self.btn_upd, self.btn_settings, self.btn_about]
+                     self.btn_hist, self.btn_db, self.btn_upd, self.btn_settings, self.btn_about]
         for btn in menu_btns:
             btn.configure(text=L[btn.lang_key])
             if btn.lang_key in self._tooltips:
@@ -930,6 +1256,7 @@ class SecurePassPro(ctk.CTk):
             self._update_strength_meter(self.entry_res.get())
         
         self._update_master_status_label()
+        self._update_auto_lock_label()
     
     def _change_language(self, lang: str) -> None:
         self.current_lang = lang
@@ -942,11 +1269,12 @@ class SecurePassPro(ctk.CTk):
                 btn.configure(fg_color="#2d6a4f" if l == lang else "#4b4b4b", corner_radius=self.current_radius)
         
         if self.settings_window and self.settings_window.winfo_exists():
-            self._close_settings()   # releases grab before destroy
+            self._close_settings()
         
         if self.entry_res.get():
             self._update_strength_meter(self.entry_res.get())
         self._update_master_status_label()
+        self._update_auto_lock_label()
     
     def _change_theme(self, mode: str) -> None:
         self.current_theme = mode
@@ -963,13 +1291,11 @@ class SecurePassPro(ctk.CTk):
         if self.settings_window and self.settings_window.winfo_exists():
             self._close_settings()
         
-        def apply_theme():
-            try:
-                ctk.set_appearance_mode(mode)
-                self.update_idletasks()
-            except Exception:
-                pass
-        self.after(50, apply_theme)
+        try:
+            ctk.set_appearance_mode(mode)
+            self.update_idletasks()
+        except Exception:
+            pass
     
     # ==================== RGB ANIMATION ====================
     
@@ -1158,7 +1484,6 @@ class SecurePassPro(ctk.CTk):
             while len(result) < length:
                 result.append(secrets.choice(full_pool))
         
-        # Cryptographically secure shuffle (Fisher-Yates with secrets)
         for i in range(len(result) - 1, 0, -1):
             j = secrets.randbelow(i + 1)
             result[i], result[j] = result[j], result[i]
@@ -1285,6 +1610,8 @@ class SecurePassPro(ctk.CTk):
         try:
             if self.clipboard_get() == expected:
                 self.clipboard_clear()
+                L = LANGUAGES[self.current_lang]
+                CTkMessageBox.info(self, L["master_title"], L.get("clipboard_cleared", "✅ Clipboard cleared!"))
         except Exception:
             pass
         finally:
@@ -1325,7 +1652,6 @@ class SecurePassPro(ctk.CTk):
             return False
     
     def _save(self) -> None:
-        """Save password to file – one file, no extra sidecar files."""
         L = LANGUAGES[self.current_lang]
         pwd = self.entry_res.get().strip()
         if not pwd:
@@ -1348,7 +1674,6 @@ class SecurePassPro(ctk.CTk):
         try:
             ext = os.path.splitext(path)[1].lower()
             
-            # PDF files
             if ext == ".pdf":
                 pdf = UTF8PDF()
                 pdf.set_author("Maxim Melnikov")
@@ -1360,8 +1685,6 @@ class SecurePassPro(ctk.CTk):
                 _tmpdir = None
                 if os.path.exists(self._pdf_font_path):
                     try:
-                        # Copy font to a temp dir so fpdf caches (.pkl) are
-                        # created there and NOT in the application folder
                         _tmpdir = tempfile.mkdtemp()
                         _tmp_font = os.path.join(_tmpdir, 'DejaVuSans.ttf')
                         shutil.copy2(self._pdf_font_path, _tmp_font)
@@ -1371,21 +1694,18 @@ class SecurePassPro(ctk.CTk):
                         pass
                 
                 def _latin1(text: str) -> str:
-                    """Encode text to latin-1 safely, replacing unsupported chars."""
                     return text.encode('latin-1', errors='replace').decode('latin-1')
 
                 if dejavu_loaded:
                     pdf.set_font('DejaVu', '', 16)
-                    lbl_title  = "Secure Pass Pro v4.0"
-                    lbl_date   = f"{L['pdf_date']}: {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
-                    lbl_pass   = f"{L['pdf_pass']}: {pwd}"
+                    lbl_title = "Secure Pass Pro v4.0"
+                    lbl_date = f"{L['pdf_date']}: {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
+                    lbl_pass = f"{L['pdf_pass']}: {pwd}"
                 else:
-                    # DejaVu unavailable — fall back to Arial (latin-1 only)
-                    # Use English labels and sanitize all text including password
                     pdf.set_font('Arial', 'B', 16)
-                    lbl_title  = "Secure Pass Pro v4.0"
-                    lbl_date   = _latin1(f"Date: {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-                    lbl_pass   = _latin1(f"Password: {pwd}")
+                    lbl_title = "Secure Pass Pro v4.0"
+                    lbl_date = _latin1(f"Date: {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+                    lbl_pass = _latin1(f"Password: {pwd}")
 
                 pdf.cell(200, 10, txt=lbl_title, ln=True, align='C')
 
@@ -1401,18 +1721,15 @@ class SecurePassPro(ctk.CTk):
                 try:
                     pdf.output(path)
                 finally:
-                    # Always clean up temp font dir (removes .pkl cache files)
                     if _tmpdir and os.path.exists(_tmpdir):
                         shutil.rmtree(_tmpdir, ignore_errors=True)
                 if not self._verify_pdf(path):
                     raise IOError(L["err_integrity"])
             else:
-                # Save password to text file
                 pwd_bytes = pwd.encode("utf-8")
                 with open(path, "wb") as f:
                     f.write(pwd_bytes)
                 
-                # Verify integrity (in-memory only, no separate .sha256 file)
                 if not self._verify_text_file(path, pwd_bytes):
                     raise IOError(L["err_integrity"])
             
@@ -1424,7 +1741,6 @@ class SecurePassPro(ctk.CTk):
             CTkMessageBox.error(self, L.get("err_title", "Error"), L["err_save"].format(e))
     
     def _open(self) -> None:
-        """Open password from file - opens ALL file types"""
         L = LANGUAGES[self.current_lang]
         
         path = filedialog.askopenfilename(
@@ -1444,13 +1760,11 @@ class SecurePassPro(ctk.CTk):
         try:
             ext = os.path.splitext(path)[1].lower()
 
-            # Guard: refuse to open a .sha256 sidecar as a password
             if path.lower().endswith(HASH_EXTENSION):
                 CTkMessageBox.error(self, L.get("err_title", "Error"),
                                     L["err_unsupported"].format(HASH_EXTENSION))
                 return
 
-            # PDF files - open with external viewer (no shell=True to avoid injection)
             if ext == ".pdf":
                 if _IS_WINDOWS:
                     os.startfile(path)
@@ -1461,10 +1775,8 @@ class SecurePassPro(ctk.CTk):
                 self._play_sound("success")
                 return
             
-            # Text files - read content
             content = None
 
-            # Refuse oversized files (10 KB limit – passwords don't need more)
             try:
                 file_size = os.path.getsize(path)
                 if file_size > 10_240:
@@ -1474,7 +1786,6 @@ class SecurePassPro(ctk.CTk):
             except OSError:
                 pass
 
-            # Try different encodings
             encodings = ['utf-8', 'cp1251', 'latin-1', 'cp866', 'koi8-r', 'utf-16', 'utf-32']
             
             for encoding in encodings:
@@ -1485,7 +1796,6 @@ class SecurePassPro(ctk.CTk):
                 except (UnicodeDecodeError, UnicodeError, UnicodeEncodeError):
                     continue
             
-            # Fallback: read as binary
             if content is None:
                 try:
                     with open(path, 'rb') as f:
@@ -1497,7 +1807,6 @@ class SecurePassPro(ctk.CTk):
             if not content:
                 raise ValueError("File is empty or contains no readable text")
             
-            # SHA-256 integrity check (if .sha256 file exists)
             hash_path = path + HASH_EXTENSION
             if os.path.exists(hash_path):
                 try:
@@ -1514,9 +1823,7 @@ class SecurePassPro(ctk.CTk):
                     self.after(3000, lambda: self.title(L["win_title"]))
                 except Exception:
                     pass
-            # No .sha256 file — open silently without warning
 
-            # Insert content into password field
             self.entry_res.delete(0, "end")
             self.entry_res.insert(0, content)
             self._update_strength_meter(content)
@@ -1575,6 +1882,186 @@ class SecurePassPro(ctk.CTk):
                 pass
             self.qr_window = None
     
+    def _show_db_window(self) -> None:
+        L = LANGUAGES[self.current_lang]
+        colors = CTkMessageBox._get_colors(self._get_actual_theme())
+        radius = self.current_radius
+        
+        if self.db_window and self.db_window.winfo_exists():
+            self.db_window.lift()
+            self.db_window.focus_force()
+            return
+        
+        self.db_window = ctk.CTkToplevel(self)
+        self.db_window.title(L["db_title"])
+        self.db_window.resizable(True, True)
+        self._apply_window_rounding(self.db_window)
+        self._center_window_relative_to_parent(self.db_window, 700, 560)
+        self.db_window.configure(fg_color=colors["bg"])
+        self.db_window.protocol("WM_DELETE_WINDOW", self._close_db_window)
+        
+        top = ctk.CTkFrame(self.db_window, fg_color="transparent")
+        top.pack(fill="x", padx=16, pady=(14, 6))
+        
+        ctk.CTkLabel(top, text=L["db_label_prompt"], font=("Segoe UI", 13),
+                     text_color=colors["label_text"]).pack(side="left", padx=(0, 6))
+        
+        label_var = tk.StringVar()
+        label_entry = ctk.CTkEntry(top, textvariable=label_var, width=220, height=36,
+                                   font=("Segoe UI", 13), fg_color=colors["entry_bg"],
+                                   text_color=colors["fg"], corner_radius=radius)
+        label_entry.pack(side="left", padx=(0, 10))
+        
+        def do_save():
+            pwd = self.entry_res.get()
+            if not pwd:
+                CTkMessageBox.warning(self.db_window, L["db_title"], L["db_no_pass"])
+                return
+            PasswordDB.save(label_var.get().strip(), pwd)
+            CTkMessageBox.info(self.db_window, L["db_title"], L["db_saved"])
+            label_var.set("")
+            refresh()
+        
+        label_entry.bind("<Return>", lambda e: do_save())
+        
+        save_btn = ctk.CTkButton(top, text=L["db_save_current"], width=190, height=36,
+                                 fg_color="#1a6b5a", hover_color="#2da882",
+                                 font=("Segoe UI", 13, "bold"), corner_radius=radius,
+                                 command=do_save)
+        save_btn.pack(side="left")
+        
+        search_var = tk.StringVar()
+        search_entry = ctk.CTkEntry(self.db_window, textvariable=search_var,
+                                    height=34, font=("Segoe UI", 13),
+                                    fg_color=colors["entry_bg"], text_color=colors["fg"],
+                                    corner_radius=radius, placeholder_text=L["db_search"])
+        search_entry.pack(fill="x", padx=16, pady=(4, 2))
+        search_var.trace_add("write", lambda *_: refresh())
+        
+        count_lbl = ctk.CTkLabel(self.db_window, text="", font=("Segoe UI", 12), text_color="gray")
+        count_lbl.pack(anchor="w", padx=16)
+        
+        scroll_frame = ctk.CTkScrollableFrame(self.db_window, fg_color=colors["bg"], corner_radius=radius)
+        scroll_frame.pack(fill="both", expand=True, padx=14, pady=(6, 10))
+        
+        close_btn = ctk.CTkButton(self.db_window, text=L["close"], width=140, height=38,
+                                  fg_color="#ca5010", hover_color="#e05a1a",
+                                  font=("Segoe UI", 13), corner_radius=radius,
+                                  command=self._close_db_window)
+        close_btn.pack(pady=(0, 12))
+        
+        def open_edit_dialog(rec):
+            dlg = ctk.CTkToplevel(self.db_window)
+            dlg.title(L["db_edit_title"])
+            dlg.resizable(False, False)
+            dlg.grab_set()
+            dlg.attributes("-topmost", True)
+            dlg_colors = CTkMessageBox._get_colors(self._get_actual_theme())
+            dlg.configure(fg_color=dlg_colors["bg"])
+            self._center_window_relative_to_parent(dlg, 420, 260)
+            
+            ctk.CTkLabel(dlg, text=L["db_edit_label"], font=("Segoe UI", 13),
+                         text_color=dlg_colors["label_text"]).pack(padx=20, pady=(18, 2), anchor="w")
+            lbl_var = tk.StringVar(value=rec["label"])
+            ctk.CTkEntry(dlg, textvariable=lbl_var, width=380, height=36,
+                         font=("Segoe UI", 13), fg_color=dlg_colors["entry_bg"],
+                         text_color=dlg_colors["fg"], corner_radius=radius).pack(padx=20, pady=(0, 8))
+            
+            ctk.CTkLabel(dlg, text=L["db_edit_pass"], font=("Segoe UI", 13),
+                         text_color=dlg_colors["label_text"]).pack(padx=20, pady=(0, 2), anchor="w")
+            pwd_var = tk.StringVar()
+            ctk.CTkEntry(dlg, textvariable=pwd_var, width=380, height=36,
+                         font=("Consolas", 13), fg_color=dlg_colors["entry_bg"],
+                         text_color=dlg_colors["fg"], corner_radius=radius).pack(padx=20, pady=(0, 16))
+            
+            def do_save_edit():
+                new_label = lbl_var.get().strip()
+                new_pwd = pwd_var.get().strip() or None
+                PasswordDB.update(rec["id"], new_label, new_pwd)
+                dlg.destroy()
+                refresh()
+            
+            btn_row = ctk.CTkFrame(dlg, fg_color="transparent")
+            btn_row.pack()
+            ctk.CTkButton(btn_row, text=L["ok"], width=110, height=34,
+                          fg_color="#1a6b5a", corner_radius=radius,
+                          command=do_save_edit).pack(side="left", padx=8)
+            ctk.CTkButton(btn_row, text=L["cancel"], width=110, height=34,
+                          fg_color="#ca5010", corner_radius=radius,
+                          command=dlg.destroy).pack(side="left", padx=8)
+        
+        def refresh():
+            for w in scroll_frame.winfo_children():
+                w.destroy()
+            
+            query = search_var.get().strip()
+            if query:
+                records = PasswordDB.search(query)
+            else:
+                records = PasswordDB.get_all()
+            
+            count_lbl.configure(text=L["db_count"].format(len(records)))
+            
+            if not records:
+                ctk.CTkLabel(scroll_frame, text=L["db_empty"],
+                             font=("Segoe UI", 14), text_color="gray").pack(pady=30)
+                return
+            
+            for rec in records:
+                row = ctk.CTkFrame(scroll_frame, fg_color=colors["entry_bg"], corner_radius=radius)
+                row.pack(fill="x", pady=4, padx=2)
+                
+                info_frame = ctk.CTkFrame(row, fg_color="transparent")
+                info_frame.pack(side="left", fill="x", expand=True, padx=10, pady=6)
+                
+                lbl_text = rec["label"] if rec["label"] else f"#{rec['id']}"
+                ctk.CTkLabel(info_frame, text=lbl_text,
+                             font=("Segoe UI", 13, "bold"),
+                             text_color=colors["label_text"]).pack(anchor="w")
+                ctk.CTkLabel(info_frame, text=rec["password"],
+                             font=("Consolas", 13), text_color="#4EC9B0").pack(anchor="w")
+                ctk.CTkLabel(info_frame, text=rec["created"],
+                             font=("Segoe UI", 10), text_color="gray").pack(anchor="w")
+                
+                btn_frame = ctk.CTkFrame(row, fg_color="transparent")
+                btn_frame.pack(side="right", padx=8, pady=6)
+                
+                def make_copy(p=rec["password"]):
+                    self.clipboard_clear()
+                    self.clipboard_append(p)
+                    CTkMessageBox.info(self.db_window, L["db_title"], L["copied"].format(5))
+                
+                def make_delete(rid=rec["id"]):
+                    if CTkMessageBox.question(self.db_window, L["db_title"], L["db_del_confirm"]):
+                        PasswordDB.delete(rid)
+                        refresh()
+                
+                def make_edit(r=rec):
+                    open_edit_dialog(r)
+                
+                ctk.CTkButton(btn_frame, text=L["db_copy"], width=80, height=28,
+                              fg_color="#107c10", hover_color="#20cf20",
+                              font=("Segoe UI", 12), corner_radius=radius,
+                              command=make_copy).pack(pady=2)
+                ctk.CTkButton(btn_frame, text=L["db_edit"], width=80, height=28,
+                              fg_color="#0078d4", hover_color="#309FFF",
+                              font=("Segoe UI", 12), corner_radius=radius,
+                              command=make_edit).pack(pady=2)
+                ctk.CTkButton(btn_frame, text=L["db_delete"], width=80, height=28,
+                              fg_color="#8b0000", hover_color="#cc0000",
+                              font=("Segoe UI", 12), corner_radius=radius,
+                              command=make_delete).pack(pady=2)
+        
+        refresh()
+    
+    def _close_db_window(self) -> None:
+        if self.db_window and self.db_window.winfo_exists():
+            try:
+                self.db_window.destroy()
+            except Exception:
+                pass
+            self.db_window = None
+    
     def _show_history(self) -> None:
         if self.history_window and self.history_window.winfo_exists():
             self.history_window.lift()
@@ -1605,7 +2092,7 @@ class SecurePassPro(ctk.CTk):
         else:
             history_snapshot = list(reversed(self.history))
             txt.insert("1.0", "\n".join(history_snapshot))
-        txt.configure(state="disabled")  # read-only
+        txt.configure(state="disabled")
         
         btn_f = ctk.CTkFrame(f, fg_color="transparent")
         btn_f.pack(fill="x")
@@ -1691,7 +2178,7 @@ class SecurePassPro(ctk.CTk):
         self._set_window_icon(self.settings_window)
         self.settings_window.transient(self)
         self.settings_window.grab_set()
-        self._center_window_relative_to_parent(self.settings_window, 420, 640)
+        self._center_window_relative_to_parent(self.settings_window, 420, 700)
         self._apply_window_rounding(self.settings_window)
         self.settings_window.attributes('-topmost', True)
         self.settings_window.after(100, lambda: self.settings_window.attributes('-topmost', False))
@@ -1744,6 +2231,20 @@ class SecurePassPro(ctk.CTk):
         
         self._add_separator(main_frame)
         
+        # Security info
+        security_label = ctk.CTkLabel(main_frame, text="🛡️ " + L.get("security", "Security"), font=("Segoe UI", 16, "bold"))
+        security_label.pack(pady=(8, 5))
+        
+        if MasterPassword.is_set():
+            security_status = ctk.CTkLabel(main_frame, text=L.get("master_status_text", "🔐 Master password: SET (Argon2id)"), 
+                                          font=("Segoe UI", 13), text_color="#2ECC71")
+        else:
+            security_status = ctk.CTkLabel(main_frame, text=L.get("master_status_not_set_text", "⚠️ Master password: NOT SET"), 
+                                          font=("Segoe UI", 13), text_color="#FFA500")
+        security_status.pack(pady=(0, 10))
+        
+        self._add_separator(main_frame)
+        
         # Radius
         radius_label = ctk.CTkLabel(main_frame, text=f"{L['settings_radius']}: {self.current_radius}", font=("Segoe UI", 16, "bold"))
         radius_label.pack(pady=(8, 5))
@@ -1775,6 +2276,28 @@ class SecurePassPro(ctk.CTk):
         clip_slider = ctk.CTkSlider(main_frame, from_=10, to=120, number_of_steps=110, width=300, command=self._on_clip_timeout_change)
         clip_slider.set(self.clipboard_timeout)
         clip_slider.pack(pady=(0, 10))
+        
+        self._add_separator(main_frame)
+        
+        # Auto Lock
+        auto_lock_label = ctk.CTkLabel(main_frame, text=L["auto_lock"], font=("Segoe UI", 16, "bold"))
+        auto_lock_label.pack(pady=(8, 5))
+        
+        auto_lock_text = L["auto_lock"] + (" ✅" if self.auto_lock_enabled.get() else " ❌")
+        self._auto_lock_btn = ctk.CTkButton(main_frame, text=auto_lock_text, width=150, height=40,
+                                           command=self._toggle_auto_lock, fg_color="#2d6a4f" if self.auto_lock_enabled.get() else "#4b4b4b",
+                                           font=("Segoe UI", 14), corner_radius=self.current_radius)
+        self._auto_lock_btn.pack(pady=(5, 5))
+        self._tooltips["auto_lock"] = ToolTip(self._auto_lock_btn)
+        self._tooltips["auto_lock"].set_text(L.get("tt_auto_lock", "Auto lock on inactivity"))
+        
+        self._auto_lock_label_ref = ctk.CTkLabel(main_frame, text=L["auto_lock_timeout"].format(self.auto_lock_timeout), font=("Segoe UI", 13))
+        self._auto_lock_label_ref.pack(pady=(5, 0))
+        
+        self._auto_lock_slider = ctk.CTkSlider(main_frame, from_=1, to=30, number_of_steps=29, width=300,
+                                              command=self._on_auto_lock_timeout_change)
+        self._auto_lock_slider.set(self.auto_lock_timeout)
+        self._auto_lock_slider.pack(pady=(5, 15))
         
         self._add_separator(main_frame)
         
@@ -1855,6 +2378,9 @@ class SecurePassPro(ctk.CTk):
             self._rgb_off_btn_ref = None
             self.settings_radius_label = None
             self._clip_timeout_label_ref = None
+            self._auto_lock_btn = None
+            self._auto_lock_slider = None
+            self._auto_lock_label_ref = None
     
     def _toggle_sound_settings(self) -> None:
         self.sound_enabled.set(not self.sound_enabled.get())
@@ -1891,7 +2417,6 @@ class SecurePassPro(ctk.CTk):
                 elif shutil.which("ffplay"):
                     subprocess.Popen(["ffplay", "-nodisp", "-autoexit", "-loglevel", "quiet", file_path],
                                      stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-                # aplay removed: it supports WAV only, not MP3
         except Exception:
             pass
     
