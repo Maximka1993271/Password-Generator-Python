@@ -6,8 +6,6 @@ Secure Pass Pro — это современный десктопный гене�
 
 ![v4.0 Preview](https://github.com/Maximka1993271/Password-Generator-Python/raw/main/Secure_Pass_MainWindow40.jpg)
 
-![v2.0.0 Preview](https://github.com/Maximka1993271/Password-Generator-Python/raw/main/Secure_Pass_MainWindow.png)
-
 ---
 
 ## 📋 О программе
@@ -103,6 +101,8 @@ Secure Pass Pro v4.0 — это полностью переработанная 
 
 Версия 2.0.0 — это классическая лёгкая версия, построенная на стандартной библиотеке `tkinter` (без внешних зависимостей). Идеально подходит для пользователей, которые ценят минимализм и стабильность.
 
+![v2.0.0 Preview](https://github.com/Maximka1993271/Password-Generator-Python/raw/main/Secure_Pass_MainWindow.png)
+
 ### Ключевые особенности v2.0.0
 
 - **Криптостойкая генерация** — использование модуля `secrets`
@@ -140,6 +140,16 @@ Secure Pass Pro v4.0 — это полностью переработанная 
 | **Контекстное меню** | ❌ | ✅ |
 | **Уведомления об очистке** | ❌ | ✅ |
 | Внешние зависимости | отсутствуют | customtkinter, qrcode, pillow, fpdf |
+
+---
+
+## 🏆 Уникальные преимущества v4.0
+
+- **Автосохранение** — уникальная функция, которой нет в коммерческих аналогах (1Password, Bitwarden, KeePass)
+- **RGB анимация** — динамическая подсветка **границ окна** и **заголовка Windows 11** (4 независимые полосы)
+- **Модульная архитектура** — разделение на модули core/, gui/, security/, storage/, localization/, utils/
+- **Полная локализация на русский** — все диалоги и сообщения переведены на 3 языка (RU/EN/UA)
+- **Argon2id хеширование** — современный стандарт защиты мастер-пароля (победитель Password Hashing Competition)
 
 ---
 
