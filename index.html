@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Secure Pass Pro v4.0 — Профессиональный генератор паролей. Master-пароль (PBKDF2), контроль целостности SHA-256, защита от повторов, настраиваемая очистка буфера (10-120 сек), RGB анимация, Amoled UI с неоновой подсветкой, расчет энтропии, просмотр PDF и криптостойкость. Цветная пульсация пароля: красный (слабый), оранжевый (средний), зелёный (надёжный). Кроссплатформенная поддержка Windows, macOS, Linux.">
+    <meta name="description" content="Secure Pass Pro v4.0 — Профессиональный генератор паролей. Модульная архитектура, Argon2id хеширование, SQLite база паролей, автосохранение, Master-пароль, контроль целостности SHA-256, защита от повторов, настраиваемая очистка буфера (10-120 сек), RGB анимация, Amoled UI с неоновой подсветкой, расчет энтропии, просмотр PDF и криптостойкость. Цветная пульсация пароля: красный (слабый), оранжевый (средний), зелёный (надёжный). Кроссплатформенная поддержка Windows, macOS, Linux. Полная локализация на 3 языка: Русский, English, Українська.">
     <title>Secure Pass Pro v4.0 | Профессиональная защита паролей</title>
     
     <link rel="icon" type="image/png" href="https://github.com/Maximka1993271/Password-Generator-Python/blob/main/app_icon.png?raw=true">
@@ -26,6 +26,8 @@
                         <a href="#pdf-section">📄 PDF Кириллица</a>
                         <a href="#animation-section">🎨 Анимации</a>
                         <a href="#rgb-section">🌈 RGB Анимация</a>
+                        <a href="#database-section">🗄️ SQLite База</a>
+                        <a href="#autosave-section">💾 Автосохранение</a>
                         <a href="#security-audit">🔒 Аудит безопасности</a>
                         <a href="#tech-specs">💻 Тех-стек</a>
                     </div>
@@ -62,6 +64,7 @@
             <li><a href="#pdf-section">PDF</a></li>
             <li><a href="#animation-section">Анимации</a></li>
             <li><a href="#rgb-section">RGB</a></li>
+            <li><a href="#database-section">База</a></li>
             <li><a href="#changelog-section">История</a></li>
             <li><a href="#security-audit">Аудит</a></li>
             <li><a href="#tech-specs">Тех-стек</a></li>
@@ -96,15 +99,18 @@
                 </div>
             </div>
             
-            <p><strong>Secure Pass Pro</strong> — это современный десктопный генератор паролей, построенный на Python и CustomTkinter. Программа сочетает криптографически стойкую генерацию, многоязычный интерфейс (RU/EN/UA), экспорт QR-кодов, контроль целостности файлов через SHA-256, защиту мастер-паролем (PBKDF2) и стильный Amoled-дизайн с RGB-анимацией.</p>
+            <p><strong>Secure Pass Pro</strong> — это современный десктопный генератор паролей, построенный на Python и CustomTkinter. Программа сочетает криптографически стойкую генерацию, многоязычный интерфейс (RU/EN/UA), экспорт QR-кодов, контроль целостности файлов через SHA-256, защиту мастер-паролем (Argon2id) и стильный Amoled-дизайн с RGB-анимацией.</p>
             
             <ul>
-                <li>🔒 Master Password (PBKDF2, 100,000 итераций)</li>
+                <li>🔒 Master Password (Argon2id + PBKDF2 fallback)</li>
                 <li>✅ Контроль целостности SHA-256</li>
                 <li>🌈 RGB анимация границ окна</li>
                 <li>⌨️ Горячие клавиши (F5, Ctrl+C/S/O, Esc)</li>
                 <li>🌐 Кроссплатформенность (Windows / macOS / Linux)</li>
                 <li>📄 Полная поддержка кириллицы в PDF</li>
+                <li>🗄️ SQLite база паролей с поиском и редактированием</li>
+                <li>💾 Автосохранение паролей (вкл/выкл)</li>
+                <li>🏗️ Полностью модульная архитектура (core/, gui/, security/, storage/, localization/, utils/)</li>
             </ul>
             
             <a href="https://github.com/Maximka1993271/Password-Generator-Python" target="_blank" class="github-btn">🚀 Перейти на GitHub →</a>
@@ -120,7 +126,7 @@
         <div class="hero-content">
             <div class="version-badge">Latest Release v4.0 Stable</div>
             <h1>Безопасность без <br><span class="highlight">компромиссов</span></h1>
-            <p>Профессиональный инструмент на Python 3.9+, объединяющий Neon-Amoled дизайн, мастер-пароль (PBKDF2), контроль целостности файлов, настраиваемую очистку буфера, RGB анимацию и криптостойкий движок для Windows, macOS и Linux.</p>
+            <p>Профессиональный инструмент на Python 3.9+, объединяющий модульную архитектуру, Argon2id хеширование, SQLite базу паролей, автосохранение, Neon-Amoled дизайн, мастер-пароль, контроль целостности файлов, настраиваемую очистку буфера, RGB анимацию и криптостойкий движок для Windows, macOS и Linux. Полная локализация на 3 языка: Русский, English, Українська.</p>
             <div class="hero-btns">
                 <a href="https://github.com/Maximka1993271/Password-Generator-Python/releases/download/v4.0/SecurePassPro.exe" class="btn-primary">⬇️ Скачать v4.0 Stable</a>
                 <a href="#v40-section" class="btn-secondary">Что нового?</a>
@@ -134,16 +140,40 @@
     <section id="v40-section" class="features-section">
         <h2 class="section-title">Ключевые нововведения <span class="highlight">v4.0</span></h2>
         <div class="features-grid">
-            <div class="card"><div class="card-icon">🔒</div><h3>Мастер-пароль (PBKDF2)</h3><p>Защита доступа к программе мастер-паролем. PBKDF2 хеширование (100,000 итераций, соль 32 байта), 5 попыток входа — при превышении программа блокируется. Исправлена уязвимость timing-атак через hmac.compare_digest().</p></div>
-            <div class="card"><div class="card-icon">✅</div><h3>Контроль целостности</h3><p>Автоматическое создание SHA-256 контрольных сумм (.sha256) при сохранении и проверка при открытии файлов. Защита от подмены данных. Исправлено дублирование файлов .sha256.</p></div>
+            <div class="card"><div class="card-icon">🏗️</div><h3>Модульная архитектура</h3><p>Полная реорганизация проекта на модули: core/, gui/, security/, storage/, localization/, utils/. Код стал чище, легче для поддержки и расширения.</p></div>
+            <div class="card"><div class="card-icon">🗄️</div><h3>SQLite база паролей</h3><p>Безлимитное хранение паролей с возможностью поиска, редактирования и удаления. Защита от SQL-инъекций, параметризованные запросы, Secure delete (PRAGMA).</p></div>
+            <div class="card"><div class="card-icon">💾</div><h3>Автосохранение</h3><p>Автоматическое сохранение сгенерированных паролей в базу с меткой даты. Включение/выключение через настройки. Перевод на 3 языка (RU/EN/UA).</p></div>
+            <div class="card"><div class="card-icon">🔒</div><h3>Argon2id хеширование</h3><p>Современный стандарт защиты мастер-пароля (победитель Password Hashing Competition) + PBKDF2 fallback для обратной совместимости. Защита от timing-атак через hmac.compare_digest().</p></div>
+            <div class="card"><div class="card-icon">✅</div><h3>Контроль целостности</h3><p>Автоматическое создание SHA-256 контрольных сумм при сохранении и проверка при открытии файлов. Защита от подмены данных.</p></div>
             <div class="card"><div class="card-icon">🔄</div><h3>Защита от повторов</h3><p>Новая опция "Избегать повторов символов подряд" — исключает появление одинаковых символов (aaa, 111). Криптостойкое перемешивание через secrets.randbelow().</p></div>
             <div class="card"><div class="card-icon">👁️</div><h3>Кнопка-глазок</h3><p>Одним кликом показывайте или скрывайте пароль. Полная синхронизация с чекбоксом "Скрывать символы".</p></div>
-            <div class="card"><div class="card-icon">⌨️</div><h3>Горячие клавиши</h3><p>F5 — генерация, Ctrl+C — копирование (только когда фокус не в поле пароля), Ctrl+S — сохранить, Ctrl+O — открыть, Esc — закрыть диалоги.</p></div>
-            <div class="card"><div class="card-icon">🌈</div><h3>RGB Анимация</h3><p>Динамическая цветная анимация границ окна с 4 независимыми полосами и синхронизацией заголовка Windows 11. Включается/выключается в настройках. Защита от переполнения float.</p></div>
-            <div class="card"><div class="card-icon">📄</div><h3>PDF Viewer</h3><p>Возможность не только экспортировать, но и открывать PDF файлы прямо в приложении с поддержкой кириллицы. Исправлена ошибка кодировки latin-1, удалены мусорные .pkl файлы.</p></div>
-            <div class="card"><div class="card-icon">🔊</div><h3>Pro Sound</h3><p>Реалистичный звук механического клика мыши с кроссплатформенной поддержкой: Windows (MCI), macOS (afplay), Linux (mpg123/ffplay). Исправлена shell-инъекция через subprocess.run().</p></div>
-            <div class="card"><div class="card-icon">📐</div><h3>Dynamic Radius</h3><p>Настройка закругления углов элементов (0-25px) в реальном времени, включая неоновые кнопки и поле ввода пароля.</p></div>
-            <div class="card"><div class="card-icon">⏱️</div><h3>Очистка буфера</h3><p>Настраиваемая очистка буфера обмена от 10 до 120 секунд — больше контроля, чем у KeePassXC! Умная очистка — буфер очищается только если в нём всё ещё ваш пароль.</p></div>
+            <div class="card"><div class="card-icon">⌨️</div><h3>Горячие клавиши</h3><p>F5 — генерация, Ctrl+C — копирование, Ctrl+S — сохранить, Ctrl+O — открыть, Esc — закрыть диалоги.</p></div>
+            <div class="card"><div class="card-icon">🌈</div><h3>RGB Анимация</h3><p>Динамическая цветная анимация границ окна с 4 независимыми полосами и синхронизацией заголовка Windows 11. Включается/выключается в настройках.</p></div>
+            <div class="card"><div class="card-icon">📄</div><h3>PDF экспорт</h3><p>Экспорт паролей в PDF с полной поддержкой кириллицы (шрифт DejaVuSans). Исправлена ошибка кодировки latin-1.</p></div>
+            <div class="card"><div class="card-icon">🌐</div><h3>Мультиязычность</h3><p>Полная поддержка 3 языков: Русский, English, Українська. Мгновенное переключение без перезапуска. Все диалоги и сообщения переведены.</p></div>
+            <div class="card"><div class="card-icon">⏱️</div><h3>Очистка буфера</h3><p>Настраиваемая очистка буфера обмена от 10 до 120 секунд. Умная очистка — буфер очищается только если в нём всё ещё ваш пароль.</p></div>
+        </div>
+    </section>
+
+    <!-- Новая секция: SQLite База паролей -->
+    <section id="database-section" class="features-section dark-bg">
+        <h2 class="section-title"><span class="highlight">SQLite База</span> паролей</h2>
+        <div class="features-grid">
+            <div class="card"><div class="card-icon">🗄️</div><h3>Безлимитное хранилище</h3><p>Сохраняйте сколько угодно паролей. База данных SQLite с возможностью поиска, редактирования и удаления записей.</p></div>
+            <div class="card"><div class="card-icon">🔍</div><h3>Поиск в реальном времени</h3><p>Мгновенный поиск по метке и содержимому пароля. Фильтрация записей по мере ввода текста.</p></div>
+            <div class="card"><div class="card-icon">✏️</div><h3>Редактирование</h3><p>Изменение метки и пароля через удобный диалог. Копирование пароля одним кликом.</p></div>
+            <div class="card"><div class="card-icon">🔒</div><h3>Защита от SQL-инъекций</h3><p>Все запросы к БД параметризованы. Secure delete: PRAGMA secure_delete = ON, удалённые данные не восстанавливаются.</p></div>
+        </div>
+    </section>
+
+    <!-- Новая секция: Автосохранение -->
+    <section id="autosave-section" class="features-section">
+        <h2 class="section-title"><span class="highlight">Автосохранение</span> паролей</h2>
+        <div class="features-grid">
+            <div class="card"><div class="card-icon">💾</div><h3>Автоматическое сохранение</h3><p>При включённой опции каждый сгенерированный пароль автоматически сохраняется в базу данных.</p></div>
+            <div class="card"><div class="card-icon">🏷️</div><h3>Метка с датой</h3><p>Пароли сохраняются с меткой формата: Auto 2026-05-14 15:30:00</p></div>
+            <div class="card"><div class="card-icon">⚙️</div><h3>Управление в настройках</h3><p>Удобная кнопка включения/выключения в окне настроек. Состояние сохраняется в config.json.</p></div>
+            <div class="card"><div class="card-icon">🌐</div><h3>Перевод на 3 языка</h3><p>Полная поддержка Русского, English и Українська. Единый стиль без капслока.</p></div>
         </div>
     </section>
 
@@ -151,20 +181,21 @@
         <h2 class="section-title">Централизованные <span class="highlight">Настройки</span></h2>
         <div class="features-grid">
             <div class="card"><div class="card-icon">🌐</div><h3>Смена языка</h3><p>Мгновенное переключение между Русским, Английским и Украинским языками без перезапуска программы.</p></div>
-            <div class="card"><div class="card-icon">🎨</div><h3>Тема оформления</h3><p>Выбор между Системной, Светлой и Тёмной темой с плавным переключением без зависаний.</p></div>
+            <div class="card"><div class="card-icon">🎨</div><h3>Тема оформления</h3><p>Выбор между Системной, Светлой и Тёмной темой с плавным переключением.</p></div>
             <div class="card"><div class="card-icon">🎛️</div><h3>RGB управление</h3><p>Кнопки ВКЛ/ВЫКЛ для RGB анимации границ окна. Состояние сохраняется в config.json.</p></div>
-            <div class="card"><div class="card-icon">🔊</div><h3>Управление звуком</h3><p>Включение/выключение звуковых эффектов через удобную кнопку с отображением "ВКЛ"/"ВЫКЛ". Кроссплатформенная поддержка.</p></div>
+            <div class="card"><div class="card-icon">🔊</div><h3>Управление звуком</h3><p>Включение/выключение звуковых эффектов. Кроссплатформенная поддержка (Windows MCI, macOS afplay, Linux mpg123/ffplay).</p></div>
             <div class="card"><div class="card-icon">📐</div><h3>Ползунок закругления</h3><p>Интерактивный слайдер для настройки скругления всех углов интерфейса от 0 до 25 пикселей.</p></div>
-            <div class="card"><div class="card-icon">🔒</div><h3>Управление мастер-паролем</h3><p>Установка и удаление мастер-пароля через окно настроек. Индикатор статуса (🔒 Установлен / 🔓 Не установлен). Запрет пустого мастер-пароля.</p></div>
+            <div class="card"><div class="card-icon">🔒</div><h3>Управление мастер-паролем</h3><p>Установка и удаление мастер-пароля через окно настроек. Индикатор статуса (🔒 Установлен / 🔓 Не установлен). Argon2id хеширование.</p></div>
             <div class="card"><div class="card-icon">⏱️</div><h3>Таймаут буфера</h3><p>Слайдер от 10 до 120 секунд для настройки времени очистки буфера обмена после копирования.</p></div>
-            <div class="card"><div class="card-icon">💾</div><h3>JSON конфигурация</h3><p>Все настройки сохраняются в config.json в папке пользователя. Надёжное хранение параметров с защитой от повреждения (JSONDecodeError).</p></div>
+            <div class="card"><div class="card-icon">💾</div><h3>Автосохранение</h3><p>Включение/выключение автоматического сохранения паролей в базу данных.</p></div>
+            <div class="card"><div class="card-icon">⚙️</div><h3>JSON конфигурация</h3><p>Все настройки сохраняются в config.json в папке пользователя. Надёжное хранение параметров с защитой от повреждения.</p></div>
         </div>
     </section>
 
     <section id="pdf-section" class="features-section">
         <h2 class="section-title">Полная поддержка <span class="highlight">Кириллицы в PDF</span></h2>
         <div class="features-grid">
-            <div class="card"><div class="card-icon">🖋️</div><h3>DejaVuSans.ttf</h3><p>Встроенный шрифт DejaVuSans обеспечивает корректное отображение русских и украинских символов в экспортируемых PDF-файлах. Шрифт временно копируется в temp-папку, мусорные .pkl файлы удаляются.</p></div>
+            <div class="card"><div class="card-icon">🖋️</div><h3>DejaVuSans.ttf</h3><p>Встроенный шрифт DejaVuSans обеспечивает корректное отображение русских и украинских символов в экспортируемых PDF-файлах. Временная папка для шрифта, мусорные .pkl файлы удаляются.</p></div>
             <div class="card"><div class="card-icon">✅</div><h3>Unicode совместимость</h3><p>Полная поддержка UTF-8 при экспорте документов. Кириллица отображается без иероглифов. Исправлена ошибка latin-1 кодировки.</p></div>
         </div>
     </section>
@@ -191,30 +222,28 @@
         </div>
     </section>
 
-    <!-- Секция: Полная история версий -->
+    <!-- Секция: Полная история версий (обновлена) -->
     <section id="changelog-section" class="features-section dark-bg">
         <h2 class="section-title">Полная история <span class="highlight">изменений v4.0</span></h2>
         <div class="features-grid">
-            <div class="card"><div class="card-icon">🪟</div><h3>Окна мастер-пароля</h3><ul><li>✅ Исправлен перевод на все 3 языка</li><li>✅ Исправлены цвета окон под выбранную тему</li><li>✅ Полный редизайн с закруглением углов</li><li>✅ Добавлена кнопка "Установить мастер-пароль"</li><li>✅ Добавлена кнопка "Удалить мастер-пароль"</li></ul></div>
-            <div class="card"><div class="card-icon">🎨</div><h3>Чекбоксы и визуал</h3><ul><li>✅ Улучшен внешний вид чекбоксов</li><li>✅ Синхронизация стилей чекбоксов с темой</li><li>✅ Правильные отступы между элементами</li><li>✅ Все чекбоксы запускаются снятыми</li></ul></div>
-            <div class="card"><div class="card-icon">⚙️</div><h3>Редизайн настроек</h3><ul><li>✅ Полностью новое окно с прокруткой</li><li>✅ Слайдеры для радиуса и таймаута буфера</li><li>✅ Кнопка звука с визуальным отображением</li><li>✅ Кнопки управления RGB анимацией</li><li>✅ Исправлен визуальный flash окна</li></ul></div>
-            <div class="card"><div class="card-icon">🔧</div><h3>Критические исправления</h3><ul><li>🔧 Исправлен winreg import на Linux/macOS</li><li>🔧 Исправлен AttributeError settings_labels</li><li>🔧 Исправлены 8 отсутствующих атрибутов</li><li>🔧 Исправлен конфликт Ctrl+C</li><li>🔧 Исправлена уязвимость timing-атак (hmac.compare_digest)</li><li>🔧 Исправлена shell-инъекция (subprocess.run)</li></ul></div>
-            <div class="card"><div class="card-icon">💻</div><h3>Кроссплатформенность</h3><ul><li>✅ Windows — полная поддержка с MCI звуком</li><li>✅ macOS — нативные шрифты и звук afplay</li><li>✅ Linux — шрифты DejaVu Sans и звук mpg123/ffplay</li><li>✅ Автоматический выбор шрифтов</li></ul></div>
-            <div class="card"><div class="card-icon">🛡️</div><h3>Умная очистка буфера</h3><ul><li>✅ Проверка содержимого перед очисткой</li><li>✅ Не трогает чужие данные</li><li>✅ Безопасная работа с буфером</li></ul></div>
-        </div>
-
-        <!-- ДОПОЛНИТЕЛЬНЫЕ ИСПРАВЛЕНИЯ (НОВЫЕ) -->
-        <div class="features-grid" style="margin-top: 25px;">
-            <div class="card"><div class="card-icon">📁</div><h3>Файловые операции</h3><ul><li>✅ Убрано дублирование .sha256 файлов</li><li>✅ Проверка целостности в памяти</li><li>✅ Убраны предупреждения при отсутствии .sha256</li><li>✅ Защита от открытия .sha256 как пароля</li><li>✅ Лимит файла 10 КБ</li></ul></div>
+            <div class="card"><div class="card-icon">🏗️</div><h3>Модульная архитектура</h3><ul><li>✅ Разделение на модули: core/, gui/, security/, storage/, localization/, utils/</li><li>✅ Код стал чище и легче для поддержки</li><li>✅ Легко добавлять новые функции</li></ul></div>
+            <div class="card"><div class="card-icon">🗄️</div><h3>SQLite база паролей</h3><ul><li>✅ Безлимитное хранение паролей</li><li>✅ Поиск в реальном времени</li><li>✅ Редактирование и удаление записей</li><li>✅ Защита от SQL-инъекций</li><li>✅ Secure delete (PRAGMA)</li></ul></div>
+            <div class="card"><div class="card-icon">💾</div><h3>Автосохранение</h3><ul><li>✅ Автоматическое сохранение в базу</li><li>✅ Метка с датой</li><li>✅ Кнопка в настройках (вкл/выкл)</li><li>✅ Перевод на 3 языка (RU/EN/UA)</li><li>✅ Единый стиль без капслока</li></ul></div>
+            <div class="card"><div class="card-icon">🔒</div><h3>Argon2id хеширование</h3><ul><li>✅ Современный стандарт (победитель PHC)</li><li>✅ PBKDF2 fallback для совместимости</li><li>✅ Защита от timing-атак (hmac.compare_digest)</li><li>✅ Запрет пустого мастер-пароля</li></ul></div>
+            <div class="card"><div class="card-icon">🪟</div><h3>Окна мастер-пароля</h3><ul><li>✅ Исправлен перевод на все 3 языка</li><li>✅ Исправлены цвета окон под выбранную тему</li><li>✅ Полный редизайн с закруглением углов</li><li>✅ Кнопки "Установить" и "Удалить" мастер-пароль</li></ul></div>
+            <div class="card"><div class="card-icon">🎨</div><h3>Чекбоксы и визуал</h3><ul><li>✅ Улучшен внешний вид чекбоксов</li><li>✅ Синхронизация стилей с темой</li><li>✅ Все чекбоксы запускаются снятыми</li></ul></div>
+            <div class="card"><div class="card-icon">⚙️</div><h3>Редизайн настроек</h3><ul><li>✅ Полностью новое окно с прокруткой</li><li>✅ Слайдеры для радиуса и таймаута буфера</li><li>✅ Кнопка автосохранения</li><li>✅ Кнопки управления RGB анимацией</li></ul></div>
+            <div class="card"><div class="card-icon">🔧</div><h3>Критические исправления</h3><ul><li>🔧 Исправлен winreg import на Linux/macOS</li><li>🔧 Исправлен конфликт Ctrl+C</li><li>🔧 Исправлена уязвимость timing-атак</li><li>🔧 Исправлена shell-инъекция (subprocess.run)</li></ul></div>
+            <div class="card"><div class="card-icon">💻</div><h3>Кроссплатформенность</h3><ul><li>✅ Windows — полная поддержка с MCI звуком</li><li>✅ macOS — нативные шрифты и звук afplay</li><li>✅ Linux — шрифты DejaVu Sans и звук mpg123/ffplay</li></ul></div>
+            <div class="card"><div class="card-icon">🌐</div><h3>Локализация</h3><ul><li>✅ Полная поддержка RU/EN/UA</li><li>✅ Мгновенное переключение без перезапуска</li><li>✅ Все диалоги и сообщения переведены</li><li>✅ Единый стиль без капслока</li></ul></div>
+            <div class="card"><div class="card-icon">📁</div><h3>Файловые операции</h3><ul><li>✅ Убрано дублирование .sha256 файлов</li><li>✅ Проверка целостности в памяти</li><li>✅ Защита от открытия .sha256 как пароля</li><li>✅ Лимит файла 10 КБ</li></ul></div>
             <div class="card"><div class="card-icon">📄</div><h3>PDF экспорт</h3><ul><li>✅ Исправлена ошибка latin-1 кодировки</li><li>✅ Удалены мусорные .pkl файлы</li><li>✅ Временная папка для шрифта</li><li>✅ Запасной механизм без DejaVuSans</li></ul></div>
-            <div class="card"><div class="card-icon">🔐</div><h3>Безопасность</h3><ul><li>✅ Timing-атаки (hmac.compare_digest)</li><li>✅ Криптостойкое перемешивание (secrets)</li><li>✅ Запрет пустого мастер-пароля</li><li>✅ Защита от shell-инъекций</li></ul></div>
-            <div class="card"><div class="card-icon">🖥️</div><h3>Стабильность</h3><ul><li>✅ Корректная обработка повреждённого config.json</li><li>✅ Правильное закрытие дочерних окон</li><li>✅ История паролей только для чтения</li><li>✅ Tooltip с проверкой winfo_exists()</li><li>✅ Визуальная обратная связь при сохранении</li></ul></div>
         </div>
 
         <div style="display: flex; justify-content: center; gap: 30px; flex-wrap: wrap; margin-top: 40px;">
-            <div style="background: rgba(76, 201, 176, 0.1); padding: 20px 35px; border-radius: 15px; border: 1px solid #4EC9B0; text-align: center;"><div style="font-size: 2.5rem; font-weight: 800; color: #4EC9B0;">29+</div><div style="color: #888;">Всего исправлений</div></div>
-            <div style="background: rgba(76, 201, 176, 0.1); padding: 20px 35px; border-radius: 15px; border: 1px solid #4EC9B0; text-align: center;"><div style="font-size: 2.5rem; font-weight: 800; color: #4EC9B0;">6</div><div style="color: #888;">Критических (безопасность)</div></div>
-            <div style="background: rgba(76, 201, 176, 0.1); padding: 20px 35px; border-radius: 15px; border: 1px solid #4EC9B0; text-align: center;"><div style="font-size: 2.5rem; font-weight: 800; color: #4EC9B0;">16</div><div style="color: #888;">Исправлений стабильности</div></div>
+            <div style="background: rgba(76, 201, 176, 0.1); padding: 20px 35px; border-radius: 15px; border: 1px solid #4EC9B0; text-align: center;"><div style="font-size: 2.5rem; font-weight: 800; color: #4EC9B0;">35+</div><div style="color: #888;">Всего исправлений</div></div>
+            <div style="background: rgba(76, 201, 176, 0.1); padding: 20px 35px; border-radius: 15px; border: 1px solid #4EC9B0; text-align: center;"><div style="font-size: 2.5rem; font-weight: 800; color: #4EC9B0;">7</div><div style="color: #888;">Критических (безопасность)</div></div>
+            <div style="background: rgba(76, 201, 176, 0.1); padding: 20px 35px; border-radius: 15px; border: 1px solid #4EC9B0; text-align: center;"><div style="font-size: 2.5rem; font-weight: 800; color: #4EC9B0;">3</div><div style="color: #888;">Языка (RU/EN/UA)</div></div>
             <div style="background: rgba(76, 201, 176, 0.1); padding: 20px 35px; border-radius: 15px; border: 1px solid #4EC9B0; text-align: center;"><div style="font-size: 2.5rem; font-weight: 800; color: #4EC9B0;">3</div><div style="color: #888;">Платформы</div></div>
         </div>
     </section>
@@ -226,6 +255,8 @@
             <div class="card"><div class="card-icon">⏳</div><h3>Time-to-Crack</h3><p>Оценка времени взлома методом Brute-force: от "мгновенно" до "столетий".</p></div>
             <div class="card"><div class="card-icon">⭐</div><h3>Visual Rating</h3><p>Пятизвездочный рейтинг надежности и 3-уровневая цветовая шкала.</p></div>
             <div class="card"><div class="card-icon">🛡️</div><h3>SHA-256 верификация</h3><p>Контроль целостности сохранённых файлов через SHA-256 хеширование.</p></div>
+            <div class="card"><div class="card-icon">🔒</div><h3>Argon2id</h3><p>Современный стандарт хеширования мастер-пароля (победитель Password Hashing Competition).</p></div>
+            <div class="card"><div class="card-icon">🛡️</div><h3>Защита от SQL-инъекций</h3><p>Все запросы параметризованы. Secure delete для SQLite.</p></div>
         </div>
     </section>
 
@@ -241,6 +272,8 @@
             <div class="tech-item"><h4>🟠 Оранжевый</h4><p>Средний пароль</p></div>
             <div class="tech-item"><h4>🟢 Зеленый</h4><p>Надёжный пароль</p></div>
             <div class="tech-item"><h4>🌈 RGB</h4><p>Анимация границ</p></div>
+            <div class="tech-item"><h4>💾 Зеленый</h4><p>Автосохранение</p></div>
+            <div class="tech-item"><h4>🗄️ Синий</h4><p>База паролей</p></div>
         </div>
     </section>
 
@@ -249,20 +282,25 @@
         <div class="tech-specs-container">
             <ul class="tech-list">
                 <li><strong>Разработчик:</strong> Максим Мельников (Maxim Melnikov)</li>
-                <li><strong>Версия:</strong> 4.0 Stable (13.05.2026)</li>
+                <li><strong>Версия:</strong> 4.0 Stable (14.05.2026)</li>
+                <li><strong>Архитектура:</strong> Полностью модульная (core/, gui/, security/, storage/, localization/, utils/)</li>
                 <li><strong>Ядро:</strong> Python 3.9+ (CSPRNG Secrets)</li>
-                <li><strong>Защита:</strong> Мастер-пароль (PBKDF2, 100,000 итераций, HMAC) + Контроль целостности (.sha256)</li>
+                <li><strong>Защита мастер-пароля:</strong> Argon2id (современный стандарт) + PBKDF2 fallback (600,000 итераций)</li>
+                <li><strong>Хранилище паролей:</strong> SQLite с защитой от SQL-инъекций и Secure delete</li>
+                <li><strong>Автосохранение:</strong> Да (вкл/выкл, метка с датой)</li>
+                <li><strong>Контроль целостности:</strong> SHA-256</li>
                 <li><strong>Очистка буфера:</strong> Настраиваемая 10-120 секунд + умная проверка содержимого</li>
                 <li><strong>Аудио:</strong> Кроссплатформенный (Windows MCI / macOS afplay / Linux mpg123/ffplay)</li>
-                <li><strong>Шрифты:</strong> Кроссплатформенные (_FONT_UI, _FONT_MONO, _FONT_BTN)</li>
+                <li><strong>Шрифты:</strong> Кроссплатформенные (Segoe UI, SF Pro Display, DejaVu Sans)</li>
                 <li><strong>Анимации:</strong> Цветная пульсация + RGB границ окна (защита от переполнения float)</li>
-                <li><strong>Горячие клавиши:</strong> F5, Ctrl+C (без конфликта), Ctrl+S, Ctrl+O, Esc</li>
+                <li><strong>Горячие клавиши:</strong> F5, Ctrl+C, Ctrl+S, Ctrl+O, Esc</li>
+                <li><strong>Языки:</strong> Русский, English, Українська (мгновенное переключение)</li>
                 <li><strong>Платформы:</strong> Windows 10/11, macOS, Linux</li>
-                <li><strong>Всего исправлений:</strong> 29+ (6 критических безопасности, 16 стабильности)</li>
+                <li><strong>Всего исправлений:</strong> 35+ (7 критических безопасности)</li>
             </ul>
             <div class="build-command">
-                <p class="command-label">// Команда сборки v4.0 (Full Package)</p>
-                <code class="command-code">pyinstaller --noconfirm --onefile --windowed --clean --icon="icon.ico" --add-data "icon.ico;." --add-data "Computer Mouse Click.mp3;." --add-data "DejaVuSans.ttf;." --collect-all qrcode --collect-all customtkinter --hidden-import="PIL._tkinter_finder" --name "SecurePassPro" Secure_Pass_Pro.pyw</code>
+                <p class="command-label">// Команда сборки v4.0 (модульная версия)</p>
+                <code class="command-code">pyinstaller --noconfirm --onefile --windowed --clean --icon="icon.ico" --add-data "icon.ico;." --add-data "Computer Mouse Click.mp3;." --add-data "DejaVuSans.ttf;." --add-data "core;core" --add-data "gui;gui" --add-data "security;security" --add-data "storage;storage" --add-data "localization;localization" --add-data "utils;utils" --collect-all qrcode --collect-all customtkinter --collect-all PIL --collect-all argon2 --hidden-import="PIL._tkinter_finder" --hidden-import="argon2" --hidden-import="argon2._ffi" --hidden-import="argon2._legacy" --hidden-import="fpdf" --hidden-import="sqlite3" --hidden-import="ctypes" --hidden-import="queue" --name "SecurePassPro" Secure_Pass_Pro.pyw</code>
             </div>
         </div>
     </section>
@@ -273,9 +311,14 @@
             <div class="download-card highlight-card">
                 <div class="card-icon">🏆</div>
                 <h3>Secure Pass Pro v4.0</h3>
-                <p><b>Рекомендуется.</b> Мастер-пароль (PBKDF2 + HMAC), контроль целостности SHA-256, защита от повторов, кнопка-глазок, горячие клавиши, <b>настраиваемая умная очистка буфера (10-120 сек)</b>, <b>RGB анимация границ окна</b>, Neon UI, поддержка PDF с кириллицей (DejaVuSans), кроссплатформенный звук, цветная пульсация пароля, 29+ исправлений ошибок, полная защита от timing-атак и shell-инъекций.</p>
+                <p><b>Рекомендуется.</b> Модульная архитектура, Argon2id хеширование, SQLite база паролей, автосохранение, мастер-пароль, контроль целостности SHA-256, защита от повторов, кнопка-глазок, горячие клавиши, <b>настраиваемая умная очистка буфера (10-120 сек)</b>, <b>RGB анимация границ окна</b>, Neon UI, поддержка PDF с кириллицей (DejaVuSans), кроссплатформенный звук, цветная пульсация пароля, полная локализация на 3 языка (RU/EN/UA), 35+ исправлений ошибок, полная защита от timing-атак и shell-инъекций.</p>
                 <a href="https://github.com/Maximka1993271/Password-Generator-Python/releases/download/v4.0/SecurePassPro.exe" class="btn-primary full-width">⬇️ Скачать v4.0 (.EXE)</a>
-                <div style="margin-top: 15px;"><a href="https://github.com/Maximka1993271/Password-Generator-Python/releases/download/SecurePassProv2.0.0/SecurePassPro.exe" style="color: #888; font-size: 0.8rem;">📦 Архивная версия v2.0.0 →</a></div>
+                <div style="margin-top: 15px;">
+                    <a href="https://github.com/Maximka1993271/Password-Generator-Python/archive/refs/heads/main.zip" style="color: #888; font-size: 0.8rem;">📦 Исходный код (ZIP) →</a>
+                </div>
+                <div style="margin-top: 8px;">
+                    <a href="https://github.com/Maximka1993271/Password-Generator-Python/releases/download/SecurePassProv2.0.0/SecurePassPro.exe" style="color: #888; font-size: 0.8rem;">📦 Архивная версия v2.0.0 →</a>
+                </div>
             </div>
         </div>
     </section>
@@ -285,6 +328,10 @@
             <p>© 2026 Максим Мельников • MIT License</p>
             <div class="footer-tags">
                 <span class="badge">Python 3.9+</span>
+                <span class="badge">Модульная архитектура</span>
+                <span class="badge">Argon2id</span>
+                <span class="badge">SQLite</span>
+                <span class="badge">Автосохранение</span>
                 <span class="badge">Neon-Amoled UX</span>
                 <span class="badge">CSPRNG Secrets</span>
                 <span class="badge">PBKDF2</span>
@@ -294,9 +341,9 @@
                 <span class="badge">Cross-Platform</span>
                 <span class="badge">Win/Mac/Linux</span>
                 <span class="badge">RU/EN/UA</span>
-                <span class="badge">29+ Fixes</span>
+                <span class="badge">35+ Fixes</span>
             </div>
-            <p class="footer-description">Локализация: RU, EN, UA. Программа гарантирует полную приватность данных. Генерация происходит локально. Кроссплатформенная поддержка Windows, macOS, Linux. Все критические баги исправлены (29+ исправлений), мёртвый код удалён, добавлена умная очистка буфера, защита от timing-атак и shell-инъекций. PDF экспорт с полной поддержкой кириллицы, без мусорных файлов.</p>
+            <p class="footer-description">Локализация: Русский, English, Українська. Программа гарантирует полную приватность данных. Генерация происходит локально. Кроссплатформенная поддержка Windows, macOS, Linux. Модульная архитектура, Argon2id хеширование, SQLite база паролей с автосохранением. Все критические баги исправлены (35+ исправлений), мёртвый код удалён, добавлена умная очистка буфера, защита от timing-атак и shell-инъекций. PDF экспорт с полной поддержкой кириллицы, без мусорных файлов.</p>
         </div>
     </footer>
 
