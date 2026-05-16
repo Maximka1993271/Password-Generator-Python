@@ -13,6 +13,8 @@ import datetime
 import shutil
 import tempfile
 import tkinter as tk
+import subprocess
+import ctypes
 from tkinter import filedialog
 from typing import Optional, Dict, Any, List
 
@@ -35,11 +37,46 @@ from utils.helpers import (
     apply_window_rounding, set_window_icon
 )
 
-# Constants
+# ==================== CONSTANTS & PORTABLE LOGIC ====================
 HISTORY_MAX = 50
 UPD_URL = "https://github.com/Maximka1993271/Password-Generator-Python/releases"
-CONFIG_DIR = os.path.join(os.path.expanduser("~"), ".securepasspro")
+
+# Определение базовой директории (путь к EXE или скрипту)
+if getattr(sys, 'frozen', False):
+    BASE_DIR = os.path.dirname(sys.executable)
+else:
+    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+# Путь к скрытой папке данных прямо в директории приложения
+CONFIG_DIR = os.path.join(BASE_DIR, "data")
 CONFIG_FILE = os.path.join(CONFIG_DIR, "config.json")
+
+# Создание папки data (без fallback!)
+try:
+    os.makedirs(CONFIG_DIR, exist_ok=True)
+    if sys.platform == "win32":
+        ctypes.windll.kernel32.SetFileAttributesW(CONFIG_DIR, 0x02)
+    print(f"[Config] Using config dir: {CONFIG_DIR}")
+except Exception as e:
+    print(f"[Config] Error creating config dir: {e}")
+    # НЕ откатываемся к старой папке!
+    # Если не удалось, программа будет использовать временную папку
+    import tempfile
+    CONFIG_DIR = os.path.join(tempfile.gettempdir(), "securepasspro")
+    CONFIG_FILE = os.path.join(CONFIG_DIR, "config.json")
+    os.makedirs(CONFIG_DIR, exist_ok=True)
+    print(f"[Config] Using fallback temp dir: {CONFIG_DIR}")
+
+# Удаляем старую папку, если она существует
+OLD_CONFIG_DIR = os.path.join(os.path.expanduser("~"), ".securepasspro")
+if os.path.exists(OLD_CONFIG_DIR):
+    try:
+        import shutil
+        shutil.rmtree(OLD_CONFIG_DIR)
+        print("[Cleanup] Removed old config folder")
+    except Exception as e:
+        print(f"[Cleanup] Error removing old folder: {e}")
+# =====================================================================
 
 
 class SecurePassPro(ctk.CTk):
@@ -50,8 +87,9 @@ class SecurePassPro(ctk.CTk):
         
         # Settings
         self.current_lang = "RU"
-        self.current_theme = "System"
-        self.current_radius = 10
+        self.current_theme = "Dark"
+        self.current_radius = 25
+        self.current_font_size = 14
         self.clipboard_timeout = 60
         self._clipboard_timer: Optional[str] = None
         self._rgb_anim_id: Optional[str] = None
@@ -62,6 +100,12 @@ class SecurePassPro(ctk.CTk):
         self.auto_lock_timeout = 5
         self._last_activity_time = time.time()
         self._lock_check_id: Optional[str] = None
+        
+        # Таймеры для плавных слайдеров
+        self._radius_timer = None
+        self._clip_timer = None
+        self._auto_timer = None
+        self._font_timer = None
         
         set_global_radius(self.current_radius)
         
@@ -75,8 +119,8 @@ class SecurePassPro(ctk.CTk):
         self.at_least_var = tk.BooleanVar(value=False)
         self.hide_var = tk.BooleanVar(value=False)
         self.no_repeat_var = tk.BooleanVar(value=False)
-        self.sound_enabled = tk.BooleanVar(value=False)
-        self.rgb_enabled = tk.BooleanVar(value=False)
+        self.sound_enabled = tk.BooleanVar(value=True)
+        self.rgb_enabled = tk.BooleanVar(value=True)
         
         self.history: deque = deque(maxlen=HISTORY_MAX)
         self._rgb_t = 0.0
@@ -352,10 +396,10 @@ class SecurePassPro(ctk.CTk):
     
     def _update_rgb_buttons(self) -> None:
         is_on = self.rgb_enabled.get()
-        for ref, active in (('_rgb_on_btn_ref', is_on), ('_rgb_off_btn_ref', not is_on)):
-            btn = getattr(self, ref, None)
-            if btn and btn.winfo_exists():
-                btn.configure(fg_color="#7b2d8b" if active else "#4b4b4b")
+        if self._rgb_on_btn_ref and self._rgb_on_btn_ref.winfo_exists():
+            self._rgb_on_btn_ref.configure(fg_color="#2d6a4f" if is_on else "#4b4b4b", hover_color="#2d6a4f")
+        if self._rgb_off_btn_ref and self._rgb_off_btn_ref.winfo_exists():
+            self._rgb_off_btn_ref.configure(fg_color="#8b0000", hover_color="#8b0000")
     
     # ==================== UI SETUP ====================
     
@@ -402,61 +446,82 @@ class SecurePassPro(ctk.CTk):
         return "dark"
     
     def _load_all_settings(self) -> None:
-        try:
-            if not os.path.exists(CONFIG_FILE):
-                return
-            with open(CONFIG_FILE, "r", encoding="utf-8") as f:
-                try:
+        # Полный список настроек по умолчанию
+        default_config = {
+            "THEME": "Dark",
+            "LANG": "RU",
+            "SOUND": True,
+            "RGB": True,
+            "RADIUS": 25,
+            "font_size": 14,
+            "CLIP_TIMEOUT": 60,
+            "AUTO_LOCK": False,
+            "AUTO_LOCK_TIMEOUT": 5,
+            "auto_save": False
+        }
+        
+        need_save = False
+        
+        if not os.path.exists(CONFIG_FILE):
+            need_save = True
+            config = default_config.copy()
+        else:
+            try:
+                with open(CONFIG_FILE, "r", encoding="utf-8") as f:
                     config = json.load(f)
-                except (json.JSONDecodeError, ValueError):
-                    return
-            
-            if "THEME" in config and config["THEME"] in ("System", "Light", "Dark"):
-                self.current_theme = config["THEME"]
-                actual_theme = self._get_actual_theme()
-                ctk.set_appearance_mode(self.current_theme)
-                self._apply_theme_colors(actual_theme)
-            
-            if "LANG" in config and config["LANG"] in ("RU", "EN", "UA"):
-                self._apply_lang(config["LANG"])
-            
-            if "SOUND" in config:
-                self.sound_enabled.set(config["SOUND"])
-            
-            if "CLIP_TIMEOUT" in config:
-                t = config["CLIP_TIMEOUT"]
-                if 10 <= t <= 120:
-                    self.clipboard_timeout = t
-            
-            if "RGB" in config and config["RGB"]:
-                self.rgb_enabled.set(True)
-                self.after(200, self._start_rgb)
-            
-            if "RADIUS" in config:
-                r = config["RADIUS"]
-                if 0 <= r <= 25:
-                    self.current_radius = r
-                    set_global_radius(r)
-                    self._change_radius(r)
-            
-            if "AUTO_LOCK" in config:
-                self.auto_lock_enabled.set(config["AUTO_LOCK"])
-            if "AUTO_LOCK_TIMEOUT" in config:
-                t = config["AUTO_LOCK_TIMEOUT"]
-                if 1 <= t <= 30:
-                    self.auto_lock_timeout = t
-                    self._update_auto_lock_label()
-                    
-            # Load auto save setting
-            if "auto_save" in config:
-                self.auto_save_var.set(config["auto_save"])
-                if hasattr(self, 'auto_save_btn') and self.auto_save_btn:
-                    if self.auto_save_var.get():
-                        self.auto_save_btn.configure(text="✅ ВКЛ", fg_color="#2d6a4f")
-                    else:
-                        self.auto_save_btn.configure(text="❌ ВЫКЛ", fg_color="#4b4b4b")
-        except Exception:
-            pass
+                # Проверяем, есть ли все ключи
+                for key in default_config:
+                    if key not in config:
+                        config[key] = default_config[key]
+                        need_save = True
+            except Exception:
+                config = default_config.copy()
+                need_save = True
+        
+        # Сохраняем, если нужно
+        if need_save:
+            try:
+                os.makedirs(CONFIG_DIR, exist_ok=True)
+                with open(CONFIG_FILE, "w", encoding="utf-8") as f:
+                    json.dump(config, f, indent=2, ensure_ascii=False)
+            except Exception:
+                pass
+        
+        # Синхронизируем синглтон Config с полным словарём настроек.
+        # Это гарантирует, что при первом запуске (или неполном файле)
+        # все ключи будут записаны в config.json через Config.save().
+        self.config.update(config)
+        
+        # Применяем настройки
+        self.current_theme = config.get("THEME", "Dark")
+        self.current_lang = config.get("LANG", "RU")
+        self.sound_enabled.set(config.get("SOUND", True))
+        self.rgb_enabled.set(config.get("RGB", True))
+        self.current_radius = config.get("RADIUS", 25)
+        self.current_font_size = config.get("font_size", 14)
+        self.clipboard_timeout = config.get("CLIP_TIMEOUT", 60)
+        self.auto_lock_enabled.set(config.get("AUTO_LOCK", False))
+        self.auto_lock_timeout = config.get("AUTO_LOCK_TIMEOUT", 5)
+        self.auto_save_var.set(config.get("auto_save", False))
+        
+        # Применяем визуальные настройки
+        set_global_radius(self.current_radius)
+        self._change_radius(self.current_radius)
+        self._apply_font_size(self.current_font_size)
+        
+        actual_theme = self._get_actual_theme()
+        ctk.set_appearance_mode(self.current_theme)
+        self.after(50, lambda: self._apply_theme_colors(actual_theme))
+        self.after(60, lambda: self.configure(fg_color="#F3F3F3" if actual_theme == "light" else "#1d1e1e"))
+        
+        if self.rgb_enabled.get():
+            self.after(200, self._start_rgb)
+        
+        self._update_master_status_label()
+        self._update_auto_lock_label()
+        
+        # Обновляем язык
+        self._apply_lang(self.current_lang)
     
     def _update_auto_lock_label(self) -> None:
         if self._auto_lock_label_ref and self._auto_lock_label_ref.winfo_exists():
@@ -467,17 +532,21 @@ class SecurePassPro(ctk.CTk):
         self.auto_lock_enabled.set(not self.auto_lock_enabled.get())
         if self._auto_lock_btn and self._auto_lock_btn.winfo_exists():
             L = LANGUAGES[self.current_lang]
-            self._auto_lock_btn.configure(text=L["auto_lock"] + (" ✅" if self.auto_lock_enabled.get() else " ❌"),
-                                          fg_color="#2d6a4f" if self.auto_lock_enabled.get() else "#4b4b4b")
+            if self.auto_lock_enabled.get():
+                self._auto_lock_btn.configure(
+                    text=L["auto_lock"] + " ✅",
+                    fg_color="#2d6a4f",
+                    hover_color="#2d6a4f"
+                )
+            else:
+                self._auto_lock_btn.configure(
+                    text=L["auto_lock"] + " ❌",
+                    fg_color="#8b0000",
+                    hover_color="#8b0000"
+                )
         self.config.set("AUTO_LOCK", self.auto_lock_enabled.get())
         if self.auto_lock_enabled.get():
             self._last_activity_time = time.time()
-    
-    def _on_auto_lock_timeout_change(self, val: float) -> None:
-        minutes = int(val)
-        self.auto_lock_timeout = minutes
-        self._update_auto_lock_label()
-        self.config.set("AUTO_LOCK_TIMEOUT", minutes)
     
     def _setup_ui(self) -> None:
         self.grid_columnconfigure(0, weight=1)
@@ -501,23 +570,31 @@ class SecurePassPro(ctk.CTk):
         self.cb_frame = ctk.CTkFrame(self.left_panel, fg_color="transparent")
         self.cb_frame.pack(pady=10)
         
-        self.cb_upper = ctk.CTkCheckBox(self.cb_frame, text="", variable=self.upper_var)
+        self.cb_upper = ctk.CTkCheckBox(self.cb_frame, text="", variable=self.upper_var, border_color="#4EC9B0", hover_color="#4EC9B0")
         self.cb_upper.grid(row=0, column=1, padx=(70, 20), pady=6, sticky="w")
-        self.cb_lower = ctk.CTkCheckBox(self.cb_frame, text="", variable=self.lower_var)
+        
+        self.cb_lower = ctk.CTkCheckBox(self.cb_frame, text="", variable=self.lower_var, border_color="#4EC9B0", hover_color="#4EC9B0")
         self.cb_lower.grid(row=0, column=0, padx=(20, 70), pady=6, sticky="w")
-        self.cb_digits = ctk.CTkCheckBox(self.cb_frame, text="", variable=self.digits_var)
+        
+        self.cb_digits = ctk.CTkCheckBox(self.cb_frame, text="", variable=self.digits_var, border_color="#4EC9B0", hover_color="#4EC9B0")
         self.cb_digits.grid(row=1, column=1, padx=(70, 20), pady=6, sticky="w")
-        self.cb_symb = ctk.CTkCheckBox(self.cb_frame, text="", variable=self.symb_var)
+        
+        self.cb_symb = ctk.CTkCheckBox(self.cb_frame, text="", variable=self.symb_var, border_color="#4EC9B0", hover_color="#4EC9B0")
         self.cb_symb.grid(row=1, column=0, padx=(20, 70), pady=6, sticky="w")
-        self.cb_ambig = ctk.CTkCheckBox(self.cb_frame, text="", variable=self.ambig_var)
+        
+        self.cb_ambig = ctk.CTkCheckBox(self.cb_frame, text="", variable=self.ambig_var, border_color="#4EC9B0", hover_color="#4EC9B0")
         self.cb_ambig.grid(row=2, column=0, columnspan=2, padx=20, pady=8, sticky="w")
-        self.cb_unambig = ctk.CTkCheckBox(self.cb_frame, text="", variable=self.unambig_var)
+        
+        self.cb_unambig = ctk.CTkCheckBox(self.cb_frame, text="", variable=self.unambig_var, border_color="#4EC9B0", hover_color="#4EC9B0")
         self.cb_unambig.grid(row=3, column=0, columnspan=2, padx=20, pady=8, sticky="w")
-        self.cb_at_least = ctk.CTkCheckBox(self.cb_frame, text="", variable=self.at_least_var)
+        
+        self.cb_at_least = ctk.CTkCheckBox(self.cb_frame, text="", variable=self.at_least_var, border_color="#4EC9B0", hover_color="#4EC9B0")
         self.cb_at_least.grid(row=4, column=0, columnspan=2, padx=20, pady=8, sticky="w")
-        self.cb_hide = ctk.CTkCheckBox(self.cb_frame, text="", variable=self.hide_var, command=self._toggle_hide)
+        
+        self.cb_hide = ctk.CTkCheckBox(self.cb_frame, text="", variable=self.hide_var, command=self._toggle_hide, border_color="#4EC9B0", hover_color="#4EC9B0")
         self.cb_hide.grid(row=5, column=0, columnspan=2, padx=20, pady=8, sticky="w")
-        self.cb_no_repeat = ctk.CTkCheckBox(self.cb_frame, text="", variable=self.no_repeat_var)
+        
+        self.cb_no_repeat = ctk.CTkCheckBox(self.cb_frame, text="", variable=self.no_repeat_var, border_color="#4EC9B0", hover_color="#4EC9B0")
         self.cb_no_repeat.grid(row=6, column=0, columnspan=2, padx=20, pady=8, sticky="w")
         
         self.entry_frame = ctk.CTkFrame(self.left_panel, fg_color="transparent")
@@ -547,35 +624,57 @@ class SecurePassPro(ctk.CTk):
         self.lbl_menu = ctk.CTkLabel(self.right_panel, text="", font=("Segoe UI", 18, "bold"))
         self.lbl_menu.pack(pady=15)
         
-        self.btn_gen = self._create_menu_btn(self.right_panel, "btn_gen", "tt_gen", self._generate, "#0067c0")
-        self.btn_copy = self._create_menu_btn(self.right_panel, "btn_copy", "tt_copy", self._copy, "#107c10")
-        self.btn_save = self._create_menu_btn(self.right_panel, "btn_save", "tt_save", self._save, "#0078d4")
-        self.btn_open = self._create_menu_btn(self.right_panel, "btn_open", "tt_open", self._open, "#0078d4")
-        self.btn_qr = self._create_menu_btn(self.right_panel, "btn_qr", "tt_qr", self._show_qr, "#8764b8")
-        self.btn_hist = self._create_menu_btn(self.right_panel, "btn_hist", "tt_hist", self._show_history, "#4b4b4b")
-        self.btn_db = self._create_menu_btn(self.right_panel, "btn_db", "tt_db", self._show_db_window, "#1a6b5a")
-        self.btn_upd = self._create_menu_btn(self.right_panel, "btn_upd", "tt_upd", lambda: webbrowser.open(UPD_URL), "#ca5010")
-        self.btn_settings = self._create_menu_btn(self.right_panel, "btn_settings", "tt_settings", self._show_settings, "#2d6a4f")
-        self.btn_about = self._create_menu_btn(self.right_panel, "btn_about", "tt_about", self._show_about, "#4b4b4b")
+        self.btn_gen = self._create_menu_btn(self.right_panel, "btn_gen", "tt_gen", self._generate, "#00C853")
+        self.btn_copy = self._create_menu_btn(self.right_panel, "btn_copy", "tt_copy", self._copy, "#00B0F0")
+        self.btn_save = self._create_menu_btn(self.right_panel, "btn_save", "tt_save", self._save, "#9C27B0")
+        self.btn_open = self._create_menu_btn(self.right_panel, "btn_open", "tt_open", self._open, "#FF9800")
+        self.btn_qr = self._create_menu_btn(self.right_panel, "btn_qr", "tt_qr", self._show_qr, "#E91E63")
+        self.btn_hist = self._create_menu_btn(self.right_panel, "btn_hist", "tt_hist", self._show_history, "#FFC107")
+        self.btn_db = self._create_menu_btn(self.right_panel, "btn_db", "tt_db", self._show_db_window, "#2196F3")
+        self.btn_upd = self._create_menu_btn(self.right_panel, "btn_upd", "tt_upd", lambda: webbrowser.open(UPD_URL), "#009688")
+        self.btn_settings = self._create_menu_btn(self.right_panel, "btn_settings", "tt_settings", self._show_settings, "#607D8B")
+        self.btn_about = self._create_menu_btn(self.right_panel, "btn_about", "tt_about", self._show_about, "#455A64")
         
-        self.bottom_frame = ctk.CTkFrame(self, fg_color=("#e0e0e0", "#1d1e1e"), corner_radius=15)
+        self.bottom_frame = ctk.CTkFrame(self, fg_color="transparent", corner_radius=0)
         self.bottom_frame.grid(row=1, column=0, columnspan=2, sticky="ew", padx=20, pady=(0, 15))
         self.lbl_app_rating = ctk.CTkLabel(self.bottom_frame, text="★★★★★", font=("Segoe UI", 20), text_color="#FFD700")
         self.lbl_app_rating.pack(pady=(5, 5))
     
     def _create_menu_btn(self, parent, lang_key: str, tt_key: str, cmd, color: str) -> ctk.CTkButton:
-        colors_map = {"#0067c0": "#00A2FF", "#107c10": "#20CF20", "#0078d4": "#309FFF", "#8764b8": "#B080FF", "#4b4b4b": "#808080", "#ca5010": "#FF8C00", "#2d6a4f": "#40916c", "#1a6b5a": "#2da882"}
-        neon_color = colors_map.get(color, color)
-        btn = ctk.CTkButton(parent, text="", command=lambda: self._run_menu_command(cmd), fg_color=color, height=45, border_width=2, border_color=neon_color, font=("Segoe UI", 13, "bold"), hover_color=neon_color, corner_radius=self.current_radius)
+        # Словарь цветов для неона при наведении
+        neon_colors = {
+            "#00C853": "#00E676",  # Зелёный -> ярко-зелёный
+            "#00B0F0": "#4FC3F7",  # Голубой -> светло-голубой
+            "#9C27B0": "#CE93D8",  # Фиолетовый -> светло-фиолетовый
+            "#FF9800": "#FFB74D",  # Оранжевый -> светло-оранжевый
+            "#E91E63": "#F06292",  # Малиновый -> светло-малиновый
+            "#FFC107": "#FFD54F",  # Золотой -> светло-золотой
+            "#2196F3": "#64B5F6",  # Синий -> светло-синий
+            "#009688": "#4DB6AC",  # Бирюзовый -> светло-бирюзовый
+            "#607D8B": "#90A4AE",  # Серый -> светло-серый
+            "#455A64": "#78909C",  # Тёмно-серый -> серый
+        }
+        
+        hover = neon_colors.get(color, color)
+        
+        btn = ctk.CTkButton(parent, text="", fg_color=color, height=45, border_width=0, font=("Segoe UI", 13, "bold"), hover_color=hover, corner_radius=self.current_radius)
+        
+        original_cmd = cmd
+        
+        def animated_cmd():
+            self._animate_button(btn)
+            original_cmd()
+        
+        btn.configure(command=animated_cmd)
         btn.pack(pady=6, padx=15, fill="x")
         btn.lang_key = lang_key
         btn.tt_key = tt_key
         self._tooltips[lang_key] = ToolTip(btn)
         return btn
     
-    def _run_menu_command(self, command) -> None:
+    def _animate_button(self, btn: ctk.CTkButton) -> None:
+        """Анимация нажатия кнопки (только звук)"""
         play_sound("click", self.sound_enabled.get())
-        command()
     
     def _apply_theme_colors(self, actual_theme: str) -> None:
         if actual_theme == "light":
@@ -585,6 +684,7 @@ class SecurePassPro(ctk.CTk):
             bg_main, fg_main, entry_bg = "#1d1e1e", "#FFFFFF", "#2b2b2b"
             panel_bg, border_color, checkmark_color = "#1d1e1e", "#3a3a3a", "#4EC9B0"
         
+        self.configure(fg_color=bg_main)
         self.left_panel.configure(fg_color=panel_bg)
         self.right_panel.configure(fg_color=panel_bg, border_color=border_color)
         self.entry_res.configure(fg_color=entry_bg, text_color=fg_main)
@@ -600,10 +700,9 @@ class SecurePassPro(ctk.CTk):
         self.lbl_crack.configure(text_color=fg_main)
         self.lbl_menu.configure(text_color=fg_main)
         
-        new_bg = "#F3F3F3" if actual_theme == "light" else "#1d1e1e"
         for c in (self._rgb_c_top, self._rgb_c_bottom, self._rgb_c_left, self._rgb_c_right):
             if c:
-                c.configure(bg=new_bg)
+                c.configure(bg=bg_main)
     
     def _change_radius(self, val: int) -> None:
         rad = int(val)
@@ -626,8 +725,7 @@ class SecurePassPro(ctk.CTk):
         self.entry_frame.configure(corner_radius=rad)
         
         if hasattr(self, 'settings_radius_label') and self.settings_radius_label and self.settings_radius_label.winfo_exists():
-            L = LANGUAGES[self.current_lang]
-            self.settings_radius_label.configure(text=f"{L['settings_radius']}: {rad}")
+            self.settings_radius_label.configure(text=f"{rad} px")
         
         self._update_settings_radius()
         self.config.set("RADIUS", rad)
@@ -646,9 +744,9 @@ class SecurePassPro(ctk.CTk):
     
     def _center_main_window(self) -> None:
         self.update_idletasks()
-        x = (self.winfo_screenwidth() // 2) - (850 // 2)
-        y = (self.winfo_screenheight() // 2) - (780 // 2)
-        self.geometry(f"850x780+{x}+{y}")
+        x = (self.winfo_screenwidth() // 2) - (950 // 2)
+        y = (self.winfo_screenheight() // 2) - (800 // 2)
+        self.geometry(f"950x800+{x}+{y}")
     
     def _center_window_relative_to_parent(self, window, width: int, height: int) -> None:
         window.update_idletasks()
@@ -711,7 +809,6 @@ class SecurePassPro(ctk.CTk):
         self._update_master_status_label()
         self._update_auto_lock_label()
         
-        # Update auto save button text
         if hasattr(self, 'auto_save_btn') and self.auto_save_btn:
             if self.auto_save_var.get():
                 self.auto_save_btn.configure(text=L.get("auto_save_on", "✅ ВКЛ"))
@@ -734,27 +831,35 @@ class SecurePassPro(ctk.CTk):
             self._update_strength_meter(self.entry_res.get())
         self._update_master_status_label()
         self._update_auto_lock_label()
+        
+        if hasattr(self, 'font_size_value') and self.font_size_value:
+            self.font_size_value.configure(text=f"{self.current_font_size}px")
     
     def _change_theme(self, mode: str) -> None:
         self.current_theme = mode
         self.config.set("THEME", mode)
-        
-        actual_theme = self._get_actual_theme()
-        self._apply_theme_colors(actual_theme)
-        
+
         for name, btn in self.theme_buttons.items():
             if btn and btn.winfo_exists():
                 btn.configure(fg_color="#2d6a4f" if name == mode else "#4b4b4b")
-        
+
         if self.settings_window and self.settings_window.winfo_exists():
             self._close_settings()
-        
+
         try:
             ctk.set_appearance_mode(mode)
-            self.update_idletasks()
         except Exception:
             pass
+
+        self.after(50, self._sync_theme_colors)
     
+    def _sync_theme_colors(self) -> None:
+        actual_theme = self._get_actual_theme()
+        self._apply_theme_colors(actual_theme)
+        bg = "#F3F3F3" if actual_theme == "light" else "#1d1e1e"
+        self.configure(fg_color=bg)
+        self.update_idletasks()
+
     # ==================== PASSWORD GENERATION ====================
     
     def _update_len_label(self, val: float) -> None:
@@ -824,8 +929,11 @@ class SecurePassPro(ctk.CTk):
             except Exception:
                 pass
         pulse_step()
-    
+        
     def _generate(self) -> None:
+        if hasattr(self, 'btn_gen') and self.btn_gen:
+            self._animate_button(self.btn_gen)
+        
         L = LANGUAGES[self.current_lang]
         
         self.generator.use_upper = self.upper_var.get()
@@ -861,15 +969,15 @@ class SecurePassPro(ctk.CTk):
             self._update_strength_meter(password)
             play_sound("generate", self.sound_enabled.get())
             
-            # AUTO SAVE
             if self.auto_save_var.get():
                 label = f"Auto {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
                 PasswordDB.save(label, password)
                 print(f"[AutoSave] Saved: {label}")
     
-    # ==================== CLIPBOARD OPERATIONS ====================
-    
     def _copy(self) -> None:
+        if hasattr(self, 'btn_copy') and self.btn_copy:
+            self._animate_button(self.btn_copy)
+        
         pwd = self.entry_res.get().strip()
         if not pwd:
             return
@@ -902,19 +1010,6 @@ class SecurePassPro(ctk.CTk):
             pass
         finally:
             self._clipboard_timer = None
-    
-    def _on_clip_timeout_change(self, val: float) -> None:
-        seconds = int(val)
-        self.clipboard_timeout = seconds
-        if self._clip_timeout_label_ref and self._clip_timeout_label_ref.winfo_exists():
-            L = LANGUAGES[self.current_lang]
-            self._clip_timeout_label_ref.configure(text=L["clip_timeout"].format(seconds))
-        
-        if "btn_copy" in self._tooltips:
-            L = LANGUAGES[self.current_lang]
-            self._tooltips["btn_copy"].set_text(L["tt_copy"].format(seconds))
-        
-        self.config.set("CLIP_TIMEOUT", seconds)
     
     # ==================== FILE OPERATIONS ====================
     
@@ -1240,7 +1335,7 @@ class SecurePassPro(ctk.CTk):
         f = ctk.CTkFrame(self.history_window, fg_color="transparent")
         f.pack(expand=True, fill="both", padx=20, pady=20)
         ctk.CTkLabel(f, text=L["btn_hist"], font=("Segoe UI", 20, "bold")).pack(pady=10)
-        
+        self.current_radius = 25
         txt = ctk.CTkTextbox(f, font=("Consolas", 14), corner_radius=self.current_radius)
         txt.pack(fill="both", expand=True, pady=10)
         
@@ -1335,7 +1430,7 @@ class SecurePassPro(ctk.CTk):
         set_window_icon(self.settings_window)
         self.settings_window.transient(self)
         self.settings_window.grab_set()
-        self._center_window_relative_to_parent(self.settings_window, 420, 750)
+        self._center_window_relative_to_parent(self.settings_window, 550, 800)
         apply_window_rounding(self.settings_window)
         self.settings_window.attributes('-topmost', True)
         self.settings_window.after(100, lambda: self.settings_window.attributes('-topmost', False))
@@ -1383,12 +1478,12 @@ class SecurePassPro(ctk.CTk):
         if MasterPassword.is_set():
             security_status = ctk.CTkLabel(main_frame, text=L.get("master_status_text", "🔐 Master password: SET (Argon2id)"), font=("Segoe UI", 13), text_color="#2ECC71")
         else:
-            security_status = ctk.CTkLabel(main_frame, text=L.get("master_status_not_set_text", "⚠️ Master password: NOT SET"), font=("Segoe UI", 13), text_color="#FFA500")
+            security_status = ctk.CTkLabel(main_frame, text=L.get("master_status_not_set_text", "⚠️ Master password: NOT SET"), font=("Segoe UI", 13), text_color="#FF4444")
         security_status.pack(pady=(0, 10))
         
         self._add_separator(main_frame)
         
-        # Radius
+        # Radius (плавный слайдер)
         radius_label = ctk.CTkLabel(main_frame, text=f"{L['settings_radius']}: {self.current_radius}", font=("Segoe UI", 16, "bold"))
         radius_label.pack(pady=(8, 5))
         self.settings_radius_label = radius_label
@@ -1404,12 +1499,12 @@ class SecurePassPro(ctk.CTk):
         sound_label.pack(pady=(8, 8))
         
         sound_text = L["sound_on"] if self.sound_enabled.get() else L["sound_off"]
-        self._sound_btn = ctk.CTkButton(main_frame, text=sound_text, width=150, height=40, command=self._toggle_sound_settings, fg_color="#0078d4", font=("Segoe UI", 14), corner_radius=self.current_radius)
+        self._sound_btn = ctk.CTkButton(main_frame, text=sound_text, width=150, height=40, command=self._toggle_sound_settings, fg_color="#2d6a4f" if self.sound_enabled.get() else "#8b0000", hover_color="#2d6a4f" if self.sound_enabled.get() else "#8b0000", font=("Segoe UI", 14), corner_radius=self.current_radius)
         self._sound_btn.pack(pady=(0, 15))
         
         self._add_separator(main_frame)
         
-        # Clipboard timeout
+        # Clipboard timeout (плавный слайдер)
         clip_timeout_label = ctk.CTkLabel(main_frame, text=L["clip_timeout"].format(self.clipboard_timeout), font=("Segoe UI", 16, "bold"))
         clip_timeout_label.pack(pady=(8, 5))
         self._clip_timeout_label_ref = clip_timeout_label
@@ -1420,12 +1515,12 @@ class SecurePassPro(ctk.CTk):
         
         self._add_separator(main_frame)
         
-        # Auto Lock
+         # Auto Lock
         auto_lock_label = ctk.CTkLabel(main_frame, text=L["auto_lock"], font=("Segoe UI", 16, "bold"))
         auto_lock_label.pack(pady=(8, 5))
         
         auto_lock_text = L["auto_lock"] + (" ✅" if self.auto_lock_enabled.get() else " ❌")
-        self._auto_lock_btn = ctk.CTkButton(main_frame, text=auto_lock_text, width=150, height=40, command=self._toggle_auto_lock, fg_color="#2d6a4f" if self.auto_lock_enabled.get() else "#4b4b4b", font=("Segoe UI", 14), corner_radius=self.current_radius)
+        self._auto_lock_btn = ctk.CTkButton(main_frame, text=auto_lock_text, width=150, height=40, command=self._toggle_auto_lock, fg_color="#2d6a4f" if self.auto_lock_enabled.get() else "#8b0000", hover_color="#2d6a4f" if self.auto_lock_enabled.get() else "#8b0000", font=("Segoe UI", 14), corner_radius=self.current_radius)
         self._auto_lock_btn.pack(pady=(5, 5))
         self._tooltips["auto_lock"] = ToolTip(self._auto_lock_btn)
         self._tooltips["auto_lock"].set_text(L.get("tt_auto_lock", "Auto lock on inactivity"))
@@ -1433,6 +1528,7 @@ class SecurePassPro(ctk.CTk):
         self._auto_lock_label_ref = ctk.CTkLabel(main_frame, text=L["auto_lock_timeout"].format(self.auto_lock_timeout), font=("Segoe UI", 13))
         self._auto_lock_label_ref.pack(pady=(5, 0))
         
+        # Auto lock timeout (плавный слайдер)
         self._auto_lock_slider = ctk.CTkSlider(main_frame, from_=1, to=30, number_of_steps=29, width=300, command=self._on_auto_lock_timeout_change)
         self._auto_lock_slider.set(self.auto_lock_timeout)
         self._auto_lock_slider.pack(pady=(5, 15))
@@ -1465,11 +1561,27 @@ class SecurePassPro(ctk.CTk):
         
         is_rgb_on = self.rgb_enabled.get()
         
-        self._rgb_on_btn_ref = ctk.CTkButton(rgb_frame, text=L["rgb_on"], width=110, height=35, command=lambda: self._set_rgb(True), fg_color="#7b2d8b" if is_rgb_on else "#4b4b4b", font=("Segoe UI", 13), corner_radius=self.current_radius)
+        self._rgb_on_btn_ref = ctk.CTkButton(rgb_frame, text=L["rgb_on"], width=110, height=35, command=lambda: self._set_rgb(True), fg_color="#2d6a4f" if is_rgb_on else "#4b4b4b", hover_color="#2d6a4f", font=("Segoe UI", 13), corner_radius=self.current_radius)
         self._rgb_on_btn_ref.pack(side="left", padx=5)
         
-        self._rgb_off_btn_ref = ctk.CTkButton(rgb_frame, text=L["rgb_off"], width=110, height=35, command=lambda: self._set_rgb(False), fg_color="#4b4b4b" if is_rgb_on else "#7b2d8b", font=("Segoe UI", 13), corner_radius=self.current_radius)
+        self._rgb_off_btn_ref = ctk.CTkButton(rgb_frame, text=L["rgb_off"], width=110, height=35, command=lambda: self._set_rgb(False), fg_color="#8b0000", hover_color="#8b0000", font=("Segoe UI", 13), corner_radius=self.current_radius)
         self._rgb_off_btn_ref.pack(side="left", padx=5)
+        
+        self._add_separator(main_frame)
+        
+        # Font size (плавный слайдер)
+        font_size_label = ctk.CTkLabel(main_frame, text=L.get("font_size", "Размер шрифта"), 
+                                        font=("Segoe UI", 16, "bold"))
+        font_size_label.pack(pady=(8, 5))
+        
+        self.font_size_value = ctk.CTkLabel(main_frame, text=f"{self.current_font_size}px",
+                                             font=("Segoe UI", 18, "bold"))
+        self.font_size_value.pack(pady=(0, 5))
+        
+        self.font_size_slider = ctk.CTkSlider(main_frame, from_=10, to=20, number_of_steps=10,
+                                               command=self._on_font_size_change, width=300)
+        self.font_size_slider.set(self.current_font_size)
+        self.font_size_slider.pack(pady=(0, 10))
         
         self._add_separator(main_frame)
         
@@ -1483,15 +1595,18 @@ class SecurePassPro(ctk.CTk):
             width=150,
             height=40,
             command=self._toggle_auto_save,
-            fg_color="#2d6a4f" if self.auto_save_var.get() else "#4b4b4b",
+            fg_color="#2d6a4f" if self.auto_save_var.get() else "#8b0000",
+            hover_color="#2d6a4f" if self.auto_save_var.get() else "#8b0000",
             corner_radius=self.current_radius
         )
+        self.auto_save_btn.pack(pady=(0, 15))
+        
         self.auto_save_btn.pack(pady=(0, 15))
         
         self._add_separator(main_frame)
         
         # Close button
-        self._close_btn = ctk.CTkButton(main_frame, text=L["close"], command=self._close_settings, fg_color="#ca5010", width=150, height=40, font=("Segoe UI", 14), corner_radius=self.current_radius)
+        self._close_btn = ctk.CTkButton(main_frame, text=L["close"], command=self._close_settings, fg_color="#8b0000", hover_color="#8b0000", width=150, height=40, font=("Segoe UI", 14), corner_radius=self.current_radius)
         self._close_btn.pack(pady=(10, 10))
         
         self.settings_labels = {'lang': lang_label, 'theme': theme_label, 'sound': sound_label, 'close_btn': self._close_btn, 'sound_btn': self._sound_btn, 'radius_slider': radius_slider}
@@ -1503,9 +1618,67 @@ class SecurePassPro(ctk.CTk):
     def _on_radius_change(self, val: float) -> None:
         rad = int(val)
         if self.settings_radius_label and self.settings_radius_label.winfo_exists():
+            self.settings_radius_label.configure(text=f"{rad} px")
+        
+        if self._radius_timer:
+            self.after_cancel(self._radius_timer)
+        self._radius_timer = self.after(50, lambda: self._change_radius(rad))
+    
+    def _on_clip_timeout_change(self, val: float) -> None:
+        seconds = int(val)
+        if self._clip_timeout_label_ref and self._clip_timeout_label_ref.winfo_exists():
             L = LANGUAGES[self.current_lang]
-            self.settings_radius_label.configure(text=f"{L['settings_radius']}: {rad}")
-        self._change_radius(rad)
+            self._clip_timeout_label_ref.configure(text=L["clip_timeout"].format(seconds))
+        
+        if self._clip_timer:
+            self.after_cancel(self._clip_timer)
+        self._clip_timer = self.after(50, lambda: self._apply_clip_timeout(seconds))
+    
+    def _apply_clip_timeout(self, seconds: int) -> None:
+        self.clipboard_timeout = seconds
+        if "btn_copy" in self._tooltips:
+            L = LANGUAGES[self.current_lang]
+            self._tooltips["btn_copy"].set_text(L["tt_copy"].format(seconds))
+        self.config.set("CLIP_TIMEOUT", seconds)
+    
+    def _on_auto_lock_timeout_change(self, val: float) -> None:
+        minutes = int(val)
+        if self._auto_lock_label_ref and self._auto_lock_label_ref.winfo_exists():
+            L = LANGUAGES[self.current_lang]
+            self._auto_lock_label_ref.configure(text=L["auto_lock_timeout"].format(minutes))
+        
+        if self._auto_timer:
+            self.after_cancel(self._auto_timer)
+        self._auto_timer = self.after(50, lambda: self._apply_auto_timeout(minutes))
+    
+    def _apply_auto_timeout(self, minutes: int) -> None:
+        self.auto_lock_timeout = minutes
+        self.config.set("AUTO_LOCK_TIMEOUT", minutes)
+    
+    def _on_font_size_change(self, val: float) -> None:
+        size = int(val)
+        if hasattr(self, 'font_size_value') and self.font_size_value:
+            self.font_size_value.configure(text=f"{size}px")
+        
+        if self._font_timer:
+            self.after_cancel(self._font_timer)
+        self._font_timer = self.after(50, lambda: self._apply_font_size(size))
+    
+    def _apply_font_size(self, size: int) -> None:
+        self.current_font_size = size
+        self.config.set("font_size", size)
+        
+        menu_btns = [self.btn_gen, self.btn_copy, self.btn_save, self.btn_open, 
+                     self.btn_qr, self.btn_hist, self.btn_db, self.btn_upd, 
+                     self.btn_settings, self.btn_about]
+        for btn in menu_btns:
+            btn.configure(font=("Segoe UI", size - 1, "bold"))
+        
+        self.lbl_title.configure(font=("Segoe UI", size + 6, "bold"))
+        self.lbl_menu.configure(font=("Segoe UI", size + 4, "bold"))
+        self.lbl_strength_text.configure(font=("Segoe UI", size, "bold"))
+        self.entry_res.configure(font=("Consolas", size + 8))
+        self.btn_eye.configure(font=("Segoe UI", size + 6))
     
     def _close_settings(self) -> None:
         if self.settings_window:
@@ -1526,12 +1699,27 @@ class SecurePassPro(ctk.CTk):
             self._auto_lock_btn = None
             self._auto_lock_slider = None
             self._auto_lock_label_ref = None
+            self._radius_timer = None
+            self._clip_timer = None
+            self._auto_timer = None
+            self._font_timer = None
     
     def _toggle_sound_settings(self) -> None:
         self.sound_enabled.set(not self.sound_enabled.get())
         if self._sound_btn and self._sound_btn.winfo_exists():
             L = LANGUAGES[self.current_lang]
-            self._sound_btn.configure(text=L["sound_on"] if self.sound_enabled.get() else L["sound_off"])
+            if self.sound_enabled.get():
+                self._sound_btn.configure(
+                    text=L["sound_on"],
+                    fg_color="#2d6a4f",
+                    hover_color="#2d6a4f"
+                )
+            else:
+                self._sound_btn.configure(
+                    text=L["sound_off"],
+                    fg_color="#8b0000",
+                    hover_color="#8b0000"
+                )
         play_sound("click", self.sound_enabled.get())
         self.config.set("SOUND", self.sound_enabled.get())
     
@@ -1542,10 +1730,18 @@ class SecurePassPro(ctk.CTk):
         
         L = LANGUAGES[self.current_lang]
         if new_value:
-            self.auto_save_btn.configure(text=L["auto_save_on"], fg_color="#2d6a4f")
+            self.auto_save_btn.configure(
+                text=L["auto_save_on"],
+                fg_color="#2d6a4f",
+                hover_color="#2d6a4f"
+            )
             CTkMessageBox.info(self, L["auto_save"], L["auto_save_enabled"])
         else:
-            self.auto_save_btn.configure(text=L["auto_save_off"], fg_color="#4b4b4b")
+            self.auto_save_btn.configure(
+                text=L["auto_save_off"],
+                fg_color="#8b0000",
+                hover_color="#8b0000"
+            )
             CTkMessageBox.info(self, L["auto_save"], L["auto_save_disabled"])
     
     def _toggle_hide(self) -> None:
@@ -1568,16 +1764,26 @@ class SecurePassPro(ctk.CTk):
             if MasterPassword.is_set():
                 self._master_status_label.configure(text=f"{L['master_current']} 🔒 {L['master_status_set']}", text_color="#2ECC71")
             else:
-                self._master_status_label.configure(text=f"{L['master_current']} 🔓 {L['master_status_not_set']}", text_color="#FFA500")
+                self._master_status_label.configure(text=f"{L['master_current']} 🔓 {L['master_status_not_set']}", text_color="#FF4444")
     
     def _update_master_buttons(self) -> None:
         if not self._master_set_btn or not self._master_set_btn.winfo_exists():
             return
         L = LANGUAGES[self.current_lang]
         if MasterPassword.is_set():
-            self._master_set_btn.configure(text="🔒 " + L["master_btn_remove"], fg_color="#8b0000", command=self._remove_master_password)
+            self._master_set_btn.configure(
+                text="🔒 " + L["master_btn_remove"],
+                fg_color="#8b0000",
+                hover_color="#8b0000",
+                command=self._remove_master_password
+            )
         else:
-            self._master_set_btn.configure(text="🔓 " + L["master_btn_set"], fg_color="#2d6a4f", command=self._toggle_master_password)
+            self._master_set_btn.configure(
+                text="🔓 " + L["master_btn_set"],
+                fg_color="#2d6a4f",
+                hover_color="#2d6a4f",
+                command=self._toggle_master_password
+            )
     
     def _toggle_master_password(self) -> None:
         L = LANGUAGES[self.current_lang]
