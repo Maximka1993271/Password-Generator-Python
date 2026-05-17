@@ -38,5 +38,8 @@ class ToolTip:
     
     def hide_tip(self, event=None) -> None:
         if self.tip_window:
-            self.tip_window.destroy()
+            try:
+                self.tip_window.destroy()
+            except Exception:
+                pass
             self.tip_window = None
