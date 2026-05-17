@@ -51,7 +51,7 @@ def center_screen(win: tk.Tk, width: int, height: int) -> None:
 
 def get_resource_path(filename: str) -> str:
     """Get path to resource file (works for PyInstaller)"""
-    base_dir = sys._MEIPASS if hasattr(sys, '_MEIPASS') else os.path.dirname(os.path.abspath(__file__))
+    base_dir = sys._MEIPASS if hasattr(sys, '_MEIPASS') else os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     return os.path.join(base_dir, filename)
 
 
@@ -101,11 +101,20 @@ def play_sound(sound_type: str = "click", sound_enabled: bool = True,
     if not sound_enabled:
         return
     
+    # Определяем правильный путь к файлу
     if base_path is None:
-        base_path = sys._MEIPASS if hasattr(sys, '_MEIPASS') else os.path.dirname(os.path.abspath(__file__))
+        # Сначала пробуем найти файл в папке с программой
+        script_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        file_path = os.path.join(script_dir, "Computer Mouse Click.mp3")
+        
+        # Если не нашли, пробуем путь PyInstaller
+        if not os.path.exists(file_path) and hasattr(sys, '_MEIPASS'):
+            file_path = os.path.join(sys._MEIPASS, "Computer Mouse Click.mp3")
+    else:
+        file_path = base_path if os.path.isfile(base_path) else os.path.join(base_path, "Computer Mouse Click.mp3")
     
-    file_path = os.path.join(base_path, "Computer Mouse Click.mp3")
     if not os.path.exists(file_path):
+        print(f"[Sound] Файл не найден: {file_path}")
         return
     
     try:
@@ -122,9 +131,8 @@ def play_sound(sound_type: str = "click", sound_enabled: bool = True,
                 except Exception:
                     pass
             
-            if hasattr(ctypes, 'windll'):
-                import threading
-                threading.Timer(1.0, close_sound).start()
+            import threading
+            threading.Timer(1.0, close_sound).start()
         elif _IS_MACOS:
             if shutil.which("afplay"):
                 subprocess.Popen(["afplay", file_path],
@@ -136,5 +144,5 @@ def play_sound(sound_type: str = "click", sound_enabled: bool = True,
             elif shutil.which("ffplay"):
                 subprocess.Popen(["ffplay", "-nodisp", "-autoexit", "-loglevel", "quiet", file_path],
                                stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-    except Exception:
-        pass
+    except Exception as e:
+        print(f"[Sound] Ошибка: {e}")
