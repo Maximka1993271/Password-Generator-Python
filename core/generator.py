@@ -103,6 +103,13 @@ class PasswordGenerator:
     
     def generate(self) -> Optional[str]:
         """Generate a password based on current settings"""
+        try:
+            length = int(self.length)
+        except (TypeError, ValueError):
+            return None
+        if length <= 0:
+            return None
+
         pool = self._get_pool()
         
         if not pool:
@@ -112,9 +119,9 @@ class PasswordGenerator:
             categories = self._get_categories()
             if not categories or len(categories) < 1:
                 categories = [pool]
-            
-            # Ensure we have enough length
-            min_len = max(self.length, len(categories))
+            if length < len(categories):
+                return None
+
             password_chars = []
             
             # Take one from each category
@@ -123,7 +130,7 @@ class PasswordGenerator:
                     password_chars.append(secrets.choice(cat))
             
             # Fill the rest from the full pool
-            remaining = self.length - len(password_chars)
+            remaining = length - len(password_chars)
             for _ in range(remaining):
                 password_chars.append(secrets.choice(pool))
             
@@ -135,13 +142,14 @@ class PasswordGenerator:
             result = "".join(password_chars)
         else:
             # Simple generation
-            result = ''.join(secrets.choice(pool) for _ in range(self.length))
+            result = ''.join(secrets.choice(pool) for _ in range(length))
         
         # Apply no-repeat constraint if needed
         if self.no_repeat:
             fixed = self._fix_no_repeats(list(result), pool)
-            if fixed:
-                result = fixed
+            if not fixed:
+                return None
+            result = fixed
         
         return result
 
@@ -175,7 +183,7 @@ class StrengthCalculator:
             pool_size += 32
         
         combinations = pool_size ** len(password) if pool_size > 0 else 0
-        entropy_bits = len(password) * (pool_size.bit_length() - 1) if pool_size > 0 else 0
+        entropy_bits = len(password) * math.log2(pool_size) if pool_size > 0 else 0
         
         if entropy_bits < 40:
             strength_level = 'weak'
