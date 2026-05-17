@@ -5,6 +5,7 @@ import os
 import sys
 import json
 import ctypes
+import tempfile
 from typing import Dict, Any
 
 # Путь рядом с EXE или скриптом — тот же, что в main_window.py
@@ -24,6 +25,24 @@ def _hide_dir(path: str) -> None:
             ctypes.windll.kernel32.SetFileAttributesW(path, 0x02)
         except Exception:
             pass
+
+
+def _atomic_write_json(path: str, data: Dict[str, Any]) -> None:
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    _hide_dir(os.path.dirname(path))
+    fd, tmp_path = tempfile.mkstemp(prefix=".tmp-", dir=os.path.dirname(path), text=True)
+    try:
+        with os.fdopen(fd, "w", encoding="utf-8") as f:
+            json.dump(data, f, indent=2, ensure_ascii=False)
+            f.flush()
+            os.fsync(f.fileno())
+        os.replace(tmp_path, path)
+    except Exception:
+        try:
+            os.remove(tmp_path)
+        except Exception:
+            pass
+        raise
 
 
 class Config:
@@ -46,16 +65,14 @@ class Config:
 
         try:
             with open(CONFIG_FILE, "r", encoding="utf-8") as f:
-                self._data = json.load(f)
+                data = json.load(f)
+                self._data = data if isinstance(data, dict) else {}
         except (json.JSONDecodeError, ValueError):
             self._data = {}
 
     def save(self) -> None:
         """Save config to file"""
-        os.makedirs(CONFIG_DIR, exist_ok=True)
-        _hide_dir(CONFIG_DIR)          # скрываем сразу после создания
-        with open(CONFIG_FILE, "w", encoding="utf-8") as f:
-            json.dump(self._data, f, indent=2, ensure_ascii=False)
+        _atomic_write_json(CONFIG_FILE, self._data)
 
     def get(self, key: str, default=None):
         """Get config value"""
