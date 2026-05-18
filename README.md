@@ -92,6 +92,15 @@ Secure Pass Pro v4.0 — это полностью переработанная 
 - **Круглые чекбоксы** — эстетичный дизайн
 - **Фильтрация sensitive данных в логах** — безопасность
 
+### 🔧 Технические улучшения (18.05.2026)
+
+- **Замена 84 блоков `except Exception`** — все широкие исключения заменены на конкретные типы (`InvalidTag`, `ValueError`, `OSError`, `PermissionError`, `sqlite3.Error`, `URLError`, `TimeoutError`, `tk.TclError`, `AttributeError`)
+- **Улучшено логирование ошибок** — добавлены вызовы `logger.error()` и `logger.debug()` во все критичные места
+- **Исправлен `security/antidebug.py`** — восстановлена функция `init_anti_debug()`, добавлены тихие версии детекторов
+- **Обновлена локализация** — добавлены недостающие ключи (`err_encrypt`, `err_decrypt`, `err_database`, `err_network`, `err_permission`, `status_ok`, `status_error`, `status_warning`, `please_wait`)
+- **Модульная архитектура закреплена** — полное разделение на `core/`, `gui/`, `security/`, `storage/`, `localization/`, `utils/`
+- **11 файлов исправлено** — все mixins, security-модули, database, widgets, lang
+
 ### 🛡️ Безопасность v4.0
 
 | Защита | Описание | Уровень |
@@ -177,6 +186,3 @@ pip install customtkinter qrcode[pil] pillow fpdf argon2-cffi cryptography
 
 # Запуск v4.0
 python3 Secure_Pass_Pro.pyw
-
-📝 Лицензия
-MIT License — свободное использование, модификация и распространение.
