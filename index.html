@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Secure Pass Pro v4.0 — Профессиональный генератор паролей. Модульная архитектура, Argon2id хеширование, SQLite база паролей, автосохранение, Master-пароль, Rate Limiting, система логирования, очистка памяти (ctypes.memset), Secure Clipboard, полное шифрование БД, анти-отладка, panic cleanup, контроль целостности HMAC-SHA256, защита от повторов, настраиваемая очистка буфера (10-120 сек), RGB анимация ВСЕГО ОКНА, АНИМАЦИЯ КНОПОК, НЕОНОВЫЕ ЧЕКБОКСЫ, ЦВЕТОВАЯ ИНДИКАЦИЯ (зелёный/красный), Amoled UI с неоновой подсветкой, расчет энтропии, просмотр PDF и криптостойкость. Цветная пульсация пароля: красный (слабый), оранжевый (средний), зелёный (надёжный). Кроссплатформенная поддержка Windows, macOS, Linux. Полная локализация на 3 языка: Русский, English, Українська.">
+    <meta name="description" content="Secure Pass Pro v4.0 — Профессиональный генератор паролей. Модульная архитектура, Argon2id хеширование, SQLite база паролей, автосохранение, Master-пароль, Rate Limiting, система логирования, очистка памяти (ctypes.memset), Secure Clipboard, полное шифрование БД, анти-отладка, panic cleanup, контроль целостности HMAC-SHA256, защита от повторов, настраиваемая очистка буфера (10-120 сек), RGB анимация ВСЕГО ОКНА, АНИМАЦИЯ КНОПОК, НЕОНОВЫЕ ЧЕКБОКСЫ, ЦВЕТОВАЯ ИНДИКАЦИЯ (зелёный/красный), Amoled UI с неоновой подсветкой, расчет энтропии, просмотр PDF и криптостойкость. Цветная пульсация пароля: красный (слабый), оранжевый (средний), зелёный (надёжный). Кроссплатформенная поддержка Windows, macOS, Linux. Полная локализация на 3 языка: Русский, English, Українська. SQLCipher полное шифрование БД, DPAPI аппаратное шифрование, Signed updates с проверкой подписи RSA-PSS.">
     <title>Secure Pass Pro v4.0 | Профессиональная защита паролей</title>
     
     <link rel="icon" type="image/png" href="https://github.com/Maximka1993271/Password-Generator-Python/blob/main/app_icon.png?raw=true">
@@ -11,6 +11,17 @@
     
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
+    <style>
+        /* Увеличенное расстояние между картинкой и текстом */
+        .hero {
+            gap: 60px;
+        }
+        @media (max-width: 768px) {
+            .hero {
+                gap: 40px;
+            }
+        }
+    </style>
 </head>
 <body>
 
@@ -34,24 +45,8 @@
                         <a href="#autosave-section">💾 Автосохранение</a>
                         <a href="#security-audit">🔒 Аудит безопасности</a>
                         <a href="#tech-specs">💻 Тех-стек</a>
-                    </div>
-                </li>
-                <li><a href="#changelog-section">📋 История версий</a></li>
-                <li class="dropdown">
-                    <a href="#">📥 Скачать ▼</a>
-                    <div class="dropdown-content">
-                        <div class="dropdown-item-group">
-                            <strong>Secure Pass Pro v4.0 (Рекомендуется)</strong>
-                            <div class="download-buttons-inline">
-                                <a href="https://github.com/Maximka1993271/Password-Generator-Python/releases/download/v4.0/SecurePassPro.exe" class="download-btn-small download-btn-v40-small">⬇️ Скачать v4.0 (.EXE)</a>
-                            </div>
-                        </div>
-                        <div class="dropdown-item-group">
-                            <strong>Архивная версия</strong>
-                            <div class="submenu-links">
-                                <a href="https://github.com/Maximka1993271/Password-Generator-Python/releases/download/v2.0/SecurePassPro.exe">📦 Secure Pass Pro v2.0.0 (Classic)</a>
-                            </div>
-                        </div>
+                        <a href="#changelog-section">📋 История версий</a>
+                        <a href="#download-center">📥 Скачать</a>
                     </div>
                 </li>
                 <li><a href="#" id="about-btn">ℹ️ О нас</a></li>
@@ -59,26 +54,6 @@
             </ul>
         </nav>
     </header>
-
-    <!-- Вторая строка навигации (быстрые ссылки) -->
-    <div class="nav-secondary">
-        <ul>
-            <li><a href="#v40-section">Возможности</a></li>
-            <li><a href="#security-section">Безопасность</a></li>
-            <li><a href="#settings-section">Настройки</a></li>
-            <li><a href="#pdf-section">PDF</a></li>
-            <li><a href="#animation-section">Анимации</a></li>
-            <li><a href="#button-animation-section">Анимация кнопок</a></li>
-            <li><a href="#color-indication-section">Цветовая индикация</a></li>
-            <li><a href="#checkbox-section">Чекбоксы</a></li>
-            <li><a href="#rgb-section">RGB</a></li>
-            <li><a href="#database-section">База</a></li>
-            <li><a href="#changelog-section">История</a></li>
-            <li><a href="#security-audit">Аудит</a></li>
-            <li><a href="#tech-specs">Тех-стек</a></li>
-            <li><a href="#download-center">Скачать</a></li>
-        </ul>
-    </div>
 
     <!-- Модальное окно "О нас" (GitHub страница) -->
     <div id="github-modal" class="github-page">
@@ -107,7 +82,7 @@
                 </div>
             </div>
             
-            <p><strong>Secure Pass Pro</strong> — это современный десктопный генератор паролей, построенный на Python и CustomTkinter. Программа сочетает криптографически стойкую генерацию, многоязычный интерфейс (RU/EN/UA), экспорт QR-кодов, контроль целостности файлов через HMAC-SHA256, защиту мастер-паролем (Argon2id + Rate Limiting) и стильный Amoled-дизайн с RGB-анимацией.</p>
+            <p><strong>Secure Pass Pro</strong> — это современный десктопный генератор паролей, построенный на Python и CustomTkinter. Программа сочетает криптографически стойкую генерацию, многоязычный интерфейс (RU/EN/UA), экспорт QR-кодов, контроль целостности файлов через HMAC-SHA256, защиту мастер-паролем (Argon2id + Rate Limiting), SQLCipher полное шифрование БД, DPAPI аппаратное шифрование, Signed updates с проверкой подписи RSA-PSS и стильный Amoled-дизайн с RGB-анимацией.</p>
             
             <ul>
                 <li>🎬 Анимация всех кнопок меню (визуальная обратная связь при нажатии)</li>
@@ -124,6 +99,9 @@
                 <li>💾 Автосохранение паролей (вкл/выкл)</li>
                 <li>🏗️ Полностью модульная архитектура (core/, gui/, security/, storage/, localization/, utils/)</li>
                 <li>🔄 Panic cleanup — аварийная очистка ресурсов при краше</li>
+                <li>🚀 SQLCipher — полное шифрование базы данных</li>
+                <li>🔑 DPAPI — аппаратное шифрование через Windows API</li>
+                <li>✅ Signed updates — проверка подписи обновлений RSA-PSS</li>
             </ul>
             
             <a href="https://github.com/Maximka1993271/Password-Generator-Python" target="_blank" class="github-btn">🚀 Перейти на GitHub →</a>
@@ -139,7 +117,7 @@
         <div class="hero-content">
             <div class="version-badge">Latest Release v4.0 Stable</div>
             <h1>Безопасность без <br><span class="highlight">компромиссов</span></h1>
-            <p>Профессиональный инструмент на Python 3.9+, объединяющий модульную архитектуру, Argon2id хеширование с Rate Limiting, SQLite базу паролей с полным шифрованием, автосохранение, Neon-Amoled дизайн, мастер-пароль, контроль целостности HMAC-SHA256, настраиваемую очистку буфера, очистку памяти (ctypes.memset), Secure Clipboard, систему логирования с ротацией, RGB анимацию ВСЕГО ОКНА, АНИМАЦИЮ КНОПОК, НЕОНОВЫЕ ЧЕКБОКСЫ, ЦВЕТОВУЮ ИНДИКАЦИЮ (зелёный/красный) и криптостойкий движок для Windows, macOS и Linux. Полная локализация на 3 языка: Русский, English, Українська.</p>
+            <p>Профессиональный инструмент на Python 3.9+, объединяющий модульную архитектуру, Argon2id хеширование с Rate Limiting, SQLite базу паролей с полным шифрованием, SQLCipher, DPAPI, Signed updates, автосохранение, Neon-Amoled дизайн, мастер-пароль, контроль целостности HMAC-SHA256, настраиваемую очистку буфера, очистку памяти (ctypes.memset), Secure Clipboard, систему логирования с ротацией, RGB анимацию ВСЕГО ОКНА, АНИМАЦИЮ КНОПОК, НЕОНОВЫЕ ЧЕКБОКСЫ, ЦВЕТОВУЮ ИНДИКАЦИЮ (зелёный/красный) и криптостойкий движок для Windows, macOS и Linux. Полная локализация на 3 языка: Русский, English, Українська.</p>
             <div class="hero-btns">
                 <a href="https://github.com/Maximka1993271/Password-Generator-Python/releases/download/v4.0/SecurePassPro.exe" class="btn-primary">⬇️ Скачать v4.0 Stable</a>
                 <a href="#v40-section" class="btn-secondary">Что нового?</a>
@@ -155,6 +133,9 @@
         <div class="features-grid">
             <div class="card"><div class="card-icon">🏗️</div><h3>Модульная архитектура</h3><p>Полная реорганизация проекта на модули: core/, gui/, security/, storage/, localization/, utils/. Код стал чище, легче для поддержки и расширения.</p></div>
             <div class="card"><div class="card-icon">🗄️</div><h3>SQLite база паролей</h3><p>Безлимитное хранение паролей с полным шифрованием (label + password). Поиск, редактирование и удаление. Защита от SQL-инъекций, Secure delete (PRAGMA).</p></div>
+            <div class="card"><div class="card-icon">🔒</div><h3>SQLCipher поддержка</h3><p>Полное шифрование всей базы данных. Опционально — требует установки sqlcipher3.</p></div>
+            <div class="card"><div class="card-icon">🔑</div><h3>DPAPI аппаратное шифрование</h3><p>Аппаратное шифрование через Windows Data Protection API. Ключи хранятся в защищённом хранилище Windows.</p></div>
+            <div class="card"><div class="card-icon">✅</div><h3>Signed updates</h3><p>Безопасные обновления с проверкой цифровой подписи RSA-PSS. Встроенный публичный ключ для верификации.</p></div>
             <div class="card"><div class="card-icon">💾</div><h3>Автосохранение</h3><p>Автоматическое сохранение сгенерированных паролей в базу с меткой даты. Включение/выключение через настройки. Перевод на 3 языка (RU/EN/UA).</p></div>
             <div class="card"><div class="card-icon">🎬</div><h3>Анимация кнопок</h3><p>Все кнопки меню анимируются при нажатии (уменьшаются и возвращаются за 60 мс) + механический звук клика для приятного тактильного отклика.</p></div>
             <div class="card"><div class="card-icon">🟢🔴</div><h3>Цветовая индикация</h3><p>Все переключатели (RGB, звук, автоблокировка, автосохранение) имеют цветовую индикацию: зелёный — включено, красный — выключено.</p></div>
@@ -185,6 +166,9 @@
             <div class="card"><div class="card-icon">🧹</div><h3>Очистка памяти</h3><p>Обнуление паролей через ctypes.memset после использования</p></div>
             <div class="card"><div class="card-icon">🔑</div><h3>Secure Clipboard</h3><p>Защита буфера обмена через Windows API</p></div>
             <div class="card"><div class="card-icon">🗄️</div><h3>Полное шифрование БД</h3><p>Шифруются и label, и password (AES-256-GCM)</p></div>
+            <div class="card"><div class="card-icon">🔒</div><h3>SQLCipher</h3><p>Полное шифрование всей базы данных</p></div>
+            <div class="card"><div class="card-icon">🔑</div><h3>DPAPI</h3><p>Аппаратное шифрование через Windows API</p></div>
+            <div class="card"><div class="card-icon">✅</div><h3>Signed updates</h3><p>Проверка подписи обновлений RSA-PSS</p></div>
             <div class="card"><div class="card-icon">🔌</div><h3>Пул соединений БД</h3><p>Singleton connection pool для производительности</p></div>
             <div class="card"><div class="card-icon">🛡️</div><h3>Анти-отладка</h3><p>Обнаружение отладчиков и VM</p></div>
             <div class="card"><div class="card-icon">🔄</div><h3>Panic Cleanup</h3><p>Аварийная очистка ресурсов при краше</p></div>
@@ -222,7 +206,7 @@
             <div class="card"><div class="card-icon">🗄️</div><h3>Безлимитное хранилище</h3><p>Сохраняйте сколько угодно паролей. База данных SQLite с возможностью поиска, редактирования и удаления записей.</p></div>
             <div class="card"><div class="card-icon">🔍</div><h3>Поиск в реальном времени</h3><p>Мгновенный поиск по метке и содержимому пароля. Фильтрация записей по мере ввода текста.</p></div>
             <div class="card"><div class="card-icon">✏️</div><h3>Редактирование</h3><p>Изменение метки и пароля через удобный диалог. Копирование пароля одним кликом.</p></div>
-            <div class="card"><div class="card-icon">🔒</div><h3>Полное шифрование</h3><p>Шифруются и label, и password (AES-256-GCM). Защита от SQL-инъекций, Secure delete: PRAGMA secure_delete = ON.</p></div>
+            <div class="card"><div class="card-icon">🔒</div><h3>Полное шифрование</h3><p>Шифруются и label, и password (AES-256-GCM + SQLCipher опционально). Защита от SQL-инъекций, Secure delete: PRAGMA secure_delete = ON.</p></div>
         </div>
     </section>
 
@@ -317,6 +301,7 @@
             <div class="card"><div class="card-icon">📁</div><h3>Файловые операции</h3><ul><li>✅ Убрано дублирование .sha256 файлов</li><li>✅ HMAC-SHA256 вместо SHA-256</li><li>✅ Защита от downgrade attack</li><li>✅ Миграция legacy хешей</li></ul></div>
             <div class="card"><div class="card-icon">📄</div><h3>PDF экспорт</h3><ul><li>✅ Исправлена ошибка latin-1 кодировки</li><li>✅ Удалены мусорные .pkl файлы</li><li>✅ Временная папка для шрифта</li><li>✅ Запасной механизм без DejaVuSans</li></ul></div>
             <div class="card"><div class="card-icon">🔧</div><h3>Технические улучшения (18.05.2026)</h3><ul><li>✅ Замена 84 блоков except Exception на конкретные типы (InvalidTag, ValueError, OSError, PermissionError, sqlite3.Error, URLError, TimeoutError, tk.TclError, AttributeError)</li><li>✅ Улучшено логирование ошибок — добавлены вызовы logger.error() и logger.debug() во все критичные места</li><li>✅ Исправлен security/antidebug.py — восстановлена функция init_anti_debug(), добавлены тихие версии детекторов</li><li>✅ Обновлена локализация — добавлены недостающие ключи (err_encrypt, err_decrypt, err_database, err_network, err_permission, status_ok, status_error, status_warning, please_wait)</li><li>✅ Модульная архитектура закреплена — полное разделение на core/, gui/, security/, storage/, localization/, utils/</li><li>✅ 11 файлов исправлено — все mixins, security-модули, database, widgets, lang</li></ul></div>
+            <div class="card"><div class="card-icon">🚀</div><h3>Enterprise-улучшения (19.05.2026)</h3><ul><li>✅ SQLCipher — полное шифрование базы данных</li><li>✅ DPAPI — аппаратное шифрование через Windows API</li><li>✅ Signed updates — проверка подписи обновлений RSA-PSS</li><li>✅ Key rotation — ротация ключей шифрования</li><li>✅ Full metadata encryption — скрытие метаданных таблиц БД</li></ul></div>
         </div>
 
         <div style="display: flex; justify-content: center; gap: 30px; flex-wrap: wrap; margin-top: 40px;">
@@ -341,6 +326,8 @@
             <div class="card"><div class="card-icon">🔑</div><h3>Secure Clipboard</h3><p>Защита буфера обмена через Windows API.</p></div>
             <div class="card"><div class="card-icon">📝</div><h3>Логирование</h3><p>Ротация логов, crash reports, фильтрация sensitive данных.</p></div>
             <div class="card"><div class="card-icon">🔄</div><h3>Panic Cleanup</h3><p>Аварийная очистка ресурсов при краше.</p></div>
+            <div class="card"><div class="card-icon">🔒</div><h3>SQLCipher</h3><p>Полное шифрование базы данных.</p></div>
+            <div class="card"><div class="card-icon">🔑</div><h3>DPAPI</h3><p>Аппаратное шифрование через Windows API.</p></div>
         </div>
     </section>
 
@@ -361,6 +348,8 @@
             <div class="tech-item"><h4>🌈 RGB</h4><p>Анимация границ</p></div>
             <div class="tech-item"><h4>💾 Зеленый</h4><p>Автосохранение</p></div>
             <div class="tech-item"><h4>🗄️ Синий</h4><p>База паролей</p></div>
+            <div class="tech-item"><h4>🔒 SQLCipher</h4><p>Полное шифрование БД</p></div>
+            <div class="tech-item"><h4>🔑 DPAPI</h4><p>Аппаратное шифрование</p></div>
         </div>
     </section>
 
@@ -369,19 +358,22 @@
         <div class="tech-specs-container">
             <ul class="tech-list">
                 <li><strong>Разработчик:</strong> Максим Мельников (Maxim Melnikov)</li>
-                <li><strong>Версия:</strong> 4.0 Stable (18.05.2026)</li>
+                <li><strong>Версия:</strong> 4.0 Stable (19.05.2026)</li>
                 <li><strong>Архитектура:</strong> Полностью модульная (core/, gui/, security/, storage/, localization/, utils/)</li>
                 <li><strong>Ядро:</strong> Python 3.9+ (CSPRNG Secrets)</li>
                 <li><strong>Защита мастер-пароля:</strong> Argon2id + PBKDF2 fallback (600,000 итераций) + Rate Limiting</li>
-                <li><strong>Хранилище паролей:</strong> SQLite с полным шифрованием (AES-256-GCM), защита от SQL-инъекций, Secure delete</li>
+                <li><strong>Хранилище паролей:</strong> SQLite с полным шифрованием (AES-256-GCM + SQLCipher опционально), защита от SQL-инъекций, Secure delete</li>
                 <li><strong>Очистка памяти:</strong> ctypes.memset</li>
                 <li><strong>Secure Clipboard:</strong> Windows API</li>
+                <li><strong>Аппаратное шифрование:</strong> Windows DPAPI</li>
+                <li><strong>Обновления:</strong> Signed updates (RSA-PSS)</li>
                 <li><strong>Логирование:</strong> Ротация 5x5MB, фильтрация sensitive данных</li>
                 <li><strong>Автосохранение:</strong> Да (вкл/выкл, метка с датой)</li>
                 <li><strong>Анимация кнопок:</strong> Да (все кнопки меню, 60 мс, механический звук)</li>
                 <li><strong>Цветовая индикация:</strong> Да (зелёный — включено, красный — выключено)</li>
                 <li><strong>Неоновые чекбоксы:</strong> Да (подсветка при наведении, вспышка при клике)</li>
                 <li><strong>RGB подсветка:</strong> ВСЕГО ОКНА (4 границы + заголовок Windows 11)</li>
+                <li><strong>Настройка RGB:</strong> Скорость (3 режима) + Толщина (3 режима)</li>
                 <li><strong>Контроль целостности:</strong> HMAC-SHA256</li>
                 <li><strong>Очистка буфера:</strong> Настраиваемая 10-120 секунд + умная проверка содержимого</li>
                 <li><strong>Аудио:</strong> Кроссплатформенный (Windows MCI / macOS afplay / Linux mpg123/ffplay)</li>
@@ -394,7 +386,7 @@
             </ul>
             <div class="build-command">
                 <p class="command-label">// Команда сборки v4.0 (модульная версия)</p>
-                <code class="command-code">pyinstaller --noconfirm --onefile --windowed --clean --icon="icon.ico" --add-data "icon.ico;." --add-data "app_icon.ico;." --add-data "Computer Mouse Click.mp3;." --add-data "DejaVuSans.ttf;." --add-data "core;core" --add-data "gui;gui" --add-data "security;security" --add-data "storage;storage" --add-data "localization;localization" --add-data "utils;utils" --collect-all qrcode --collect-all customtkinter --collect-all PIL --collect-all argon2 --collect-all cryptography --hidden-import="PIL._tkinter_finder" --hidden-import="argon2" --hidden-import="argon2._ffi" --hidden-import="argon2._legacy" --hidden-import="fpdf" --hidden-import="sqlite3" --hidden-import="ctypes" --hidden-import="queue" --hidden-import="hashlib" --hidden-import="hmac" --hidden-import="threading" --hidden-import="webbrowser" --hidden-import="re" --hidden-import="atexit" --hidden-import="signal" --name "SecurePassPro" Secure_Pass_Pro.pyw</code>
+                <code class="command-code">pyinstaller --noconfirm --onefile --windowed --clean --icon="icon.ico" --add-data "icon.ico;." --add-data "app_icon.ico;." --add-data "Computer Mouse Click.mp3;." --add-data "DejaVuSans.ttf;." --add-data "core;core" --add-data "gui;gui" --add-data "security;security" --add-data "storage;storage" --add-data "localization;localization" --add-data "utils;utils" --collect-all qrcode --collect-all customtkinter --collect-all PIL --collect-all argon2 --collect-all cryptography --hidden-import="PIL._tkinter_finder" --hidden-import="argon2" --hidden-import="argon2._ffi" --hidden-import="argon2._legacy" --hidden-import="fpdf" --hidden-import="sqlite3" --hidden-import="ctypes" --hidden-import="queue" --hidden-import="hashlib" --hidden-import="hmac" --hidden-import="threading" --hidden-import="webbrowser" --hidden-import="re" --hidden-import="atexit" --hidden-import="signal" --hidden-import="requests" --hidden-import="secrets" --hidden-import="random" --name "SecurePassPro" Secure_Pass_Pro.pyw</code>
             </div>
         </div>
     </section>
@@ -405,7 +397,7 @@
             <div class="download-card highlight-card">
                 <div class="card-icon">🏆</div>
                 <h3>Secure Pass Pro v4.0</h3>
-                <p><b>Рекомендуется.</b> Модульная архитектура, Argon2id хеширование + Rate Limiting, SQLite база паролей с полным шифрованием, автосохранение, мастер-пароль, контроль целостности HMAC-SHA256, очистка памяти (ctypes.memset), Secure Clipboard, система логирования, защита от повторов, кнопка-глазок, горячие клавиши, <b>АНИМАЦИЯ КНОПОК</b>, <b>ЦВЕТОВАЯ ИНДИКАЦИЯ (зелёный/красный)</b>, <b>НЕОНОВЫЕ ЧЕКБОКСЫ</b>, <b>настраиваемая умная очистка буфера (10-120 сек)</b>, <b>RGB анимация ВСЕГО ОКНА (границы + заголовок Windows 11 с кнопками Закрыть/Свернуть/Развернуть)</b>, Neon UI, поддержка PDF с кириллицей (DejaVuSans), кроссплатформенный звук, цветная пульсация пароля, полная локализация на 3 языка (RU/EN/UA), 50+ исправлений ошибок, полная защита от timing-атак и shell-инъекций, **замена 84 блоков except Exception на конкретные типы, улучшенное логирование, исправлен antidebug.py, добавлены ключи локализации, 11 файлов исправлено**.</p>
+                <p><b>Рекомендуется.</b> Модульная архитектура, Argon2id хеширование + Rate Limiting, SQLite база паролей с полным шифрованием, SQLCipher, DPAPI, Signed updates, автосохранение, мастер-пароль, контроль целостности HMAC-SHA256, очистка памяти (ctypes.memset), Secure Clipboard, система логирования, защита от повторов, кнопка-глазок, горячие клавиши, <b>АНИМАЦИЯ КНОПОК</b>, <b>ЦВЕТОВАЯ ИНДИКАЦИЯ (зелёный/красный)</b>, <b>НЕОНОВЫЕ ЧЕКБОКСЫ</b>, <b>настраиваемая умная очистка буфера (10-120 сек)</b>, <b>RGB анимация ВСЕГО ОКНА с настройкой скорости и толщины</b>, Neon UI, поддержка PDF с кириллицей (DejaVuSans), кроссплатформенный звук, цветная пульсация пароля, полная локализация на 3 языка (RU/EN/UA), 50+ исправлений ошибок, полная защита от timing-атак и shell-инъекций, **замена 84 блоков except Exception на конкретные типы, улучшенное логирование, исправлен antidebug.py, добавлены ключи локализации, 11 файлов исправлено, SQLCipher, DPAPI, Signed updates**.</p>
                 <a href="https://github.com/Maximka1993271/Password-Generator-Python/releases/download/v4.0/SecurePassPro.exe" class="btn-primary full-width">⬇️ Скачать v4.0 (.EXE)</a>
                 <div style="margin-top: 15px;">
                     <a href="https://github.com/Maximka1993271/Password-Generator-Python/archive/refs/heads/main.zip" style="color: #888; font-size: 0.8rem;">📦 Исходный код (ZIP) →</a>
@@ -425,6 +417,9 @@
                 <span class="badge">Модульная архитектура</span>
                 <span class="badge">Argon2id + Rate Limiting</span>
                 <span class="badge">SQLite + Полное шифрование</span>
+                <span class="badge">SQLCipher</span>
+                <span class="badge">DPAPI</span>
+                <span class="badge">Signed updates</span>
                 <span class="badge">Автосохранение</span>
                 <span class="badge">Очистка памяти (memset)</span>
                 <span class="badge">Secure Clipboard</span>
@@ -446,7 +441,7 @@
                 <span class="badge">84 Exceptions Fixed</span>
                 <span class="badge">11 Files Fixed</span>
             </div>
-            <p class="footer-description">Локализация: Русский, English, Українська. Программа гарантирует полную приватность данных. Генерация происходит локально. Кроссплатформенная поддержка Windows, macOS, Linux. Модульная архитектура, Argon2id хеширование с Rate Limiting, SQLite база паролей с полным шифрованием, автосохранение, очистка памяти (ctypes.memset), Secure Clipboard, система логирования с фильтрацией sensitive данных, panic cleanup. Все критические баги исправлены (50+ исправлений, 15 критических безопасности), мёртвый код удалён, добавлена АНИМАЦИЯ КНОПОК, ЦВЕТОВАЯ ИНДИКАЦИЯ (зелёный/красный), НЕОНОВЫЕ ЧЕКБОКСЫ, RGB подсветка ВСЕГО ОКНА, умная очистка буфера, защита от timing-атак и shell-инъекций, защита от downgrade attack. PDF экспорт с полной поддержкой кириллицы, без мусорных файлов. **18.05.2026: заменены 84 блока except Exception на конкретные типы, улучшено логирование, исправлен antidebug.py, добавлены ключи локализации, исправлено 11 файлов.**</p>
+            <p class="footer-description">Локализация: Русский, English, Українська. Программа гарантирует полную приватность данных. Генерация происходит локально. Кроссплатформенная поддержка Windows, macOS, Linux. Модульная архитектура, Argon2id хеширование с Rate Limiting, SQLite база паролей с полным шифрованием, SQLCipher, DPAPI, Signed updates, автосохранение, очистка памяти (ctypes.memset), Secure Clipboard, система логирования с фильтрацией sensitive данных, panic cleanup. Все критические баги исправлены (50+ исправлений, 15 критических безопасности), мёртвый код удалён, добавлена АНИМАЦИЯ КНОПОК, ЦВЕТОВАЯ ИНДИКАЦИЯ (зелёный/красный), НЕОНОВЫЕ ЧЕКБОКСЫ, RGB подсветка ВСЕГО ОКНА с настройкой скорости и толщины, умная очистка буфера, защита от timing-атак и shell-инъекций, защита от downgrade attack. PDF экспорт с полной поддержкой кириллицы, без мусорных файлов. **18.05.2026: заменены 84 блока except Exception на конкретные типы, улучшено логирование, исправлен antidebug.py, добавлены ключи локализации, исправлено 11 файлов. 19.05.2026: добавлены SQLCipher, DPAPI, Signed updates.**</p>
         </div>
     </footer>
 
