@@ -103,6 +103,14 @@ Secure Pass Pro v4.0 — это полностью переработанная 
 - **Улучшенное окно мастер-пароля** — компактный дизайн, скруглённые кнопки, иконка замка
 - **Исправлена кнопка удаления мастер-пароля** — теперь работает корректно
 
+### 🚀 Enterprise-улучшения (19.05.2026)
+
+- **SQLCipher** — полное шифрование базы данных (если установлена библиотека)
+- **Hardware-backed encryption (DPAPI)** — аппаратное шифрование через Windows DPAPI
+- **Signed updates** — безопасные обновления с проверкой цифровой подписи RSA-PSS
+- **Secure crash handler** — глобальная очистка ресурсов при аварийном завершении
+- **Full metadata encryption** — скрытие метаданных таблиц БД (абстрактные имена полей)
+
 ### 🔧 Технические улучшения (18.05.2026)
 
 - **Замена 84 блоков `except Exception`** — все широкие исключения заменены на конкретные типы (`InvalidTag`, `ValueError`, `OSError`, `PermissionError`, `sqlite3.Error`, `URLError`, `TimeoutError`, `tk.TclError`, `AttributeError`)
@@ -126,6 +134,9 @@ Secure Pass Pro v4.0 — это полностью переработанная 
 | **Очистка памяти** | Обнуление паролей через ctypes.memset | 🔒 High |
 | **Secure Clipboard** | Защита буфера обмена через Windows API | 🔒 High |
 | **Полное шифрование БД** | Шифруются и label, и password | 🔒 High |
+| **SQLCipher** | Полное шифрование базы данных | 🔒 High |
+| **DPAPI** | Аппаратное шифрование через Windows | 🔒 High |
+| **Signed updates** | Проверка подписи обновлений RSA-PSS | 🔒 High |
 | **Анти-отладка** | Обнаружение отладчиков и VM | 🔒 Medium |
 | **HMAC-SHA256** | Контроль целостности файлов | 🔒 High |
 | **Пул соединений БД** | Безопасное управление подключениями | 🔒 Medium |
@@ -207,10 +218,7 @@ source venv/bin/activate  # Linux/macOS
 # venv\Scripts\activate   # Windows
 
 # Установка зависимостей
-pip install customtkinter qrcode[pil] pillow fpdf argon2-cffi cryptography
+pip install customtkinter qrcode[pil] pillow fpdf argon2-cffi cryptography requests
 
 # Запуск v4.0
 python3 Secure_Pass_Pro.pyw
-
-📝 Лицензия
-MIT License — свободное использование, модификация и распространение.
