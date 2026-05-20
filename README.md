@@ -1,143 +1,252 @@
+# 🔐 Secure Pass Pro v4.0
+
 <div align="center">
 
-# 🛡️ Secure Pass Pro v4.0
+<img src="https://github.com/Maximka1993271/Password-Generator-Python/raw/main/Secure_Pass_MainWindow40.jpg" 
+alt="Secure Pass Pro v4.0 Interface"
+width="950">
 
-### **Профессиональный генератор и менеджер паролей с открытым исходным кодом**
+<br><br>
 
-[![Python](https://img.shields.io/badge/Python-3.10+-blue.svg)](https://python.org)
-[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
-[![Platform](https://img.shields.io/badge/Platform-Windows%20|%20macOS%20|%20Linux-lightgrey.svg)]()
+<img src="https://img.shields.io/badge/Version-v4.0-gold?style=for-the-badge">
+<img src="https://img.shields.io/badge/Python-3.13-blue?style=for-the-badge&logo=python">
+<img src="https://img.shields.io/badge/Platform-Windows-success?style=for-the-badge">
+<img src="https://img.shields.io/badge/Security-AES--256--GCM-darkgreen?style=for-the-badge">
+<img src="https://img.shields.io/badge/Hashing-Argon2id-red?style=for-the-badge">
+<img src="https://img.shields.io/badge/Desktop-App-orange?style=for-the-badge">
 
-**Бесплатно • Безопасно • С открытым исходным кодом**
+<br><br>
+
+## 🛡 Advanced Desktop Password Manager & Security Suite
+
+Secure Pass Pro is a modern desktop password manager and advanced password generator developed in Python.
+
+The application combines:
+
+🔐 Strong encryption  
+⚡ Advanced password generation  
+🧠 Secure memory handling  
+🛡 Integrity protection  
+📋 Clipboard security  
+🔒 Auto-lock protection  
+🚨 Panic mode security  
+🎨 Modern customizable interface  
+
+Designed with a strong focus on:
+
+✔ Security  
+✔ Privacy  
+✔ Stability  
+✔ Modular architecture  
+✔ Defensive programming  
+✔ User experience  
+
+<br>
+
+<em>Secure Pass Pro v4.0 — Modern Security-Oriented Desktop Application</em>
 
 </div>
 
 ---
 
-## 📸 Скриншот
+# ✨ Features
 
-<div align="center">
-    <img src="https://github.com/Maximka1993271/Password-Generator-Python/raw/main/Secure_Pass_MainWindow40.jpg" alt="Secure Pass Pro v4.0 Interface" width="800">
-    <br>
-    <em>Интерфейс Secure Pass Pro v4.0</em>
-</div>
+## 🔑 Advanced Password Generator
 
----
-
-## 📋 О программе
-
-**Secure Pass Pro v4.0** — это профессиональный десктопный генератор и менеджер паролей с открытым исходным кодом. Программа построена на Python и CustomTkinter, сочетает криптостойкую генерацию, многоязычный интерфейс, полное шифрование данных и современный Amoled-дизайн с RGB-анимацией.
-
-### 🎯 Ключевые особенности
-
-| № | Функция | Описание |
-|---|---------|----------|
-| 1 | 👤 **Генератор имён** | 8 режимов: SAMP RP, Email, Игровой ник, Крутой ник, Красивый ник, Короткий, Длинный, Случайный |
-| 2 | 🔐 **Генерация паролей** | Криптостойкая генерация с 8 параметрами (CSPRNG) |
-| 3 | 🗄️ **База паролей** | SQLite с полным шифрованием (AES-256-GCM + SQLCipher) |
-| 4 | 🔒 **Мастер-пароль** | Argon2id хеширование + PBKDF2 fallback |
-| 5 | 🛡️ **Rate Limiting** | Защита от брутфорса (3→5с, 5→30с блокировки) |
-| 6 | 🌈 **RGB анимация** | Динамическая подсветка всего окна (4 границы + заголовок) |
-| 7 | 🎬 **Анимация кнопок** | Визуальный отклик + механический звук |
-| 8 | 🔑 **Secure Clipboard** | Защита буфера обмена (5-кратная перезапись) |
-| 9 | 🧹 **Очистка памяти** | Обнуление паролей через ctypes.memset |
-| 10 | 📝 **Система логирования** | Ротация логов, фильтрация sensitive данных |
-| 11 | ✅ **Контроль целостности** | HMAC-SHA256 проверка файлов |
-| 12 | 📄 **PDF экспорт** | Полная поддержка кириллицы (шрифт DejaVuSans) |
-| 13 | 📱 **QR-код** | Быстрая передача пароля на мобильные устройства |
-| 14 | 🔄 **Автообновление** | Проверка подписи RSA-PSS |
-| 15 | 🖱️ **Контекстное меню** | Правая кнопка мыши |
-| 16 | ⌨️ **Горячие клавиши** | F5, Ctrl+C, Ctrl+S, Ctrl+O, Esc |
+- Secure random generation using `secrets`
+- Configurable password length
+- Uppercase/lowercase support
+- Numbers and symbols
+- Entropy-focused generation
+- Strong password policies
+- Advanced customization options
 
 ---
 
-## 👤 Генератор имён (новая функция!)
+## 🔐 Master Password Protection
 
-<div align="center">
-
-| Режим | Описание | Пример |
-|-------|----------|--------|
-| **SAMP RP** | Имена для ролевых игр | `Александр_Иванов` |
-| **Email адрес** | Генерация email с транслитерацией | `ivanov.petr123@gmail.com` |
-| **Игровой ник** | Крутые ники с префиксами | `xX_Killer_Xx` |
-| **Крутой ник** | Стильные имена | `UltraHunter` |
-| **Красивый ник** | Эстетичные имена | `Luna` |
-| **Короткий (3-5)** | Краткие имена | `Max`, `Alex` |
-| **Длинный (8+)** | Полные имена | `Alexander` |
-| **Случайный** | Любой тип из перечисленных | случайный выбор |
-
-</div>
-
-**Настройки генератора:**
-- 👤 Пол: Мужской / Женский / Случайный
-- 🌐 Язык: Русский / English
-- ✂️ Разделитель: ДА (_) / НЕТ
-- 🔢 Количество: 1-10 имён за раз
+- Secure master password system
+- Argon2id password hashing
+- Brute-force protection
+- Unlock rate limiting
+- Secure verification workflow
+- Fail-safe authentication logic
 
 ---
 
-## 🔒 Безопасность
+## 🛡 Modern Encryption System
 
-<div align="center">
+Secure Pass Pro uses modern cryptographic technologies:
 
-| Защита | Технология | Уровень |
-|--------|------------|---------|
-| Мастер-пароль | Argon2id + PBKDF2 | 🔒 High |
-| Шифрование БД | AES-256-GCM + SQLCipher | 🔒 High |
-| Аппаратное шифрование | Windows DPAPI | 🔒 High |
-| Очистка памяти | ctypes.memset | 🔒 High |
-| Secure Clipboard | Windows API (5x overwrite) | 🔒 High |
-| Rate Limiting | 5 попыток → блокировка | 🔒 High |
-| Подпись обновлений | RSA-PSS | 🔒 High |
-| Целостность файлов | HMAC-SHA256 | 🔒 High |
-| Анти-отладка | IsDebuggerPresent | 🔒 Medium |
-| Фильтрация логов | Автоудаление паролей | 🔒 High |
-
-</div>
+- AES-256-GCM encryption
+- HMAC integrity verification
+- Secure key handling
+- Protected encrypted storage
+- Secure cleanup logic
 
 ---
 
-## 🎨 Цветовая схема
+## 🧠 Secure Memory Protection
 
-<div align="center">
+The application includes advanced memory protection features:
 
-| Кнопка | Цвет | HEX |
-|--------|------|-----|
-| Сгенерировать | 🟢 Изумрудный | `#00C853` |
-| **Генератор имён** | 🔴 Малиновый | `#E91E63` |
-| Копировать пароль | 🔵 Голубой | `#00B0F0` |
-| Сохранить в файл | 🟣 Фиолетовый | `#9C27B0` |
-| Открыть файл | 🟠 Оранжевый | `#FF9800` |
-| QR-код | 🔴 Малиновый | `#E91E63` |
-| История | 🟡 Золотой | `#FFC107` |
-| База паролей | 🔷 Синий | `#2196F3` |
-| Проверить утечки | 🔴 Красно-оранжевый | `#FF5722` |
-| Обновить программу | 🟢 Бирюзовый | `#009688` |
-| Настройки | ⚙️ Серый | `#607D8B` |
-| О программе | 🔘 Тёмно-серый | `#455A64` |
-
-</div>
+- Secure memory cleanup
+- Sensitive data wiping
+- Clipboard auto-clear
+- Secure runtime handling
+- Reduced secret lifetime in memory
 
 ---
 
-## 📦 Установка
+## 🚨 Panic Mode Security
 
-### Windows (рекомендуется)
+Special emergency protection system:
 
-1. Скачайте `SecurePassPro.exe` из раздела [Releases](https://github.com/Maximka1993271/Password-Generator-Python/releases)
-2. Запустите файл — установка не требуется
-3. При первом запуске можно установить мастер-пароль (опционально)
-4. Все данные сохраняются в папке `data/` рядом с EXE
+- Instant lock
+- Secure cleanup
+- Clipboard wipe
+- Emergency protection workflow
 
-### Из исходного кода
+---
 
-```bash
-# Клонирование репозитория
-git clone https://github.com/Maximka1993271/Password-Generator-Python.git
-cd Password-Generator-Python
+## 🔒 Auto-Lock System
 
-# Установка зависимостей
-pip install customtkinter qrcode[pil] pillow fpdf argon2-cffi cryptography requests
+- Automatic inactivity lock
+- Secure timeout handling
+- Session protection
+- Background protection logic
 
-# Запуск
-python Secure_Pass_Pro.pyw
+---
+
+## 📋 Clipboard Security
+
+- Protected clipboard operations
+- Automatic clipboard clearing
+- Sensitive data timeout
+- Safer copy/paste handling
+
+---
+
+# 🎨 Interface
+
+Secure Pass Pro features:
+
+- Modern desktop UI
+- Dark theme support
+- GTA-inspired visual style
+- RGB effects
+- Smooth animations
+- Customizable appearance
+- User-friendly layout
+
+---
+
+# ⚙ Architecture
+
+The project uses a modular architecture:
+
+```text
+core/
+gui/
+gui/mixins/
+security/
+storage/
+utils/
+localization/
+```
+
+The application is separated into independent layers:
+
+- Core logic
+- Security systems
+- Storage layer
+- GUI layer
+- Utility systems
+- Localization system
+
+---
+
+# 🛠 Technologies
+
+## Core Technologies
+
+- Python 3.13
+- Tkinter
+- SQLite
+- Cryptography
+- Argon2id
+
+---
+
+## Security Technologies
+
+- AES-GCM
+- HMAC
+- Secure memory cleanup
+- Integrity verification
+- Rate limiting
+- Defensive programming
+
+---
+
+# 📦 Release
+
+## 🚀 Latest Release
+
+👉 [Download SecurePassPro.exe](https://github.com/Maximka1993271/Password-Generator-Python/releases)
+
+---
+
+# 📚 Documentation
+
+Additional documentation available in:
+
+- Wiki
+- GitHub Releases
+- Source Code
+
+---
+
+# 💻 Platform
+
+Currently supported:
+
+- Windows 10
+- Windows 11
+
+---
+
+# 🔥 Project Highlights
+
+✔ Modern Security Architecture  
+✔ Advanced Password Generator  
+✔ AES-GCM Encryption  
+✔ Argon2id Protection  
+✔ Secure Memory Handling  
+✔ Panic Mode Security  
+✔ Modular Desktop Architecture  
+✔ Advanced GUI System  
+✔ Release Builds & EXE Distribution  
+✔ GitHub Wiki & Documentation  
+
+---
+
+# 👨‍💻 Developer
+
+## Maxim Melnikov
+
+GitHub:
+
+👉 https://github.com/Maximka1993271
+
+---
+
+# ⭐ Support
+
+If you like this project:
+
+- ⭐ Star the repository
+- 🍴 Fork the project
+- 🛡 Share Secure Pass Pro
+
+---
