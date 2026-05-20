@@ -1,6 +1,7 @@
 /* SECURE PASS PRO - PREMIUM STYLESHEET 
    Версия: 4.0 Stable (Amoled Optimized)
    Кроссплатформенная поддержка Windows/macOS/Linux
+   Обновлено: 21.05.2026 - добавлен Генератор имён
 */
 
 :root {
@@ -18,6 +19,7 @@
     --neon-cyan: #00acc1;
     --neon-purple: #8764b8;
     --neon-darkgreen: #2d6a4f;
+    --neon-magenta: #E91E63;
     
     /* RGB анимация */
     --rgb-red: #FF0000;
@@ -94,7 +96,7 @@ nav ul li a:hover {
     display: none;
     position: absolute;
     background: #0d1117;
-    min-width: 260px;
+    min-width: 280px;
     box-shadow: 0 8px 20px rgba(0,0,0,0.5);
     border-radius: 12px;
     border: 1px solid rgba(78, 201, 176, 0.3);
@@ -125,102 +127,6 @@ nav ul li a:hover {
     content: " ▼";
     font-size: 0.7rem;
     color: var(--text-secondary);
-}
-
-.dropdown-item-group {
-    padding: 10px 15px;
-    border-bottom: 1px solid var(--border-color);
-}
-
-.dropdown-item-group:last-child {
-    border-bottom: none;
-}
-
-.dropdown-item-group strong {
-    color: var(--accent-color);
-    display: block;
-    margin-bottom: 8px;
-    font-size: 0.85rem;
-}
-
-.download-buttons-inline {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-}
-
-.download-btn-small {
-    padding: 8px 15px;
-    border-radius: 8px;
-    text-decoration: none;
-    text-align: center;
-    font-size: 0.8rem;
-    transition: var(--transition);
-    display: inline-block;
-}
-
-.download-btn-v40-small {
-    background: var(--neon-blue);
-    color: white;
-    border: 1px solid #00A2FF;
-}
-
-.download-btn-v40-small:hover {
-    background: #00A2FF;
-    transform: translateY(-2px);
-}
-
-.download-btn-v20-small {
-    background: #4b4b4b;
-    color: white;
-    border: 1px solid #808080;
-}
-
-.download-btn-v20-small:hover {
-    background: #6b6b6b;
-    transform: translateY(-2px);
-}
-
-.submenu-links a {
-    display: block;
-    padding: 5px 0;
-    font-size: 0.75rem;
-    color: #888;
-    text-decoration: none;
-}
-
-.submenu-links a:hover {
-    color: var(--accent-color);
-}
-
-/* --- ВТОРАЯ СТРОКА НАВИГАЦИИ --- */
-.nav-secondary {
-    background: rgba(0, 0, 0, 0.95);
-    backdrop-filter: blur(10px);
-    padding: 12px 10%;
-    position: fixed;
-    width: 100%;
-    top: 70px;
-    z-index: 1999;
-    border-bottom: 1px solid #1a1a1a;
-}
-
-.nav-secondary ul {
-    display: flex;
-    justify-content: center;
-    gap: 40px;
-    list-style: none;
-}
-
-.nav-secondary ul li a {
-    text-decoration: none;
-    color: var(--text-secondary);
-    font-size: 0.9rem;
-    transition: var(--transition);
-}
-
-.nav-secondary ul li a:hover {
-    color: var(--accent-color);
 }
 
 /* --- ГЛАВНЫЙ БЛОК --- */
@@ -401,6 +307,10 @@ nav ul li a:hover {
 .card:nth-child(10) { animation-delay: 0.50s; }
 .card:nth-child(11) { animation-delay: 0.55s; }
 .card:nth-child(12) { animation-delay: 0.60s; }
+.card:nth-child(13) { animation-delay: 0.65s; }
+.card:nth-child(14) { animation-delay: 0.70s; }
+.card:nth-child(15) { animation-delay: 0.75s; }
+.card:nth-child(16) { animation-delay: 0.80s; }
 
 .card:hover { 
     border-color: var(--accent-color); 
@@ -445,6 +355,21 @@ nav ul li a:hover {
     position: absolute;
     left: -15px;
     color: var(--accent-color);
+}
+
+/* --- ГЕНЕРАТОР ИМЁН (специальные стили) --- */
+.namegen-card {
+    background: linear-gradient(135deg, #0d0d0d 0%, #1a0a1a 100%);
+    border-color: var(--neon-magenta);
+}
+
+.namegen-card:hover {
+    border-color: var(--neon-magenta);
+    box-shadow: 0 0 20px rgba(233, 30, 99, 0.2);
+}
+
+.namegen-highlight {
+    color: var(--neon-magenta);
 }
 
 /* --- ЦВЕТОВАЯ ДИФФЕРЕНЦИАЦИЯ --- */
@@ -513,7 +438,7 @@ nav ul li a:hover {
 
 .tech-list li strong {
     color: var(--accent-color);
-    min-width: 200px;
+    min-width: 220px;
     display: inline-block;
 }
 
@@ -788,6 +713,16 @@ footer {
     100% { box-shadow: 0 0 5px #FF0000; }
 }
 
+@keyframes neon-pulse {
+    0% { text-shadow: 0 0 2px var(--neon-magenta); }
+    50% { text-shadow: 0 0 10px var(--neon-magenta); }
+    100% { text-shadow: 0 0 2px var(--neon-magenta); }
+}
+
+.namegen-animation {
+    animation: neon-pulse 1.5s ease-in-out infinite;
+}
+
 /* --- ДОПОЛНИТЕЛЬНЫЕ ЭФФЕКТЫ --- */
 .pulse-border {
     animation: pulse-border 2s infinite;
@@ -819,6 +754,7 @@ footer {
 .red-text { color: #FF4444; }
 .orange-text { color: #FFA500; }
 .green-text { color: #2ECC71; }
+.magenta-text { color: #E91E63; }
 
 /* --- СТАТИСТИКА --- */
 .stats-container {
@@ -889,10 +825,6 @@ footer {
         display: none; 
     }
     
-    .nav-secondary {
-        display: none;
-    }
-    
     .hero {
         padding: 120px 5% 60px;
     }
@@ -952,6 +884,7 @@ footer {
     .tech-list li strong {
         display: block;
         margin-bottom: 5px;
+        min-width: auto;
     }
     
     .command-code {

@@ -1,6 +1,7 @@
 // Secure Pass Pro v4.0 - Premium UI Animations
 // Анимации при прокрутке, плавное появление элементов
 // Выпадающее меню, модальное окно "О нас", подсветка активного пункта
+// Генератор имён - анимации и эффекты
 // Полная совместимость с обновлённым HTML и CSS
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -64,6 +65,35 @@ document.addEventListener("DOMContentLoaded", () => {
                 document.body.style.overflow = 'auto';
             }
         };
+    }
+    
+    // --- АНИМАЦИЯ ДЛЯ ГЕНЕРАТОРА ИМЁН ---
+    const namegenSection = document.querySelector('#namegen-section');
+    const namegenCards = document.querySelectorAll('#namegen-section .card');
+    
+    if (namegenSection) {
+        // Эффект неоновой пульсации для заголовка секции
+        const namegenTitle = namegenSection.querySelector('.section-title .highlight');
+        if (namegenTitle && namegenTitle.textContent === 'Генератор имён') {
+            setInterval(() => {
+                namegenTitle.style.textShadow = '0 0 10px #E91E63';
+                setTimeout(() => {
+                    namegenTitle.style.textShadow = 'none';
+                }, 500);
+            }, 3000);
+        }
+        
+        // Анимация для карточек генератора имён
+        namegenCards.forEach((card, index) => {
+            card.addEventListener('mouseenter', () => {
+                card.style.borderColor = '#E91E63';
+                card.style.boxShadow = '0 0 20px rgba(233, 30, 99, 0.2)';
+            });
+            card.addEventListener('mouseleave', () => {
+                card.style.borderColor = '';
+                card.style.boxShadow = '';
+            });
+        });
     }
     
     // --- ОПЦИИ ДЛЯ НАБЛЮДАТЕЛЯ (Observer) ---
@@ -268,8 +298,18 @@ document.addEventListener("DOMContentLoaded", () => {
             100% { border-left-color: #FFA500; }
         }
         
+        @keyframes namegenPulse {
+            0% { text-shadow: 0 0 2px #E91E63; }
+            50% { text-shadow: 0 0 15px #E91E63; }
+            100% { text-shadow: 0 0 2px #E91E63; }
+        }
+        
         .clipboard-highlight {
             animation: clipboardGlow 2s infinite;
+        }
+        
+        .namegen-pulse {
+            animation: namegenPulse 1.5s ease-in-out infinite;
         }
         
         /* Анимация для появления карточек */
@@ -280,21 +320,27 @@ document.addEventListener("DOMContentLoaded", () => {
     document.head.appendChild(fadeAnimation);
 
     console.log("Secure Pass Pro v4.0 Web: UI Animations initialized. Выпадающее меню работает корректно!");
-    console.log("Secure Pass Pro v4.0 Web: Всего исправлений 29+, критических безопасности 6");
+    console.log("Secure Pass Pro v4.0 Web: Всего исправлений 50+, критических безопасности 15");
+    console.log("Secure Pass Pro v4.0 Web: 👤 Генератор имён - 8 режимов, выбор пола и языка!");
 
     // --- ДОБАВЛЯЕМ ТУЛТИПЫ ДЛЯ БЕЙДЖЕЙ ---
     const tooltipMap = {
+        '👤 Генератор имён': '8 режимов: SAMP RP, Email, Игровой ник, Крутой ник, Красивый ник, Короткий, Длинный, Случайный',
         'Python 3.9+': 'Python 3.9 или выше для запуска',
+        'Модульная архитектура': 'Разделение на core/, gui/, security/, storage/, localization/, utils/',
         'Neon-Amoled UX': 'Тёмный Amoled интерфейс с неоновой подсветкой',
         'CSPRNG Secrets': 'Криптографически стойкий генератор',
-        'PBKDF2': 'PBKDF2 хеширование, 100,000 итераций, соль 32 байта',
-        'SHA-256': 'Контроль целостности файлов SHA-256',
-        'HMAC': 'Защита от timing-атак через hmac.compare_digest()',
-        'RGB Animation': 'Динамическая RGB анимация границ окна',
+        'PBKDF2': 'PBKDF2 хеширование, 600,000 итераций, соль 32 байта',
+        'HMAC-SHA256': 'Контроль целостности файлов HMAC-SHA256',
+        'RGB Animation (Full Window)': 'Динамическая RGB анимация ВСЕГО окна (4 границы + заголовок)',
         'Cross-Platform': 'Полная поддержка Windows, macOS, Linux',
         'Win/Mac/Linux': 'Кроссплатформенная поддержка',
         'RU/EN/UA': 'Русский, Английский, Украинский язык интерфейса',
-        '29+ Fixes': 'Более 29 исправлений, включая 6 критических безопасности'
+        '50+ Fixes': 'Более 50 исправлений, включая 15 критических безопасности',
+        '15 Security Fixes': '15 критических исправлений безопасности',
+        'Panic Cleanup': 'Аварийная очистка ресурсов при краше',
+        '84 Exceptions Fixed': '84 блока except Exception заменены на конкретные типы',
+        '11 Files Fixed': '11 ключевых файлов проекта исправлено'
     };
     
     document.querySelectorAll('.badge').forEach(badge => {
@@ -358,6 +404,15 @@ document.addEventListener("DOMContentLoaded", () => {
         .hero-content, .hero-image, .card, .download-card, .tech-item {
             will-change: transform, opacity;
         }
+        
+        /* Специальные стили для карточек генератора имён */
+        #namegen-section .card {
+            transition: all 0.3s ease;
+        }
+        
+        #namegen-section .card:hover {
+            transform: translateY(-8px) scale(1.02);
+        }
     `;
     document.head.appendChild(tooltipStyle);
 });
@@ -370,8 +425,9 @@ window.addEventListener('load', () => {
         document.body.classList.add('loaded');
     }, 100);
     
-    console.log("%c✨ Secure Pass Pro v4.0 ✨\n%c📋 Всего исправлений: 29+\n%c🔐 Критических исправлений безопасности: 6\n%c🎨 UI/UX улучшений: 4\n%c🛡️ Исправлений стабильности: 16\n%c🧹 Удалено мёртвого кода: 3", 
+    console.log("%c✨ Secure Pass Pro v4.0 ✨\n%c👤 Генератор имён - 8 режимов\n%c📋 Всего исправлений: 50+\n%c🔐 Критических исправлений безопасности: 15\n%c🎨 UI/UX улучшений: 10+\n%c🛡️ Исправлений стабильности: 25+\n%c🧹 Удалено мёртвого кода: 84 блока", 
                 "color: #4EC9B0; font-size: 14px; font-weight: bold;",
+                "color: #E91E63; font-size: 12px;",
                 "color: #00AAFF; font-size: 12px;",
                 "color: #FF4444; font-size: 12px;",
                 "color: #4EC9B0; font-size: 12px;",
@@ -404,6 +460,10 @@ pageStyle.textContent = `
     .card ul li:nth-child(6) { animation-delay: 0.30s; }
     .card ul li:nth-child(7) { animation-delay: 0.35s; }
     .card ul li:nth-child(8) { animation-delay: 0.40s; }
+    .card ul li:nth-child(9) { animation-delay: 0.45s; }
+    .card ul li:nth-child(10) { animation-delay: 0.50s; }
+    .card ul li:nth-child(11) { animation-delay: 0.55s; }
+    .card ul li:nth-child(12) { animation-delay: 0.60s; }
     
     @keyframes slideInRight {
         from {

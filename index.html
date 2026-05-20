@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Secure Pass Pro v4.0 — Профессиональный генератор паролей. Модульная архитектура, Argon2id хеширование, SQLite база паролей, автосохранение, Master-пароль, Rate Limiting, система логирования, очистка памяти (ctypes.memset), Secure Clipboard, полное шифрование БД, анти-отладка, panic cleanup, контроль целостности HMAC-SHA256, защита от повторов, настраиваемая очистка буфера (10-120 сек), RGB анимация ВСЕГО ОКНА, АНИМАЦИЯ КНОПОК, НЕОНОВЫЕ ЧЕКБОКСЫ, ЦВЕТОВАЯ ИНДИКАЦИЯ (зелёный/красный), Amoled UI с неоновой подсветкой, расчет энтропии, просмотр PDF и криптостойкость. Цветная пульсация пароля: красный (слабый), оранжевый (средний), зелёный (надёжный). Кроссплатформенная поддержка Windows, macOS, Linux. Полная локализация на 3 языка: Русский, English, Українська. SQLCipher полное шифрование БД, DPAPI аппаратное шифрование, Signed updates с проверкой подписи RSA-PSS.">
+    <meta name="description" content="Secure Pass Pro v4.0 — Профессиональный генератор паролей. Модульная архитектура, Argon2id хеширование, SQLite база паролей, автосохранение, Master-пароль, Rate Limiting, система логирования, очистка памяти (ctypes.memset), Secure Clipboard, полное шифрование БД, анти-отладка, panic cleanup, контроль целостности HMAC-SHA256, защита от повторов, настраиваемая очистка буфера (10-120 сек), RGB анимация ВСЕГО ОКНА, АНИМАЦИЯ КНОПОК, НЕОНОВЫЕ ЧЕКБОКСЫ, ЦВЕТОВАЯ ИНДИКАЦИЯ (зелёный/красный), Amoled UI с неоновой подсветкой, расчет энтропии, просмотр PDF и криптостойкость. Цветная пульсация пароля: красный (слабый), оранжевый (средний), зелёный (надёжный). Кроссплатформенная поддержка Windows, macOS, Linux. Полная локализация на 3 языка: Русский, English, Українська. SQLCipher полное шифрование БД, DPAPI аппаратное шифрование, Signed updates с проверкой подписи RSA-PSS. 👤 Генератор имён — 8 режимов, выбор пола и языка.">
     <title>Secure Pass Pro v4.0 | Профессиональная защита паролей</title>
     
     <link rel="icon" type="image/png" href="https://github.com/Maximka1993271/Password-Generator-Python/blob/main/app_icon.png?raw=true">
@@ -11,17 +11,6 @@
     
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
-    <style>
-        /* Увеличенное расстояние между картинкой и текстом */
-        .hero {
-            gap: 60px;
-        }
-        @media (max-width: 768px) {
-            .hero {
-                gap: 40px;
-            }
-        }
-    </style>
 </head>
 <body>
 
@@ -33,6 +22,7 @@
                     <a href="#">Функции ▼</a>
                     <div class="dropdown-content">
                         <a href="#v40-section">🚀 Возможности v4.0</a>
+                        <a href="#namegen-section">👤 Генератор имён</a>
                         <a href="#security-section">🔒 Безопасность v4.0</a>
                         <a href="#settings-section">⚙️ Настройки</a>
                         <a href="#pdf-section">📄 PDF Кириллица</a>
@@ -85,6 +75,7 @@
             <p><strong>Secure Pass Pro</strong> — это современный десктопный генератор паролей, построенный на Python и CustomTkinter. Программа сочетает криптографически стойкую генерацию, многоязычный интерфейс (RU/EN/UA), экспорт QR-кодов, контроль целостности файлов через HMAC-SHA256, защиту мастер-паролем (Argon2id + Rate Limiting), SQLCipher полное шифрование БД, DPAPI аппаратное шифрование, Signed updates с проверкой подписи RSA-PSS и стильный Amoled-дизайн с RGB-анимацией.</p>
             
             <ul>
+                <li>👤 Генератор имён — 8 режимов (SAMP RP, Email, Игровой ник, Крутой ник, Красивый ник, Короткий, Длинный, Случайный)</li>
                 <li>🎬 Анимация всех кнопок меню (визуальная обратная связь при нажатии)</li>
                 <li>🟢🔴 Цветовая индикация (зелёный — включено, красный — выключено)</li>
                 <li>✅ Неоновые чекбоксы (подсветка при наведении и вспышка при клике)</li>
@@ -117,7 +108,7 @@
         <div class="hero-content">
             <div class="version-badge">Latest Release v4.0 Stable</div>
             <h1>Безопасность без <br><span class="highlight">компромиссов</span></h1>
-            <p>Профессиональный инструмент на Python 3.9+, объединяющий модульную архитектуру, Argon2id хеширование с Rate Limiting, SQLite базу паролей с полным шифрованием, SQLCipher, DPAPI, Signed updates, автосохранение, Neon-Amoled дизайн, мастер-пароль, контроль целостности HMAC-SHA256, настраиваемую очистку буфера, очистку памяти (ctypes.memset), Secure Clipboard, систему логирования с ротацией, RGB анимацию ВСЕГО ОКНА, АНИМАЦИЮ КНОПОК, НЕОНОВЫЕ ЧЕКБОКСЫ, ЦВЕТОВУЮ ИНДИКАЦИЮ (зелёный/красный) и криптостойкий движок для Windows, macOS и Linux. Полная локализация на 3 языка: Русский, English, Українська.</p>
+            <p>Профессиональный инструмент на Python 3.9+, объединяющий модульную архитектуру, Argon2id хеширование с Rate Limiting, SQLite базу паролей с полным шифрованием, SQLCipher, DPAPI, Signed updates, автосохранение, Neon-Amoled дизайн, мастер-пароль, контроль целостности HMAC-SHA256, настраиваемую очистку буфера, очистку памяти (ctypes.memset), Secure Clipboard, систему логирования с ротацией, RGB анимацию ВСЕГО ОКНА, АНИМАЦИЮ КНОПОК, НЕОНОВЫЕ ЧЕКБОКСЫ, ЦВЕТОВУЮ ИНДИКАЦИЮ (зелёный/красный) и криптостойкий движок для Windows, macOS и Linux. Полная локализация на 3 языка: Русский, English, Українська. 👤 НОВОЕ: Генератор имён с 8 режимами!</p>
             <div class="hero-btns">
                 <a href="https://github.com/Maximka1993271/Password-Generator-Python/releases/download/v4.0/SecurePassPro.exe" class="btn-primary">⬇️ Скачать v4.0 Stable</a>
                 <a href="#v40-section" class="btn-secondary">Что нового?</a>
@@ -131,6 +122,7 @@
     <section id="v40-section" class="features-section">
         <h2 class="section-title">Ключевые нововведения <span class="highlight">v4.0</span></h2>
         <div class="features-grid">
+            <div class="card"><div class="card-icon">👤</div><h3>Генератор имён</h3><p>8 режимов: SAMP RP, Email, Игровой ник, Крутой ник, Красивый ник, Короткий (3-5), Длинный (8+), Случайный. Выбор пола и языка. Неоновая рамка, копирование всех результатов.</p></div>
             <div class="card"><div class="card-icon">🏗️</div><h3>Модульная архитектура</h3><p>Полная реорганизация проекта на модули: core/, gui/, security/, storage/, localization/, utils/. Код стал чище, легче для поддержки и расширения.</p></div>
             <div class="card"><div class="card-icon">🗄️</div><h3>SQLite база паролей</h3><p>Безлимитное хранение паролей с полным шифрованием (label + password). Поиск, редактирование и удаление. Защита от SQL-инъекций, Secure delete (PRAGMA).</p></div>
             <div class="card"><div class="card-icon">🔒</div><h3>SQLCipher поддержка</h3><p>Полное шифрование всей базы данных. Опционально — требует установки sqlcipher3.</p></div>
@@ -157,8 +149,25 @@
         </div>
     </section>
 
+    <!-- Новая секция: Генератор имён -->
+    <section id="namegen-section" class="features-section dark-bg">
+        <h2 class="section-title"><span class="highlight">Генератор имён</span> 👤</h2>
+        <div class="features-grid">
+            <div class="card"><div class="card-icon">🎮</div><h3>SAMP RP</h3><p>Имена для ролевых игр (например: Александр_Иванов)</p></div>
+            <div class="card"><div class="card-icon">📧</div><h3>Email адрес</h3><p>Генерация email с транслитерацией русских имён</p></div>
+            <div class="card"><div class="card-icon">🎮</div><h3>Игровой ник</h3><p>Крутые ники с префиксами (xX_, Xx_, Ultra, Mega, Super)</p></div>
+            <div class="card"><div class="card-icon">🔥</div><h3>Крутой ник</h3><p>Стильные имена с префиксами COOL</p></div>
+            <div class="card"><div class="card-icon">🌸</div><h3>Красивый ник</h3><p>Эстетичные имена (Luna, Stella, Aurora, Iris)</p></div>
+            <div class="card"><div class="card-icon">📝</div><h3>Короткий (3-5)</h3><p>Краткие имена (Max, Alex, Sam, Tom)</p></div>
+            <div class="card"><div class="card-icon">📏</div><h3>Длинный (8+)</h3><p>Полные имена (Alexander, Maximilian, Christopher)</p></div>
+            <div class="card"><div class="card-icon">🎲</div><h3>Случайный</h3><p>Любой тип из перечисленных выше</p></div>
+            <div class="card"><div class="card-icon">⚙️</div><h3>Настройки</h3><p>Пол (Мужской/Женский/Случайный), Язык (Русский/English), Разделитель (ДА/НЕТ), Количество (1-10)</p></div>
+            <div class="card"><div class="card-icon">✨</div><h3>Особенности</h3><p>Неоновая рамка, копирование всех результатов, быстрая очистка, плавная анимация</p></div>
+        </div>
+    </section>
+
     <!-- Новая секция: Безопасность v4.0 -->
-    <section id="security-section" class="features-section dark-bg">
+    <section id="security-section" class="features-section">
         <h2 class="section-title"><span class="highlight">Безопасность</span> v4.0</h2>
         <div class="features-grid">
             <div class="card"><div class="card-icon">🔒</div><h3>Argon2id хеширование</h3><p>Современный стандарт защиты мастер-пароля (победитель Password Hashing Competition 2015)</p></div>
@@ -178,7 +187,7 @@
     </section>
 
     <!-- Новая секция: Цветовая индикация -->
-    <section id="color-indication-section" class="features-section">
+    <section id="color-indication-section" class="features-section dark-bg">
         <h2 class="section-title"><span class="highlight">Цветовая индикация</span> 🟢🔴</h2>
         <div class="features-grid">
             <div class="card"><div class="card-icon">🟢</div><h3>Включено — Зелёный</h3><p>RGB подсветка, звук, автоблокировка, автосохранение — все переключатели горят зелёным когда активны.</p></div>
@@ -189,7 +198,7 @@
     </section>
 
     <!-- Новая секция: Неоновые чекбоксы -->
-    <section id="checkbox-section" class="features-section dark-bg">
+    <section id="checkbox-section" class="features-section">
         <h2 class="section-title"><span class="highlight">Неоновые</span> чекбоксы ✅</h2>
         <div class="features-grid">
             <div class="card"><div class="card-icon">✨</div><h3>Подсветка при наведении</h3><p>При наведении курсора на чекбокс он подсвечивается неоновым цветом для лучшей видимости.</p></div>
@@ -200,7 +209,7 @@
     </section>
 
     <!-- Новая секция: SQLite База паролей -->
-    <section id="database-section" class="features-section">
+    <section id="database-section" class="features-section dark-bg">
         <h2 class="section-title"><span class="highlight">SQLite База</span> паролей</h2>
         <div class="features-grid">
             <div class="card"><div class="card-icon">🗄️</div><h3>Безлимитное хранилище</h3><p>Сохраняйте сколько угодно паролей. База данных SQLite с возможностью поиска, редактирования и удаления записей.</p></div>
@@ -211,7 +220,7 @@
     </section>
 
     <!-- Новая секция: Автосохранение -->
-    <section id="autosave-section" class="features-section dark-bg">
+    <section id="autosave-section" class="features-section">
         <h2 class="section-title"><span class="highlight">Автосохранение</span> паролей</h2>
         <div class="features-grid">
             <div class="card"><div class="card-icon">💾</div><h3>Автоматическое сохранение</h3><p>При включённой опции каждый сгенерированный пароль автоматически сохраняется в базу данных.</p></div>
@@ -222,7 +231,7 @@
     </section>
 
     <!-- Новая секция: Анимация кнопок -->
-    <section id="button-animation-section" class="features-section">
+    <section id="button-animation-section" class="features-section dark-bg">
         <h2 class="section-title"><span class="highlight">Анимация</span> кнопок</h2>
         <div class="features-grid">
             <div class="card"><div class="card-icon">🎬</div><h3>Визуальная обратная связь</h3><p>Все кнопки меню анимируются при нажатии — уменьшаются и возвращаются к исходному размеру за 60 мс.</p></div>
@@ -232,7 +241,7 @@
         </div>
     </section>
 
-    <section id="settings-section" class="features-section dark-bg">
+    <section id="settings-section" class="features-section">
         <h2 class="section-title">Централизованные <span class="highlight">Настройки</span></h2>
         <div class="features-grid">
             <div class="card"><div class="card-icon">🌐</div><h3>Смена языка</h3><p>Мгновенное переключение между Русским, Английским и Украинским языками без перезапуска программы.</p></div>
@@ -247,7 +256,7 @@
         </div>
     </section>
 
-    <section id="pdf-section" class="features-section">
+    <section id="pdf-section" class="features-section dark-bg">
         <h2 class="section-title">Полная поддержка <span class="highlight">Кириллицы в PDF</span></h2>
         <div class="features-grid">
             <div class="card"><div class="card-icon">🖋️</div><h3>DejaVuSans.ttf</h3><p>Встроенный шрифт DejaVuSans обеспечивает корректное отображение русских и украинских символов в экспортируемых PDF-файлах. Временная папка для шрифта, мусорные .pkl файлы удаляются.</p></div>
@@ -256,7 +265,7 @@
     </section>
 
     <!-- Секция: Цветная пульсация пароля -->
-    <section id="animation-section" class="features-section dark-bg">
+    <section id="animation-section" class="features-section">
         <h2 class="section-title">Цветная <span class="highlight">Пульсация</span> пароля</h2>
         <div class="features-grid">
             <div class="card"><div class="card-icon">🔴</div><h3>Слабый пароль</h3><p>При генерации слабого пароля (до 40 бит) поле пароля вспыхивает <strong style="color:#FF4444;">КРАСНЫМ</strong> неоном.</p></div>
@@ -267,7 +276,7 @@
     </section>
 
     <!-- Секция: RGB Анимация ВСЕГО ОКНА -->
-    <section id="rgb-section" class="features-section">
+    <section id="rgb-section" class="features-section dark-bg">
         <h2 class="section-title"><span class="highlight">RGB Анимация</span> ВСЕГО ОКНА</h2>
         <div class="features-grid">
             <div class="card"><div class="card-icon">🌈</div><h3>4 независимых полосы</h3><p>Верхняя, нижняя, левая и правая границы окна анимируются с разными цветовыми фазами.</p></div>
@@ -278,9 +287,10 @@
     </section>
 
     <!-- Секция: Полная история версий (обновлена) -->
-    <section id="changelog-section" class="features-section dark-bg">
+    <section id="changelog-section" class="features-section">
         <h2 class="section-title">Полная история <span class="highlight">изменений v4.0</span></h2>
         <div class="features-grid">
+            <div class="card"><div class="card-icon">👤</div><h3>Генератор имён</h3><ul><li>✅ 8 режимов генерации</li><li>✅ Выбор пола (Мужской/Женский/Случайный)</li><li>✅ Выбор языка (Русский/English)</li><li>✅ Настройка разделителя</li><li>✅ Регулировка количества (1-10)</li><li>✅ Неоновая рамка</li><li>✅ Копирование всех результатов</li></ul></div>
             <div class="card"><div class="card-icon">🏗️</div><h3>Модульная архитектура</h3><ul><li>✅ Разделение на модули: core/, gui/, security/, storage/, localization/, utils/</li><li>✅ Код стал чище и легче для поддержки</li><li>✅ Легко добавлять новые функции</li></ul></div>
             <div class="card"><div class="card-icon">🗄️</div><h3>SQLite база паролей</h3><ul><li>✅ Безлимитное хранение паролей</li><li>✅ Полное шифрование (label + password)</li><li>✅ Поиск в реальном времени</li><li>✅ Редактирование и удаление записей</li><li>✅ Защита от SQL-инъекций</li><li>✅ Secure delete (PRAGMA)</li></ul></div>
             <div class="card"><div class="card-icon">💾</div><h3>Автосохранение</h3><ul><li>✅ Автоматическое сохранение в базу</li><li>✅ Метка с датой</li><li>✅ Кнопка в настройках (вкл/выкл)</li><li>✅ Перевод на 3 языка (RU/EN/UA)</li><li>✅ Единый стиль без капслока</li></ul></div>
@@ -300,7 +310,7 @@
             <div class="card"><div class="card-icon">🌐</div><h3>Локализация</h3><ul><li>✅ Полная поддержка RU/EN/UA</li><li>✅ Мгновенное переключение без перезапуска</li><li>✅ Все диалоги и сообщения переведены</li><li>✅ Единый стиль без капслока</li></ul></div>
             <div class="card"><div class="card-icon">📁</div><h3>Файловые операции</h3><ul><li>✅ Убрано дублирование .sha256 файлов</li><li>✅ HMAC-SHA256 вместо SHA-256</li><li>✅ Защита от downgrade attack</li><li>✅ Миграция legacy хешей</li></ul></div>
             <div class="card"><div class="card-icon">📄</div><h3>PDF экспорт</h3><ul><li>✅ Исправлена ошибка latin-1 кодировки</li><li>✅ Удалены мусорные .pkl файлы</li><li>✅ Временная папка для шрифта</li><li>✅ Запасной механизм без DejaVuSans</li></ul></div>
-            <div class="card"><div class="card-icon">🔧</div><h3>Технические улучшения (18.05.2026)</h3><ul><li>✅ Замена 84 блоков except Exception на конкретные типы (InvalidTag, ValueError, OSError, PermissionError, sqlite3.Error, URLError, TimeoutError, tk.TclError, AttributeError)</li><li>✅ Улучшено логирование ошибок — добавлены вызовы logger.error() и logger.debug() во все критичные места</li><li>✅ Исправлен security/antidebug.py — восстановлена функция init_anti_debug(), добавлены тихие версии детекторов</li><li>✅ Обновлена локализация — добавлены недостающие ключи (err_encrypt, err_decrypt, err_database, err_network, err_permission, status_ok, status_error, status_warning, please_wait)</li><li>✅ Модульная архитектура закреплена — полное разделение на core/, gui/, security/, storage/, localization/, utils/</li><li>✅ 11 файлов исправлено — все mixins, security-модули, database, widgets, lang</li></ul></div>
+            <div class="card"><div class="card-icon">🔧</div><h3>Технические улучшения (18.05.2026)</h3><ul><li>✅ Замена 84 блоков except Exception на конкретные типы</li><li>✅ Улучшено логирование ошибок</li><li>✅ Исправлен security/antidebug.py</li><li>✅ Обновлена локализация</li><li>✅ Модульная архитектура закреплена</li><li>✅ 11 файлов исправлено</li></ul></div>
             <div class="card"><div class="card-icon">🚀</div><h3>Enterprise-улучшения (19.05.2026)</h3><ul><li>✅ SQLCipher — полное шифрование базы данных</li><li>✅ DPAPI — аппаратное шифрование через Windows API</li><li>✅ Signed updates — проверка подписи обновлений RSA-PSS</li><li>✅ Key rotation — ротация ключей шифрования</li><li>✅ Full metadata encryption — скрытие метаданных таблиц БД</li></ul></div>
         </div>
 
@@ -308,12 +318,12 @@
             <div style="background: rgba(76, 201, 176, 0.1); padding: 20px 35px; border-radius: 15px; border: 1px solid #4EC9B0; text-align: center;"><div style="font-size: 2.5rem; font-weight: 800; color: #4EC9B0;">50+</div><div style="color: #888;">Всего исправлений</div></div>
             <div style="background: rgba(76, 201, 176, 0.1); padding: 20px 35px; border-radius: 15px; border: 1px solid #4EC9B0; text-align: center;"><div style="font-size: 2.5rem; font-weight: 800; color: #4EC9B0;">15</div><div style="color: #888;">Критических (безопасность)</div></div>
             <div style="background: rgba(76, 201, 176, 0.1); padding: 20px 35px; border-radius: 15px; border: 1px solid #4EC9B0; text-align: center;"><div style="font-size: 2.5rem; font-weight: 800; color: #4EC9B0;">3</div><div style="color: #888;">Языка (RU/EN/UA)</div></div>
-            <div style="background: rgba(76, 201, 176, 0.1); padding: 20px 35px; border-radius: 15px; border: 1px solid #4EC9B0; text-align: center;"><div style="font-size: 2.5rem; font-weight: 800; color: #4EC9B0;">9</div><div style="color: #888;">Миксинов</div></div>
-            <div style="background: rgba(76, 201, 176, 0.1); padding: 20px 35px; border-radius: 15px; border: 1px solid #4EC9B0; text-align: center;"><div style="font-size: 2.5rem; font-weight: 800; color: #4EC9B0;">6</div><div style="color: #888;">Модулей</div></div>
+            <div style="background: rgba(76, 201, 176, 0.1); padding: 20px 35px; border-radius: 15px; border: 1px solid #4EC9B0; text-align: center;"><div style="font-size: 2.5rem; font-weight: 800; color: #4EC9B0;">10</div><div style="color: #888;">Миксинов</div></div>
+            <div style="background: rgba(76, 201, 176, 0.1); padding: 20px 35px; border-radius: 15px; border: 1px solid #4EC9B0; text-align: center;"><div style="font-size: 2.5rem; font-weight: 800; color: #4EC9B0;">8</div><div style="color: #888;">Режимов генератора имён</div></div>
         </div>
     </section>
 
-    <section id="security-audit" class="features-section">
+    <section id="security-audit" class="features-section dark-bg">
         <h2 class="section-title">Аудит <span class="highlight">безопасности</span></h2>
         <div class="features-grid">
             <div class="card"><div class="card-icon">🔢</div><h3>Энтропия</h3><p>Точный математический расчет сложности пароля в битах по формуле Шеннона для оценки криптостойкости.</p></div>
@@ -331,9 +341,10 @@
         </div>
     </section>
 
-    <section id="tech-section" class="tech-stack features-section dark-bg">
+    <section id="tech-section" class="tech-stack">
         <h2 class="section-title">Цветовая <span class="highlight">Дифференциация</span></h2>
         <div class="tech-grid">
+            <div class="tech-item"><h4>👤 Генератор имён</h4><p>8 режимов</p></div>
             <div class="tech-item"><h4>🎬 Анимация кнопок</h4><p>Визуальный отклик</p></div>
             <div class="tech-item"><h4>🟢🔴 Цветовая индикация</h4><p>Вкл/Выкл</p></div>
             <div class="tech-item"><h4>✅ Неоновые чекбоксы</h4><p>Подсветка</p></div>
@@ -353,14 +364,15 @@
         </div>
     </section>
 
-    <section id="tech-specs" class="features-section">
+    <section id="tech-specs" class="features-section dark-bg">
         <h2 class="section-title">Технические <span class="highlight">данные</span></h2>
         <div class="tech-specs-container">
             <ul class="tech-list">
                 <li><strong>Разработчик:</strong> Максим Мельников (Maxim Melnikov)</li>
-                <li><strong>Версия:</strong> 4.0 Stable (19.05.2026)</li>
+                <li><strong>Версия:</strong> 4.0 Stable (21.05.2026)</li>
                 <li><strong>Архитектура:</strong> Полностью модульная (core/, gui/, security/, storage/, localization/, utils/)</li>
                 <li><strong>Ядро:</strong> Python 3.9+ (CSPRNG Secrets)</li>
+                <li><strong>Генератор имён:</strong> 8 режимов, выбор пола и языка, неоновая рамка</li>
                 <li><strong>Защита мастер-пароля:</strong> Argon2id + PBKDF2 fallback (600,000 итераций) + Rate Limiting</li>
                 <li><strong>Хранилище паролей:</strong> SQLite с полным шифрованием (AES-256-GCM + SQLCipher опционально), защита от SQL-инъекций, Secure delete</li>
                 <li><strong>Очистка памяти:</strong> ctypes.memset</li>
@@ -391,13 +403,13 @@
         </div>
     </section>
 
-    <section id="download-center" class="download-section dark-bg">
+    <section id="download-center" class="download-section">
         <h2 class="section-title">Центр загрузок</h2>
         <div class="download-grid">
             <div class="download-card highlight-card">
                 <div class="card-icon">🏆</div>
                 <h3>Secure Pass Pro v4.0</h3>
-                <p><b>Рекомендуется.</b> Модульная архитектура, Argon2id хеширование + Rate Limiting, SQLite база паролей с полным шифрованием, SQLCipher, DPAPI, Signed updates, автосохранение, мастер-пароль, контроль целостности HMAC-SHA256, очистка памяти (ctypes.memset), Secure Clipboard, система логирования, защита от повторов, кнопка-глазок, горячие клавиши, <b>АНИМАЦИЯ КНОПОК</b>, <b>ЦВЕТОВАЯ ИНДИКАЦИЯ (зелёный/красный)</b>, <b>НЕОНОВЫЕ ЧЕКБОКСЫ</b>, <b>настраиваемая умная очистка буфера (10-120 сек)</b>, <b>RGB анимация ВСЕГО ОКНА с настройкой скорости и толщины</b>, Neon UI, поддержка PDF с кириллицей (DejaVuSans), кроссплатформенный звук, цветная пульсация пароля, полная локализация на 3 языка (RU/EN/UA), 50+ исправлений ошибок, полная защита от timing-атак и shell-инъекций, **замена 84 блоков except Exception на конкретные типы, улучшенное логирование, исправлен antidebug.py, добавлены ключи локализации, 11 файлов исправлено, SQLCipher, DPAPI, Signed updates**.</p>
+                <p><b>Рекомендуется.</b> Модульная архитектура, Argon2id хеширование + Rate Limiting, SQLite база паролей с полным шифрованием, SQLCipher, DPAPI, Signed updates, автосохранение, мастер-пароль, контроль целостности HMAC-SHA256, очистка памяти (ctypes.memset), Secure Clipboard, система логирования, защита от повторов, кнопка-глазок, горячие клавиши, <b>АНИМАЦИЯ КНОПОК</b>, <b>ЦВЕТОВАЯ ИНДИКАЦИЯ (зелёный/красный)</b>, <b>НЕОНОВЫЕ ЧЕКБОКСЫ</b>, <b>настраиваемая умная очистка буфера (10-120 сек)</b>, <b>RGB анимация ВСЕГО ОКНА с настройкой скорости и толщины</b>, <b>👤 ГЕНЕРАТОР ИМЁН (8 режимов)</b>, Neon UI, поддержка PDF с кириллицей (DejaVuSans), кроссплатформенный звук, цветная пульсация пароля, полная локализация на 3 языка (RU/EN/UA), 50+ исправлений ошибок, полная защита от timing-атак и shell-инъекций, замена 84 блоков except Exception на конкретные типы, улучшенное логирование, исправлен antidebug.py, добавлены ключи локализации, 11 файлов исправлено, SQLCipher, DPAPI, Signed updates.</p>
                 <a href="https://github.com/Maximka1993271/Password-Generator-Python/releases/download/v4.0/SecurePassPro.exe" class="btn-primary full-width">⬇️ Скачать v4.0 (.EXE)</a>
                 <div style="margin-top: 15px;">
                     <a href="https://github.com/Maximka1993271/Password-Generator-Python/archive/refs/heads/main.zip" style="color: #888; font-size: 0.8rem;">📦 Исходный код (ZIP) →</a>
@@ -413,6 +425,7 @@
         <div class="footer-content">
             <p>© 2026 Максим Мельников • MIT License</p>
             <div class="footer-tags">
+                <span class="badge">👤 Генератор имён</span>
                 <span class="badge">Python 3.9+</span>
                 <span class="badge">Модульная архитектура</span>
                 <span class="badge">Argon2id + Rate Limiting</span>
@@ -441,7 +454,7 @@
                 <span class="badge">84 Exceptions Fixed</span>
                 <span class="badge">11 Files Fixed</span>
             </div>
-            <p class="footer-description">Локализация: Русский, English, Українська. Программа гарантирует полную приватность данных. Генерация происходит локально. Кроссплатформенная поддержка Windows, macOS, Linux. Модульная архитектура, Argon2id хеширование с Rate Limiting, SQLite база паролей с полным шифрованием, SQLCipher, DPAPI, Signed updates, автосохранение, очистка памяти (ctypes.memset), Secure Clipboard, система логирования с фильтрацией sensitive данных, panic cleanup. Все критические баги исправлены (50+ исправлений, 15 критических безопасности), мёртвый код удалён, добавлена АНИМАЦИЯ КНОПОК, ЦВЕТОВАЯ ИНДИКАЦИЯ (зелёный/красный), НЕОНОВЫЕ ЧЕКБОКСЫ, RGB подсветка ВСЕГО ОКНА с настройкой скорости и толщины, умная очистка буфера, защита от timing-атак и shell-инъекций, защита от downgrade attack. PDF экспорт с полной поддержкой кириллицы, без мусорных файлов. **18.05.2026: заменены 84 блока except Exception на конкретные типы, улучшено логирование, исправлен antidebug.py, добавлены ключи локализации, исправлено 11 файлов. 19.05.2026: добавлены SQLCipher, DPAPI, Signed updates.**</p>
+            <p class="footer-description">Локализация: Русский, English, Українська. Программа гарантирует полную приватность данных. Генерация происходит локально. Кроссплатформенная поддержка Windows, macOS, Linux. Модульная архитектура, Argon2id хеширование с Rate Limiting, SQLite база паролей с полным шифрованием, SQLCipher, DPAPI, Signed updates, автосохранение, очистка памяти (ctypes.memset), Secure Clipboard, система логирования с фильтрацией sensitive данных, panic cleanup. Все критические баги исправлены (50+ исправлений, 15 критических безопасности), мёртвый код удалён, добавлена АНИМАЦИЯ КНОПОК, ЦВЕТОВАЯ ИНДИКАЦИЯ (зелёный/красный), НЕОНОВЫЕ ЧЕКБОКСЫ, RGB подсветка ВСЕГО ОКНА с настройкой скорости и толщины, умная очистка буфера, защита от timing-атак и shell-инъекций, защита от downgrade attack. PDF экспорт с полной поддержкой кириллицы, без мусорных файлов. **18.05.2026: заменены 84 блока except Exception на конкретные типы, улучшено логирование, исправлен antidebug.py, добавлены ключи локализации, исправлено 11 файлов. 19.05.2026: добавлены SQLCipher, DPAPI, Signed updates. 21.05.2026: добавлен Генератор имён с 8 режимами.**</p>
         </div>
     </footer>
 
