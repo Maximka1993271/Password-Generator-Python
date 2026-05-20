@@ -193,7 +193,7 @@ The application is separated into independent layers:
 
 ## 🚀 Latest Release
 
-👉 [Download SecurePassPro.exe](https://github.com/Maximka1993271/Password-Generator-Python/releases)
+👉 [Download SecurePassPro.exe](https://github.com/Maximka1993271/Password-Generator-Python/releases/download/v4.0/SecurePassPro.exe)
 
 ---
 
