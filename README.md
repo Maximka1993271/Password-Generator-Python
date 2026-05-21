@@ -136,17 +136,6 @@
 # Скачайте SecurePassPro.exe из раздела Releases
 # Запустите файл — установка не требуется
 
-📝 Лицензия
-MIT License
-
-Copyright (c) 2026 Максим Мельников
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction...
-
-<div align="center">
-Secure Pass Pro v4.0 — Ваша безопасность в надёжных руках 🔐
 
 https://img.shields.io/github/stars/Maximka1993271/Password-Generator-Python
 
