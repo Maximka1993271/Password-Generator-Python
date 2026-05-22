@@ -1,7 +1,7 @@
 /* SECURE PASS PRO - PREMIUM STYLESHEET 
    Версия: 4.0 Stable (Amoled Optimized)
    Кроссплатформенная поддержка Windows/macOS/Linux
-   Обновлено: 21.05.2026 - добавлен Генератор имён
+   Обновлено: 22.05.2026 - добавлена PDF тёмная тема
 */
 
 :root {
@@ -311,6 +311,14 @@ nav ul li a:hover {
 .card:nth-child(14) { animation-delay: 0.70s; }
 .card:nth-child(15) { animation-delay: 0.75s; }
 .card:nth-child(16) { animation-delay: 0.80s; }
+.card:nth-child(17) { animation-delay: 0.85s; }
+.card:nth-child(18) { animation-delay: 0.90s; }
+.card:nth-child(19) { animation-delay: 0.95s; }
+.card:nth-child(20) { animation-delay: 1.00s; }
+.card:nth-child(21) { animation-delay: 1.05s; }
+.card:nth-child(22) { animation-delay: 1.10s; }
+.card:nth-child(23) { animation-delay: 1.15s; }
+.card:nth-child(24) { animation-delay: 1.20s; }
 
 .card:hover { 
     border-color: var(--accent-color); 
@@ -370,6 +378,21 @@ nav ul li a:hover {
 
 .namegen-highlight {
     color: var(--neon-magenta);
+}
+
+/* --- PDF тёмная тема (специальные стили) --- */
+.pdf-dark-card {
+    background: linear-gradient(135deg, #0d0d0d 0%, #0a1a1a 100%);
+    border-color: var(--accent-color);
+}
+
+.pdf-dark-card:hover {
+    border-color: var(--accent-color);
+    box-shadow: 0 0 20px rgba(78, 201, 176, 0.2);
+}
+
+.pdf-highlight {
+    color: var(--accent-color);
 }
 
 /* --- ЦВЕТОВАЯ ДИФФЕРЕНЦИАЦИЯ --- */
@@ -719,8 +742,18 @@ footer {
     100% { text-shadow: 0 0 2px var(--neon-magenta); }
 }
 
+@keyframes pdf-glow {
+    0% { box-shadow: 0 0 5px #4EC9B0; }
+    50% { box-shadow: 0 0 20px #4EC9B0; }
+    100% { box-shadow: 0 0 5px #4EC9B0; }
+}
+
 .namegen-animation {
     animation: neon-pulse 1.5s ease-in-out infinite;
+}
+
+.pdf-animation {
+    animation: pdf-glow 2s ease-in-out infinite;
 }
 
 /* --- ДОПОЛНИТЕЛЬНЫЕ ЭФФЕКТЫ --- */
@@ -755,6 +788,7 @@ footer {
 .orange-text { color: #FFA500; }
 .green-text { color: #2ECC71; }
 .magenta-text { color: #E91E63; }
+.cyan-text { color: #4EC9B0; }
 
 /* --- СТАТИСТИКА --- */
 .stats-container {
