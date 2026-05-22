@@ -262,7 +262,7 @@
 
 ### Windows (рекомендуется)
 
-1. Скачайте `SecurePassPro.exe` из раздела [Releases](https://github.com/Maximka1993271/Password-Generator-Python/releases)
+1. Скачайте `SecurePassPro.exe` из раздела [Releases](https://github.com/Maximka1993271/Password-Generator-Python/releases/download/v4.0/SecurePassPro.exe)
 2. Запустите файл — установка не требуется
 3. При первом запуске мастер-пароль не требуется (можно установить позже)
 4. Все данные сохраняются в папке `data/` рядом с EXE
