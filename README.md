@@ -258,20 +258,6 @@
 
 ---
 
-## 📁 Структура локализации
-localization/
-├── lang.py # Основной файл с языками (RU, EN, UA)
-│ ├── LANGUAGES["RU"] # Русский словарь (300+ ключей)
-│ ├── LANGUAGES["EN"] # English dictionary (300+ keys)
-│ └── LANGUAGES["UA"] # Український словник (300+ ключів)
-├── LanguageManager # Менеджер языков
-│ ├── set_language() # Смена языка
-│ ├── get_text() # Получение текста
-│ ├── repair_keys() # Восстановление ключей
-│ └── fallback logic # Автоматический fallback
-
----
-
 ## 📦 Установка и запуск
 
 ### Windows (рекомендуется)
