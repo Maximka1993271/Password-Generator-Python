@@ -1,7 +1,7 @@
 /* SECURE PASS PRO - PREMIUM STYLESHEET 
    Версия: 4.0 Stable (Amoled Optimized)
    Кроссплатформенная поддержка Windows/macOS/Linux
-   Обновлено: 22.05.2026 - добавлена PDF тёмная тема
+   Обновлено: 23.05.2026 - добавлена 2FA и Генератор имён
 */
 
 :root {
@@ -20,6 +20,10 @@
     --neon-purple: #8764b8;
     --neon-darkgreen: #2d6a4f;
     --neon-magenta: #E91E63;
+    
+    /* 2FA цвет */
+    --neon-gold: #FFD700;
+    --neon-orange: #FFA500;
     
     /* RGB анимация */
     --rgb-red: #FF0000;
@@ -96,7 +100,7 @@ nav ul li a:hover {
     display: none;
     position: absolute;
     background: #0d1117;
-    min-width: 280px;
+    min-width: 300px;
     box-shadow: 0 8px 20px rgba(0,0,0,0.5);
     border-radius: 12px;
     border: 1px solid rgba(78, 201, 176, 0.3);
@@ -295,6 +299,39 @@ nav ul li a:hover {
     animation: fadeInUp 0.5s ease forwards;
 }
 
+/* 2FA карточка */
+.card[data-type="2fa"] {
+    border-color: var(--neon-gold);
+    background: linear-gradient(135deg, #0d0d0d 0%, #1a1a0a 100%);
+}
+
+.card[data-type="2fa"]:hover {
+    border-color: var(--neon-gold);
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.2);
+}
+
+/* Генератор имён карточка */
+.card[data-type="namegen"] {
+    border-color: var(--neon-magenta);
+    background: linear-gradient(135deg, #0d0d0d 0%, #1a0a1a 100%);
+}
+
+.card[data-type="namegen"]:hover {
+    border-color: var(--neon-magenta);
+    box-shadow: 0 0 20px rgba(233, 30, 99, 0.2);
+}
+
+/* PDF тёмная тема карточка */
+.card[data-type="pdf"] {
+    border-color: var(--accent-color);
+    background: linear-gradient(135deg, #0d0d0d 0%, #0a1a1a 100%);
+}
+
+.card[data-type="pdf"]:hover {
+    border-color: var(--accent-color);
+    box-shadow: 0 0 20px rgba(78, 201, 176, 0.2);
+}
+
 .card:nth-child(1) { animation-delay: 0.05s; }
 .card:nth-child(2) { animation-delay: 0.10s; }
 .card:nth-child(3) { animation-delay: 0.15s; }
@@ -319,6 +356,8 @@ nav ul li a:hover {
 .card:nth-child(22) { animation-delay: 1.10s; }
 .card:nth-child(23) { animation-delay: 1.15s; }
 .card:nth-child(24) { animation-delay: 1.20s; }
+.card:nth-child(25) { animation-delay: 1.25s; }
+.card:nth-child(26) { animation-delay: 1.30s; }
 
 .card:hover { 
     border-color: var(--accent-color); 
@@ -365,34 +404,9 @@ nav ul li a:hover {
     color: var(--accent-color);
 }
 
-/* --- ГЕНЕРАТОР ИМЁН (специальные стили) --- */
-.namegen-card {
-    background: linear-gradient(135deg, #0d0d0d 0%, #1a0a1a 100%);
-    border-color: var(--neon-magenta);
-}
-
-.namegen-card:hover {
-    border-color: var(--neon-magenta);
-    box-shadow: 0 0 20px rgba(233, 30, 99, 0.2);
-}
-
-.namegen-highlight {
-    color: var(--neon-magenta);
-}
-
-/* --- PDF тёмная тема (специальные стили) --- */
-.pdf-dark-card {
-    background: linear-gradient(135deg, #0d0d0d 0%, #0a1a1a 100%);
-    border-color: var(--accent-color);
-}
-
-.pdf-dark-card:hover {
-    border-color: var(--accent-color);
-    box-shadow: 0 0 20px rgba(78, 201, 176, 0.2);
-}
-
-.pdf-highlight {
-    color: var(--accent-color);
+/* 2FA список */
+.card ul li[data-2fa]::before {
+    color: var(--neon-gold);
 }
 
 /* --- ЦВЕТОВАЯ ДИФФЕРЕНЦИАЦИЯ --- */
@@ -416,6 +430,24 @@ nav ul li a:hover {
     border: 1px solid var(--border-color);
     transition: var(--transition);
     min-width: 160px;
+}
+
+.tech-item[data-type="2fa"] {
+    border-color: var(--neon-gold);
+}
+
+.tech-item[data-type="2fa"]:hover {
+    border-color: var(--neon-gold);
+    box-shadow: 0 0 15px rgba(255, 215, 0, 0.2);
+}
+
+.tech-item[data-type="namegen"] {
+    border-color: var(--neon-magenta);
+}
+
+.tech-item[data-type="namegen"]:hover {
+    border-color: var(--neon-magenta);
+    box-shadow: 0 0 15px rgba(233, 30, 99, 0.2);
 }
 
 .tech-item:hover {
@@ -463,6 +495,10 @@ nav ul li a:hover {
     color: var(--accent-color);
     min-width: 220px;
     display: inline-block;
+}
+
+.tech-list li strong[data-2fa] {
+    color: var(--neon-gold);
 }
 
 .build-command {
@@ -671,6 +707,21 @@ footer {
     font-family: 'Inter', -apple-system, sans-serif;
 }
 
+.badge[data-2fa] {
+    border-color: var(--neon-gold);
+    color: var(--neon-gold);
+}
+
+.badge[data-namegen] {
+    border-color: var(--neon-magenta);
+    color: var(--neon-magenta);
+}
+
+.badge[data-pdf] {
+    border-color: var(--accent-color);
+    color: var(--accent-color);
+}
+
 .badge:hover {
     border-color: var(--accent-color);
     color: var(--accent-color);
@@ -748,12 +799,22 @@ footer {
     100% { box-shadow: 0 0 5px #4EC9B0; }
 }
 
+@keyframes tfa-glow {
+    0% { box-shadow: 0 0 5px #FFD700; }
+    50% { box-shadow: 0 0 20px #FFD700; }
+    100% { box-shadow: 0 0 5px #FFD700; }
+}
+
 .namegen-animation {
     animation: neon-pulse 1.5s ease-in-out infinite;
 }
 
 .pdf-animation {
     animation: pdf-glow 2s ease-in-out infinite;
+}
+
+.tfa-animation {
+    animation: tfa-glow 2s ease-in-out infinite;
 }
 
 /* --- ДОПОЛНИТЕЛЬНЫЕ ЭФФЕКТЫ --- */
@@ -789,6 +850,7 @@ footer {
 .green-text { color: #2ECC71; }
 .magenta-text { color: #E91E63; }
 .cyan-text { color: #4EC9B0; }
+.gold-text { color: #FFD700; }
 
 /* --- СТАТИСТИКА --- */
 .stats-container {
@@ -808,6 +870,11 @@ footer {
     transition: var(--transition);
 }
 
+.stat-box[data-2fa] {
+    border-color: var(--neon-gold);
+    background: rgba(255, 215, 0, 0.1);
+}
+
 .stat-box:hover {
     transform: translateY(-5px);
     background: rgba(76, 201, 176, 0.15);
@@ -817,6 +884,10 @@ footer {
     font-size: 2.5rem;
     font-weight: 800;
     color: #4EC9B0;
+}
+
+.stat-number[data-2fa] {
+    color: var(--neon-gold);
 }
 
 .stat-label {

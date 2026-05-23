@@ -2,6 +2,7 @@
 // Анимации при прокрутке, плавное появление элементов
 // Выпадающее меню, модальное окно "О нас", подсветка активного пункта
 // Генератор имён - анимации и эффекты
+// 2FA - анимации и эффекты
 // Полная совместимость с обновлённым HTML и CSS
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -67,6 +68,36 @@ document.addEventListener("DOMContentLoaded", () => {
         };
     }
     
+    // --- АНИМАЦИЯ ДЛЯ 2FA ---
+    const tfaSection = document.querySelector('#2fa-section');
+    const tfaCards = document.querySelectorAll('#2fa-section .card');
+    
+    if (tfaSection) {
+        // Эффект неоновой пульсации для заголовка секции 2FA
+        const tfaTitle = tfaSection.querySelector('.section-title .highlight');
+        if (tfaTitle && tfaTitle.textContent === 'Двухфакторная аутентификация') {
+            setInterval(() => {
+                tfaTitle.style.textShadow = '0 0 10px #FFD700';
+                setTimeout(() => {
+                    tfaTitle.style.textShadow = 'none';
+                }, 500);
+            }, 3000);
+        }
+        
+        // Анимация для карточек 2FA
+        tfaCards.forEach((card, index) => {
+            card.setAttribute('data-type', '2fa');
+            card.addEventListener('mouseenter', () => {
+                card.style.borderColor = '#FFD700';
+                card.style.boxShadow = '0 0 20px rgba(255, 215, 0, 0.2)';
+            });
+            card.addEventListener('mouseleave', () => {
+                card.style.borderColor = '';
+                card.style.boxShadow = '';
+            });
+        });
+    }
+    
     // --- АНИМАЦИЯ ДЛЯ ГЕНЕРАТОРА ИМЁН ---
     const namegenSection = document.querySelector('#namegen-section');
     const namegenCards = document.querySelectorAll('#namegen-section .card');
@@ -85,9 +116,28 @@ document.addEventListener("DOMContentLoaded", () => {
         
         // Анимация для карточек генератора имён
         namegenCards.forEach((card, index) => {
+            card.setAttribute('data-type', 'namegen');
             card.addEventListener('mouseenter', () => {
                 card.style.borderColor = '#E91E63';
                 card.style.boxShadow = '0 0 20px rgba(233, 30, 99, 0.2)';
+            });
+            card.addEventListener('mouseleave', () => {
+                card.style.borderColor = '';
+                card.style.boxShadow = '';
+            });
+        });
+    }
+    
+    // --- АНИМАЦИЯ ДЛЯ PDF ТЁМНОЙ ТЕМЫ ---
+    const pdfSection = document.querySelector('#pdf-section');
+    const pdfCards = document.querySelectorAll('#pdf-section .card');
+    
+    if (pdfSection) {
+        pdfCards.forEach((card, index) => {
+            card.setAttribute('data-type', 'pdf');
+            card.addEventListener('mouseenter', () => {
+                card.style.borderColor = '#4EC9B0';
+                card.style.boxShadow = '0 0 20px rgba(78, 201, 176, 0.2)';
             });
             card.addEventListener('mouseleave', () => {
                 card.style.borderColor = '';
@@ -304,12 +354,22 @@ document.addEventListener("DOMContentLoaded", () => {
             100% { text-shadow: 0 0 2px #E91E63; }
         }
         
+        @keyframes tfaPulse {
+            0% { text-shadow: 0 0 2px #FFD700; }
+            50% { text-shadow: 0 0 15px #FFD700; }
+            100% { text-shadow: 0 0 2px #FFD700; }
+        }
+        
         .clipboard-highlight {
             animation: clipboardGlow 2s infinite;
         }
         
         .namegen-pulse {
             animation: namegenPulse 1.5s ease-in-out infinite;
+        }
+        
+        .tfa-pulse {
+            animation: tfaPulse 1.5s ease-in-out infinite;
         }
         
         /* Анимация для появления карточек */
@@ -322,9 +382,12 @@ document.addEventListener("DOMContentLoaded", () => {
     console.log("Secure Pass Pro v4.0 Web: UI Animations initialized. Выпадающее меню работает корректно!");
     console.log("Secure Pass Pro v4.0 Web: Всего исправлений 50+, критических безопасности 15");
     console.log("Secure Pass Pro v4.0 Web: 👤 Генератор имён - 8 режимов, выбор пола и языка!");
+    console.log("Secure Pass Pro v4.0 Web: 🔐 Двухфакторная аутентификация (2FA) - TOTP, Google Authenticator, резервные коды!");
+    console.log("Secure Pass Pro v4.0 Web: 🌙 PDF тёмная тема - уникальная функция!");
 
     // --- ДОБАВЛЯЕМ ТУЛТИПЫ ДЛЯ БЕЙДЖЕЙ ---
     const tooltipMap = {
+        '🔐 Двухфакторная аутентификация': 'TOTP, поддержка Google Authenticator, резервные коды, anti-replay защита, brute-force защита',
         '👤 Генератор имён': '8 режимов: SAMP RP, Email, Игровой ник, Крутой ник, Красивый ник, Короткий, Длинный, Случайный',
         'Python 3.9+': 'Python 3.9 или выше для запуска',
         'Модульная архитектура': 'Разделение на core/, gui/, security/, storage/, localization/, utils/',
@@ -340,7 +403,8 @@ document.addEventListener("DOMContentLoaded", () => {
         '15 Security Fixes': '15 критических исправлений безопасности',
         'Panic Cleanup': 'Аварийная очистка ресурсов при краше',
         '84 Exceptions Fixed': '84 блока except Exception заменены на конкретные типы',
-        '11 Files Fixed': '11 ключевых файлов проекта исправлено'
+        '11 Files Fixed': '11 ключевых файлов проекта исправлено',
+        '🌙 PDF Dark Theme': 'Уникальная функция! Экспорт паролей в PDF с тёмной темой оформления'
     };
     
     document.querySelectorAll('.badge').forEach(badge => {
@@ -413,6 +477,20 @@ document.addEventListener("DOMContentLoaded", () => {
         #namegen-section .card:hover {
             transform: translateY(-8px) scale(1.02);
         }
+        
+        /* Специальные стили для карточек 2FA */
+        #2fa-section .card {
+            transition: all 0.3s ease;
+        }
+        
+        #2fa-section .card:hover {
+            transform: translateY(-8px) scale(1.02);
+        }
+        
+        /* Стили для 2FA анимаций */
+        .tfa-glow {
+            animation: tfaPulse 2s ease-in-out infinite;
+        }
     `;
     document.head.appendChild(tooltipStyle);
 });
@@ -425,14 +503,16 @@ window.addEventListener('load', () => {
         document.body.classList.add('loaded');
     }, 100);
     
-    console.log("%c✨ Secure Pass Pro v4.0 ✨\n%c👤 Генератор имён - 8 режимов\n%c📋 Всего исправлений: 50+\n%c🔐 Критических исправлений безопасности: 15\n%c🎨 UI/UX улучшений: 10+\n%c🛡️ Исправлений стабильности: 25+\n%c🧹 Удалено мёртвого кода: 84 блока", 
+    console.log("%c✨ Secure Pass Pro v4.0 ✨\n%c🔐 Двухфакторная аутентификация (2FA)\n%c👤 Генератор имён - 8 режимов\n%c📋 Всего исправлений: 50+\n%c🔐 Критических исправлений безопасности: 15\n%c🎨 UI/UX улучшений: 10+\n%c🛡️ Исправлений стабильности: 25+\n%c🧹 Удалено мёртвого кода: 84 блока\n%c🌙 PDF тёмная тема - уникальная функция!", 
                 "color: #4EC9B0; font-size: 14px; font-weight: bold;",
+                "color: #FFD700; font-size: 12px;",
                 "color: #E91E63; font-size: 12px;",
                 "color: #00AAFF; font-size: 12px;",
                 "color: #FF4444; font-size: 12px;",
                 "color: #4EC9B0; font-size: 12px;",
                 "color: #4EC9B0; font-size: 12px;",
-                "color: #888; font-size: 12px;");
+                "color: #888; font-size: 12px;",
+                "color: #4EC9B0; font-size: 12px;");
 });
 
 // Стили для body

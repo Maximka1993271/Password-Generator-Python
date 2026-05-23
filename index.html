@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Secure Pass Pro v4.0 — Профессиональный генератор паролей. Модульная архитектура, Argon2id хеширование, SQLite база паролей, автосохранение, Master-пароль, Rate Limiting, система логирования, очистка памяти (ctypes.memset), Secure Clipboard, полное шифрование БД, анти-отладка, panic cleanup, контроль целостности HMAC-SHA256, защита от повторов, настраиваемая очистка буфера (10-120 сек), RGB анимация ВСЕГО ОКНА, АНИМАЦИЯ КНОПОК, НЕОНОВЫЕ ЧЕКБОКСЫ, ЦВЕТОВАЯ ИНДИКАЦИЯ (зелёный/красный), Amoled UI с неоновой подсветкой, расчет энтропии, просмотр PDF и криптостойкость. Цветная пульсация пароля: красный (слабый), оранжевый (средний), зелёный (надёжный). Кроссплатформенная поддержка Windows, macOS, Linux. Полная локализация на 3 языка: Русский, English, Українська. SQLCipher полное шифрование БД, DPAPI аппаратное шифрование, Signed updates с проверкой подписи RSA-PSS. 👤 Генератор имён — 8 режимов, выбор пола и языка. 🌙 PDF тёмная тема — уникальная функция!">
+    <meta name="description" content="Secure Pass Pro v4.0 — Профессиональный генератор паролей. Модульная архитектура, Argon2id хеширование, SQLite база паролей, автосохранение, Master-пароль, Rate Limiting, система логирования, очистка памяти (ctypes.memset), Secure Clipboard, полное шифрование БД, анти-отладка, panic cleanup, контроль целостности HMAC-SHA256, защита от повторов, настраиваемая очистка буфера (10-120 сек), RGB анимация ВСЕГО ОКНА, АНИМАЦИЯ КНОПОК, НЕОНОВЫЕ ЧЕКБОКСЫ, ЦВЕТОВАЯ ИНДИКАЦИЯ (зелёный/красный), Amoled UI с неоновой подсветкой, расчет энтропии, просмотр PDF и криптостойкость. Цветная пульсация пароля: красный (слабый), оранжевый (средний), зелёный (надёжный). Кроссплатформенная поддержка Windows, macOS, Linux. Полная локализация на 3 языка: Русский, English, Українська. SQLCipher полное шифрование БД, DPAPI аппаратное шифрование, Signed updates с проверкой подписи RSA-PSS. 👤 Генератор имён — 8 режимов, выбор пола и языка. 🌙 PDF тёмная тема — уникальная функция! 🔐 Двухфакторная аутентификация (2FA) — TOTP, поддержка Google Authenticator, резервные коды!">
     <title>Secure Pass Pro v4.0 | Профессиональная защита паролей</title>
     
     <link rel="icon" type="image/png" href="https://github.com/Maximka1993271/Password-Generator-Python/blob/main/app_icon.png?raw=true">
@@ -22,6 +22,7 @@
                     <a href="#">Функции ▼</a>
                     <div class="dropdown-content">
                         <a href="#v40-section">🚀 Возможности v4.0</a>
+                        <a href="#2fa-section">🔐 Двухфакторная аутентификация (2FA)</a>
                         <a href="#namegen-section">👤 Генератор имён</a>
                         <a href="#security-section">🔒 Безопасность v4.0</a>
                         <a href="#settings-section">⚙️ Настройки</a>
@@ -72,9 +73,10 @@
                 </div>
             </div>
             
-            <p><strong>Secure Pass Pro</strong> — это современный десктопный генератор паролей, построенный на Python и CustomTkinter. Программа сочетает криптографически стойкую генерацию, многоязычный интерфейс (RU/EN/UA), экспорт QR-кодов, контроль целостности файлов через HMAC-SHA256, защиту мастер-паролем (Argon2id + Rate Limiting), SQLCipher полное шифрование БД, DPAPI аппаратное шифрование, Signed updates с проверкой подписи RSA-PSS и стильный Amoled-дизайн с RGB-анимацией.</p>
+            <p><strong>Secure Pass Pro</strong> — это современный десктопный генератор паролей, построенный на Python и CustomTkinter. Программа сочетает криптографически стойкую генерацию, многоязычный интерфейс (RU/EN/UA), экспорт QR-кодов, контроль целостности файлов через HMAC-SHA256, защиту мастер-паролем (Argon2id + Rate Limiting), SQLCipher полное шифрование БД, DPAPI аппаратное шифрование, Signed updates с проверкой подписи RSA-PSS, <strong>🔐 ДВУХФАКТОРНУЮ АУТЕНТИФИКАЦИЮ (2FA)</strong> и стильный Amoled-дизайн с RGB-анимацией.</p>
             
             <ul>
+                <li>🔐 <strong>Двухфакторная аутентификация (2FA)</strong> — TOTP, поддержка Google Authenticator, резервные коды, anti-replay защита, brute-force защита (5 попыток за 60 секунд)</li>
                 <li>👤 Генератор имён — 8 режимов (SAMP RP, Email, Игровой ник, Крутой ник, Красивый ник, Короткий, Длинный, Случайный)</li>
                 <li>🎬 Анимация всех кнопок меню (визуальная обратная связь при нажатии)</li>
                 <li>🟢🔴 Цветовая индикация (зелёный — включено, красный — выключено)</li>
@@ -109,7 +111,7 @@
         <div class="hero-content">
             <div class="version-badge">Latest Release v4.0 Stable</div>
             <h1>Безопасность без <br><span class="highlight">компромиссов</span></h1>
-            <p>Профессиональный инструмент на Python 3.9+, объединяющий модульную архитектуру, Argon2id хеширование с Rate Limiting, SQLite базу паролей с полным шифрованием, SQLCipher, DPAPI, Signed updates, автосохранение, Neon-Amoled дизайн, мастер-пароль, контроль целостности HMAC-SHA256, настраиваемую очистку буфера, очистку памяти (ctypes.memset), Secure Clipboard, систему логирования с ротацией, RGB анимацию ВСЕГО ОКНА, АНИМАЦИЮ КНОПОК, НЕОНОВЫЕ ЧЕКБОКСЫ, ЦВЕТОВУЮ ИНДИКАЦИЮ (зелёный/красный) и криптостойкий движок для Windows, macOS и Linux. Полная локализация на 3 языка: Русский, English, Українська. 👤 НОВОЕ: Генератор имён с 8 режимами! 🌙 PDF тёмная тема — уникальная функция!</p>
+            <p>Профессиональный инструмент на Python 3.9+, объединяющий модульную архитектуру, Argon2id хеширование с Rate Limiting, SQLite базу паролей с полным шифрованием, SQLCipher, DPAPI, Signed updates, автосохранение, Neon-Amoled дизайн, мастер-пароль, контроль целостности HMAC-SHA256, настраиваемую очистку буфера, очистку памяти (ctypes.memset), Secure Clipboard, систему логирования с ротацией, RGB анимацию ВСЕГО ОКНА, АНИМАЦИЮ КНОПОК, НЕОНОВЫЕ ЧЕКБОКСЫ, ЦВЕТОВУЮ ИНДИКАЦИЮ (зелёный/красный) и криптостойкий движок для Windows, macOS и Linux. Полная локализация на 3 языка: Русский, English, Українська. 🔐 <strong>НОВОЕ: Двухфакторная аутентификация (2FA) — TOTP, поддержка Google Authenticator, резервные коды!</strong> 👤 НОВОЕ: Генератор имён с 8 режимами! 🌙 PDF тёмная тема — уникальная функция!</p>
             <div class="hero-btns">
                 <a href="https://github.com/Maximka1993271/Password-Generator-Python/releases/download/v4.0/SecurePassPro.exe" class="btn-primary">⬇️ Скачать v4.0 Stable</a>
                 <a href="#v40-section" class="btn-secondary">Что нового?</a>
@@ -123,6 +125,7 @@
     <section id="v40-section" class="features-section">
         <h2 class="section-title">Ключевые нововведения <span class="highlight">v4.0</span></h2>
         <div class="features-grid">
+            <div class="card"><div class="card-icon">🔐</div><h3>Двухфакторная аутентификация (2FA)</h3><p>Полная поддержка TOTP (Time-based One-Time Password) — совместимость с Google Authenticator, Authy, Microsoft Authenticator. 6-значные коды, интервал 30 секунд. Резервные коды для восстановления доступа. Anti-replay защита + brute-force защита (5 попыток за 60 секунд).</p></div>
             <div class="card"><div class="card-icon">👤</div><h3>Генератор имён</h3><p>8 режимов: SAMP RP, Email, Игровой ник, Крутой ник, Красивый ник, Короткий (3-5), Длинный (8+), Случайный. Выбор пола и языка. Неоновая рамка, копирование всех результатов.</p></div>
             <div class="card"><div class="card-icon">🏗️</div><h3>Модульная архитектура</h3><p>Полная реорганизация проекта на модули: core/, gui/, security/, storage/, localization/, utils/. Код стал чище, легче для поддержки и расширения.</p></div>
             <div class="card"><div class="card-icon">🗄️</div><h3>SQLite база паролей</h3><p>Безлимитное хранение паролей с полным шифрованием (label + password). Поиск, редактирование и удаление. Защита от SQL-инъекций, Secure delete (PRAGMA).</p></div>
@@ -131,7 +134,7 @@
             <div class="card"><div class="card-icon">✅</div><h3>Signed updates</h3><p>Безопасные обновления с проверкой цифровой подписи RSA-PSS. Встроенный публичный ключ для верификации.</p></div>
             <div class="card"><div class="card-icon">💾</div><h3>Автосохранение</h3><p>Автоматическое сохранение сгенерированных паролей в базу с меткой даты. Включение/выключение через настройки. Перевод на 3 языка (RU/EN/UA).</p></div>
             <div class="card"><div class="card-icon">🎬</div><h3>Анимация кнопок</h3><p>Все кнопки меню анимируются при нажатии (уменьшаются и возвращаются за 60 мс) + механический звук клика для приятного тактильного отклика.</p></div>
-            <div class="card"><div class="card-icon">🟢🔴</div><h3>Цветовая индикация</h3><p>Все переключатели (RGB, звук, автоблокировка, автосохранение) имеют цветовую индикацию: зелёный — включено, красный — выключено.</p></div>
+            <div class="card"><div class="card-icon">🟢🔴</div><h3>Цветовая индикация</h3><p>Все переключатели (RGB, звук, автоблокировка, автосохранение, 2FA) имеют цветовую индикацию: зелёный — включено, красный — выключено.</p></div>
             <div class="card"><div class="card-icon">✅</div><h3>Неоновые чекбоксы</h3><p>Чекбоксы имеют неоновую подсветку при наведении и цветную вспышку при клике (зелёная — включение, красная — выключение).</p></div>
             <div class="card"><div class="card-icon">🔒</div><h3>Argon2id хеширование</h3><p>Современный стандарт защиты мастер-пароля (победитель Password Hashing Competition) + PBKDF2 fallback для обратной совместимости. Защита от timing-атак через hmac.compare_digest().</p></div>
             <div class="card"><div class="card-icon">🛡️</div><h3>Rate Limiting</h3><p>Защита от брутфорса мастер-пароля: 3 ошибки → 5 сек, 4 ошибки → 10 сек, 5 ошибок → 30 сек блокировки.</p></div>
@@ -145,13 +148,34 @@
             <div class="card"><div class="card-icon">⌨️</div><h3>Горячие клавиши</h3><p>F5 — генерация, Ctrl+C — копирование, Ctrl+S — сохранить, Ctrl+O — открыть, Esc — закрыть диалоги.</p></div>
             <div class="card"><div class="card-icon">🌈</div><h3>RGB Анимация ВСЕГО ОКНА</h3><p>Динамическая цветная анимация границ окна с 4 независимыми полосами И синхронизацией заголовка Windows 11 (включая кнопки "Закрыть", "Свернуть", "Развернуть"). Включается/выключается в настройках.</p></div>
             <div class="card"><div class="card-icon">📄</div><h3>PDF экспорт</h3><p>Экспорт паролей в PDF с полной поддержкой кириллицы (шрифт DejaVuSans) и <strong style="color:#4ec9b0;">ТЁМНОЙ ТЕМОЙ</strong> (уникальная функция!).</p></div>
-            <div class="card"><div class="card-icon">🌐</div><h3>Мультиязычность</h3><p>Полная поддержка 3 языков: Русский, English, Українська. Мгновенное переключение без перезапуска. Все диалоги и сообщения переведены.</p></div>
+            <div class="card"><div class="card-icon">🌐</div><h3>Мультиязычность</h3><p>Полная поддержка 3 языков: Русский, English, Українська. Мгновенное переключение без перезапуска. Все диалоги и сообщения переведены, включая интерфейс 2FA.</p></div>
             <div class="card"><div class="card-icon">⏱️</div><h3>Очистка буфера</h3><p>Настраиваемая очистка буфера обмена от 10 до 120 секунд. Умная очистка — буфер очищается только если в нём всё ещё ваш пароль.</p></div>
         </div>
     </section>
 
+    <!-- Новая секция: Двухфакторная аутентификация (2FA) -->
+    <section id="2fa-section" class="features-section dark-bg">
+        <h2 class="section-title"><span class="highlight">Двухфакторная аутентификация</span> 🔐</h2>
+        <div class="features-grid">
+            <div class="card"><div class="card-icon">🔄</div><h3>TOTP генерация</h3><p>6-значные коды, интервал 30 секунд, алгоритмы SHA1/SHA256/SHA512. Полная совместимость с RFC 6238.</p></div>
+            <div class="card"><div class="card-icon">📱</div><h3>Google Authenticator</h3><p>Полная совместимость с Google Authenticator, Authy, Microsoft Authenticator и любыми другими TOTP приложениями.</p></div>
+            <div class="card"><div class="card-icon">📷</div><h3>QR-код</h3><p>Автоматическая генерация QR-кода для быстрой и удобной настройки 2FA. Просто отсканируйте и готово!</p></div>
+            <div class="card"><div class="card-icon">🎫</div><h3>Резервные коды</h3><p>10 резервных кодов для восстановления доступа при потере устройства с аутентификатором. Каждый код можно использовать только один раз.</p></div>
+            <div class="card"><div class="card-icon">🛡️</div><h3>Anti-replay защита</h3><p>Защита от повторного использования кодов. Каждый TOTP код можно использовать только один раз в пределах интервала.</p></div>
+            <div class="card"><div class="card-icon">🔒</div><h3>Brute-force защита</h3><p>Rate limiting: 5 неудачных попыток за 60 секунд блокируют возможность ввода 2FA кода на указанный период.</p></div>
+            <div class="card"><div class="card-icon">🔄</div><h3>Регенерация кодов</h3><p>Возможность сгенерировать новые резервные коды в любой момент (старые становятся недействительными).</p></div>
+            <div class="card"><div class="card-icon">🔓</div><h3>Отключение 2FA</h3><p>Отключение двухфакторной аутентификации только после подтверждения текущим 2FA кодом для защиты от несанкционированного отключения.</p></div>
+            <div class="card"><div class="card-icon">🔐</div><h3>2FA при запуске</h3><p>При включённой 2FA после ввода мастер-пароля потребуется ввести 6-значный код из приложения-аутентификатора.</p></div>
+            <div class="card"><div class="card-icon">⚙️</div><h3>Настройки 2FA</h3><p>Отдельный раздел в настройках безопасности: включение/выключение, просмотр статуса, генерация новых резервных кодов.</p></div>
+        </div>
+        <div style="text-align: center; margin-top: 30px; padding: 20px; background: rgba(76, 201, 176, 0.1); border-radius: 15px;">
+            <h3 style="color: #4EC9B0;">Как настроить 2FA</h3>
+            <p style="margin-top: 10px;">1. Установите мастер-пароль → 2. Откройте Настройки → Безопасность → 2FA → 3. Нажмите "Включить 2FA" → 4. Отсканируйте QR-код приложением-аутентификатором → 5. Введите полученный код → 6. Сохраните резервные коды в надёжном месте!</p>
+        </div>
+    </section>
+
     <!-- Новая секция: Генератор имён -->
-    <section id="namegen-section" class="features-section dark-bg">
+    <section id="namegen-section" class="features-section">
         <h2 class="section-title"><span class="highlight">Генератор имён</span> 👤</h2>
         <div class="features-grid">
             <div class="card"><div class="card-icon">🎮</div><h3>SAMP RP</h3><p>Имена для ролевых игр (например: Александр_Иванов)</p></div>
@@ -168,9 +192,10 @@
     </section>
 
     <!-- Новая секция: Безопасность v4.0 -->
-    <section id="security-section" class="features-section">
+    <section id="security-section" class="features-section dark-bg">
         <h2 class="section-title"><span class="highlight">Безопасность</span> v4.0</h2>
         <div class="features-grid">
+            <div class="card"><div class="card-icon">🔐</div><h3>2FA (TOTP)</h3><p>Двухфакторная аутентификация с поддержкой Google Authenticator, резервные коды, anti-replay и brute-force защита</p></div>
             <div class="card"><div class="card-icon">🔒</div><h3>Argon2id хеширование</h3><p>Современный стандарт защиты мастер-пароля (победитель Password Hashing Competition 2015)</p></div>
             <div class="card"><div class="card-icon">🛡️</div><h3>Rate Limiting</h3><p>3 ошибки → 5 сек, 4 ошибки → 10 сек, 5 ошибок → 30 сек блокировки</p></div>
             <div class="card"><div class="card-icon">🧹</div><h3>Очистка памяти</h3><p>Обнуление паролей через ctypes.memset после использования</p></div>
@@ -188,10 +213,10 @@
     </section>
 
     <!-- Новая секция: Цветовая индикация -->
-    <section id="color-indication-section" class="features-section dark-bg">
+    <section id="color-indication-section" class="features-section">
         <h2 class="section-title"><span class="highlight">Цветовая индикация</span> 🟢🔴</h2>
         <div class="features-grid">
-            <div class="card"><div class="card-icon">🟢</div><h3>Включено — Зелёный</h3><p>RGB подсветка, звук, автоблокировка, автосохранение — все переключатели горят зелёным когда активны.</p></div>
+            <div class="card"><div class="card-icon">🟢</div><h3>Включено — Зелёный</h3><p>RGB подсветка, звук, автоблокировка, автосохранение, 2FA — все переключатели горят зелёным когда активны.</p></div>
             <div class="card"><div class="card-icon">🔴</div><h3>Выключено — Красный</h3><p>При выключении любой опции кнопка становится красной для наглядной обратной связи.</p></div>
             <div class="card"><div class="card-icon">🔒</div><h3>Мастер-пароль</h3><p>Кнопка "Установить" — зелёная, кнопка "Удалить" — красная.</p></div>
             <div class="card"><div class="card-icon">❌</div><h3>Кнопка закрытия</h3><p>Кнопка "Закрыть" всегда красная с красным наведением.</p></div>
@@ -199,7 +224,7 @@
     </section>
 
     <!-- Новая секция: Неоновые чекбоксы -->
-    <section id="checkbox-section" class="features-section">
+    <section id="checkbox-section" class="features-section dark-bg">
         <h2 class="section-title"><span class="highlight">Неоновые</span> чекбоксы ✅</h2>
         <div class="features-grid">
             <div class="card"><div class="card-icon">✨</div><h3>Подсветка при наведении</h3><p>При наведении курсора на чекбокс он подсвечивается неоновым цветом для лучшей видимости.</p></div>
@@ -210,7 +235,7 @@
     </section>
 
     <!-- Новая секция: SQLite База паролей -->
-    <section id="database-section" class="features-section dark-bg">
+    <section id="database-section" class="features-section">
         <h2 class="section-title"><span class="highlight">SQLite База</span> паролей</h2>
         <div class="features-grid">
             <div class="card"><div class="card-icon">🗄️</div><h3>Безлимитное хранилище</h3><p>Сохраняйте сколько угодно паролей. База данных SQLite с возможностью поиска, редактирования и удаления записей.</p></div>
@@ -221,7 +246,7 @@
     </section>
 
     <!-- Новая секция: Автосохранение -->
-    <section id="autosave-section" class="features-section">
+    <section id="autosave-section" class="features-section dark-bg">
         <h2 class="section-title"><span class="highlight">Автосохранение</span> паролей</h2>
         <div class="features-grid">
             <div class="card"><div class="card-icon">💾</div><h3>Автоматическое сохранение</h3><p>При включённой опции каждый сгенерированный пароль автоматически сохраняется в базу данных.</p></div>
@@ -232,7 +257,7 @@
     </section>
 
     <!-- Новая секция: Анимация кнопок -->
-    <section id="button-animation-section" class="features-section dark-bg">
+    <section id="button-animation-section" class="features-section">
         <h2 class="section-title"><span class="highlight">Анимация</span> кнопок</h2>
         <div class="features-grid">
             <div class="card"><div class="card-icon">🎬</div><h3>Визуальная обратная связь</h3><p>Все кнопки меню анимируются при нажатии — уменьшаются и возвращаются к исходному размеру за 60 мс.</p></div>
@@ -242,9 +267,10 @@
         </div>
     </section>
 
-    <section id="settings-section" class="features-section">
+    <section id="settings-section" class="features-section dark-bg">
         <h2 class="section-title">Централизованные <span class="highlight">Настройки</span></h2>
         <div class="features-grid">
+            <div class="card"><div class="card-icon">🔐</div><h3>Настройки 2FA</h3><p>Включение/выключение двухфакторной аутентификации, просмотр статуса, генерация новых резервных кодов.</p></div>
             <div class="card"><div class="card-icon">🌐</div><h3>Смена языка</h3><p>Мгновенное переключение между Русским, Английским и Украинским языками без перезапуска программы.</p></div>
             <div class="card"><div class="card-icon">🎨</div><h3>Тема оформления</h3><p>Выбор между Системной, Светлой и Тёмной темой с плавным переключением.</p></div>
             <div class="card"><div class="card-icon">🎛️</div><h3>RGB управление</h3><p>Кнопки ВКЛ/ВЫКЛ для RGB анимации границ окна. Состояние сохраняется в config.json.</p></div>
@@ -258,7 +284,7 @@
         </div>
     </section>
 
-    <section id="pdf-section" class="features-section dark-bg">
+    <section id="pdf-section" class="features-section">
         <h2 class="section-title">Полная поддержка <span class="highlight">Кириллицы в PDF</span> + <span class="highlight">Тёмная тема</span> 🌙</h2>
         <div class="features-grid">
             <div class="card"><div class="card-icon">🖋️</div><h3>DejaVuSans.ttf</h3><p>Встроенный шрифт DejaVuSans обеспечивает корректное отображение русских и украинских символов в экспортируемых PDF-файлах. Временная папка для шрифта, мусорные .pkl файлы удаляются.</p></div>
@@ -269,7 +295,7 @@
     </section>
 
     <!-- Секция: Цветная пульсация пароля -->
-    <section id="animation-section" class="features-section">
+    <section id="animation-section" class="features-section dark-bg">
         <h2 class="section-title">Цветная <span class="highlight">Пульсация</span> пароля</h2>
         <div class="features-grid">
             <div class="card"><div class="card-icon">🔴</div><h3>Слабый пароль</h3><p>При генерации слабого пароля (до 40 бит) поле пароля вспыхивает <strong style="color:#FF4444;">КРАСНЫМ</strong> неоном.</p></div>
@@ -280,7 +306,7 @@
     </section>
 
     <!-- Секция: RGB Анимация ВСЕГО ОКНА -->
-    <section id="rgb-section" class="features-section dark-bg">
+    <section id="rgb-section" class="features-section">
         <h2 class="section-title"><span class="highlight">RGB Анимация</span> ВСЕГО ОКНА</h2>
         <div class="features-grid">
             <div class="card"><div class="card-icon">🌈</div><h3>4 независимых полосы</h3><p>Верхняя, нижняя, левая и правая границы окна анимируются с разными цветовыми фазами.</p></div>
@@ -291,15 +317,16 @@
     </section>
 
     <!-- Секция: Полная история версий (обновлена) -->
-    <section id="changelog-section" class="features-section">
+    <section id="changelog-section" class="features-section dark-bg">
         <h2 class="section-title">Полная история <span class="highlight">изменений v4.0</span></h2>
         <div class="features-grid">
+            <div class="card"><div class="card-icon">🔐</div><h3>Двухфакторная аутентификация</h3><ul><li>✅ TOTP генерация (RFC 6238)</li><li>✅ Поддержка Google Authenticator</li><li>✅ 10 резервных кодов</li><li>✅ Anti-replay защита</li><li>✅ Brute-force защита (5 попыток/60 сек)</li><li>✅ Регенерация резервных кодов</li><li>✅ Полная локализация интерфейса 2FA</li></ul></div>
             <div class="card"><div class="card-icon">👤</div><h3>Генератор имён</h3><ul><li>✅ 8 режимов генерации</li><li>✅ Выбор пола (Мужской/Женский/Случайный)</li><li>✅ Выбор языка (Русский/English)</li><li>✅ Настройка разделителя</li><li>✅ Регулировка количества (1-10)</li><li>✅ Неоновая рамка</li><li>✅ Копирование всех результатов</li></ul></div>
             <div class="card"><div class="card-icon">🏗️</div><h3>Модульная архитектура</h3><ul><li>✅ Разделение на модули: core/, gui/, security/, storage/, localization/, utils/</li><li>✅ Код стал чище и легче для поддержки</li><li>✅ Легко добавлять новые функции</li></ul></div>
             <div class="card"><div class="card-icon">🗄️</div><h3>SQLite база паролей</h3><ul><li>✅ Безлимитное хранение паролей</li><li>✅ Полное шифрование (label + password)</li><li>✅ Поиск в реальном времени</li><li>✅ Редактирование и удаление записей</li><li>✅ Защита от SQL-инъекций</li><li>✅ Secure delete (PRAGMA)</li></ul></div>
             <div class="card"><div class="card-icon">💾</div><h3>Автосохранение</h3><ul><li>✅ Автоматическое сохранение в базу</li><li>✅ Метка с датой</li><li>✅ Кнопка в настройках (вкл/выкл)</li><li>✅ Перевод на 3 языка (RU/EN/UA)</li><li>✅ Единый стиль без капслока</li></ul></div>
             <div class="card"><div class="card-icon">🎬</div><h3>Анимация кнопок</h3><ul><li>✅ Все кнопки меню анимируются при нажатии</li><li>✅ Уменьшение/возврат за 60 мс</li><li>✅ Механический звук клика</li></ul></div>
-            <div class="card"><div class="card-icon">🟢🔴</div><h3>Цветовая индикация</h3><ul><li>✅ Зелёный — включено</li><li>✅ Красный — выключено</li><li>✅ Все переключатели имеют цветовую индикацию</li></ul></div>
+            <div class="card"><div class="card-icon">🟢🔴</div><h3>Цветовая индикация</h3><ul><li>✅ Зелёный — включено</li><li>✅ Красный — выключено</li><li>✅ Все переключатели имеют цветовую индикацию, включая 2FA</li></ul></div>
             <div class="card"><div class="card-icon">✅</div><h3>Неоновые чекбоксы</h3><ul><li>✅ Подсветка при наведении</li><li>✅ Вспышка при включении (зелёная)</li><li>✅ Вспышка при выключении (красная)</li></ul></div>
             <div class="card"><div class="card-icon">🔒</div><h3>Argon2id хеширование</h3><ul><li>✅ Современный стандарт (победитель PHC)</li><li>✅ PBKDF2 fallback для совместимости</li><li>✅ Защита от timing-атак (hmac.compare_digest)</li><li>✅ Запрет пустого мастер-пароля</li></ul></div>
             <div class="card"><div class="card-icon">🛡️</div><h3>Rate Limiting</h3><ul><li>✅ 3 ошибки → 5 сек блокировки</li><li>✅ 4 ошибки → 10 сек блокировки</li><li>✅ 5 ошибок → 30 сек блокировки</li><li>✅ Перманентная блокировка после 5 ошибок</li></ul></div>
@@ -307,12 +334,12 @@
             <div class="card"><div class="card-icon">🧹</div><h3>Очистка памяти</h3><ul><li>✅ ctypes.memset для обнуления</li><li>✅ Пароли не остаются в RAM</li><li>✅ Secure Clipboard (Windows API)</li></ul></div>
             <div class="card"><div class="card-icon">🪟</div><h3>Окна мастер-пароля</h3><ul><li>✅ Исправлен перевод на все 3 языках</li><li>✅ Исправлены цвета окон под выбранную тему</li><li>✅ Полный редизайн с закруглением углов</li><li>✅ Кнопки "Установить" и "Удалить" мастер-пароль</li></ul></div>
             <div class="card"><div class="card-icon">🎨</div><h3>Чекбоксы и визуал</h3><ul><li>✅ Улучшен внешний вид чекбоксов</li><li>✅ Синхронизация стилей с темой</li><li>✅ Все чекбоксы запускаются снятыми</li></ul></div>
-            <div class="card"><div class="card-icon">⚙️</div><h3>Редизайн настроек</h3><ul><li>✅ Полностью новое окно с прокруткой</li><li>✅ Слайдеры для радиуса и таймаута буфера</li><li>✅ Кнопка автосохранения</li><li>✅ Кнопки управления RGB анимацией</li><li>✅ Выбор темы PDF (Светлая/Тёмная)</li></ul></div>
+            <div class="card"><div class="card-icon">⚙️</div><h3>Редизайн настроек</h3><ul><li>✅ Полностью новое окно с прокруткой</li><li>✅ Слайдеры для радиуса и таймаута буфера</li><li>✅ Кнопка автосохранения</li><li>✅ Кнопки управления RGB анимацией</li><li>✅ Выбор темы PDF (Светлая/Тёмная)</li><li>✅ Раздел 2FA в безопасности</li></ul></div>
             <div class="card"><div class="card-icon">🌈</div><h3>RGB ВСЕГО ОКНА</h3><ul><li>✅ 4 независимые полосы анимации</li><li>✅ Синхронизация заголовка Windows 11</li><li>✅ Кнопки "Закрыть/Свернуть/Развернуть" меняют цвет</li><li>✅ ON/OFF управление из настроек</li></ul></div>
             <div class="card"><div class="card-icon">🌙</div><h3>PDF тёмная тема</h3><ul><li>✅ Уникальная функция (нет у конкурентов!)</li><li>✅ Выбор темы в настройках</li><li>✅ Идеально для ночного режима</li></ul></div>
             <div class="card"><div class="card-icon">🔧</div><h3>Критические исправления</h3><ul><li>🔧 Исправлен winreg import на Linux/macOS</li><li>🔧 Исправлен конфликт Ctrl+C</li><li>🔧 Исправлена уязвимость timing-атак</li><li>🔧 Исправлена shell-инъекция (subprocess.run)</li><li>🔧 Исправлена RGB анимация (добавлены импорты ctypes и subprocess)</li><li>🔧 Исправлена утечка файловых дескрипторов в SQLite</li><li>🔧 Исправлен downgrade attack в integrity.py</li></ul></div>
             <div class="card"><div class="card-icon">💻</div><h3>Кроссплатформенность</h3><ul><li>✅ Windows — полная поддержка с MCI звуком</li><li>✅ macOS — нативные шрифты и звук afplay</li><li>✅ Linux — шрифты DejaVu Sans и звук mpg123/ffplay</li></ul></div>
-            <div class="card"><div class="card-icon">🌐</div><h3>Локализация</h3><ul><li>✅ Полная поддержка RU/EN/UA</li><li>✅ Мгновенное переключение без перезапуска</li><li>✅ Все диалоги и сообщения переведены</li><li>✅ Единый стиль без капслока</li></ul></div>
+            <div class="card"><div class="card-icon">🌐</div><h3>Локализация</h3><ul><li>✅ Полная поддержка RU/EN/UA</li><li>✅ Мгновенное переключение без перезапуска</li><li>✅ Все диалоги и сообщения переведены, включая интерфейс 2FA</li><li>✅ Единый стиль без капслока</li></ul></div>
             <div class="card"><div class="card-icon">📁</div><h3>Файловые операции</h3><ul><li>✅ Убрано дублирование .sha256 файлов</li><li>✅ HMAC-SHA256 вместо SHA-256</li><li>✅ Защита от downgrade attack</li><li>✅ Миграция legacy хешей</li></ul></div>
             <div class="card"><div class="card-icon">📄</div><h3>PDF экспорт</h3><ul><li>✅ Исправлена ошибка latin-1 кодировки</li><li>✅ Удалены мусорные .pkl файлы</li><li>✅ Временная папка для шрифта</li><li>✅ Запасной механизм без DejaVuSans</li><li>✅ Тёмная тема PDF (уникально!)</li></ul></div>
             <div class="card"><div class="card-icon">🔧</div><h3>Технические улучшения (18.05.2026)</h3><ul><li>✅ Замена 84 блоков except Exception на конкретные типы</li><li>✅ Улучшено логирование ошибок</li><li>✅ Исправлен security/antidebug.py</li><li>✅ Обновлена локализация</li><li>✅ Модульная архитектура закреплена</li><li>✅ 11 файлов исправлено</li></ul></div>
@@ -328,9 +355,10 @@
         </div>
     </section>
 
-    <section id="security-audit" class="features-section dark-bg">
+    <section id="security-audit" class="features-section">
         <h2 class="section-title">Аудит <span class="highlight">безопасности</span></h2>
         <div class="features-grid">
+            <div class="card"><div class="card-icon">🔐</div><h3>2FA (TOTP)</h3><p>Двухфакторная аутентификация с поддержкой Google Authenticator, резервные коды, anti-replay и brute-force защита.</p></div>
             <div class="card"><div class="card-icon">🔢</div><h3>Энтропия</h3><p>Точный математический расчет сложности пароля в битах по формуле Шеннона для оценки криптостойкости.</p></div>
             <div class="card"><div class="card-icon">⏳</div><h3>Time-to-Crack</h3><p>Оценка времени взлома методом Brute-force: от "мгновенно" до "столетий".</p></div>
             <div class="card"><div class="card-icon">⭐</div><h3>Visual Rating</h3><p>Пятизвездочный рейтинг надежности и 3-уровневая цветовая шкала.</p></div>
@@ -346,9 +374,10 @@
         </div>
     </section>
 
-    <section id="tech-section" class="tech-stack">
+    <section id="tech-section" class="tech-stack dark-bg">
         <h2 class="section-title">Цветовая <span class="highlight">Дифференциация</span></h2>
         <div class="tech-grid">
+            <div class="tech-item"><h4>🔐 2FA</h4><p>Двухфакторная аутентификация</p></div>
             <div class="tech-item"><h4>👤 Генератор имён</h4><p>8 режимов</p></div>
             <div class="tech-item"><h4>🎬 Анимация кнопок</h4><p>Визуальный отклик</p></div>
             <div class="tech-item"><h4>🟢🔴 Цветовая индикация</h4><p>Вкл/Выкл</p></div>
@@ -370,7 +399,7 @@
         </div>
     </section>
 
-    <section id="tech-specs" class="features-section dark-bg">
+    <section id="tech-specs" class="features-section">
         <h2 class="section-title">Технические <span class="highlight">данные</span></h2>
         <div class="tech-specs-container">
             <ul class="tech-list">
@@ -378,6 +407,7 @@
                 <li><strong>Версия:</strong> 4.0 Stable (21.05.2026)</li>
                 <li><strong>Архитектура:</strong> Полностью модульная (core/, gui/, security/, storage/, localization/, utils/)</li>
                 <li><strong>Ядро:</strong> Python 3.9+ (CSPRNG Secrets)</li>
+                <li><strong>2FA:</strong> TOTP (RFC 6238), поддержка Google Authenticator, резервные коды, anti-replay, brute-force защита</li>
                 <li><strong>Генератор имён:</strong> 8 режимов, выбор пола и языка, неоновая рамка</li>
                 <li><strong>Защита мастер-пароля:</strong> Argon2id + PBKDF2 fallback (600,000 итераций) + Rate Limiting</li>
                 <li><strong>Хранилище паролей:</strong> SQLite с полным шифрованием (AES-256-GCM + SQLCipher опционально), защита от SQL-инъекций, Secure delete</li>
@@ -410,13 +440,13 @@
         </div>
     </section>
 
-    <section id="download-center" class="download-section">
+    <section id="download-center" class="download-section dark-bg">
         <h2 class="section-title">Центр загрузок</h2>
         <div class="download-grid">
             <div class="download-card highlight-card">
                 <div class="card-icon">🏆</div>
                 <h3>Secure Pass Pro v4.0</h3>
-                <p><b>Рекомендуется.</b> Модульная архитектура, Argon2id хеширование + Rate Limiting, SQLite база паролей с полным шифрованием, SQLCipher, DPAPI, Signed updates, автосохранение, мастер-пароль, контроль целостности HMAC-SHA256, очистка памяти (ctypes.memset), Secure Clipboard, система логирования, защита от повторов, кнопка-глазок, горячие клавиши, <b>АНИМАЦИЯ КНОПОК</b>, <b>ЦВЕТОВАЯ ИНДИКАЦИЯ (зелёный/красный)</b>, <b>НЕОНОВЫЕ ЧЕКБОКСЫ</b>, <b>настраиваемая умная очистка буфера (10-120 сек)</b>, <b>RGB анимация ВСЕГО ОКНА с настройкой скорости и толщины</b>, <b>👤 ГЕНЕРАТОР ИМЁН (8 режимов)</b>, <b>🌙 PDF ТЁМНАЯ ТЕМА (уникальная функция!)</b>, Neon UI, поддержка PDF с кириллицей (DejaVuSans), кроссплатформенный звук, цветная пульсация пароля, полная локализация на 3 языка (RU/EN/UA), 50+ исправлений ошибок, полная защита от timing-атак и shell-инъекций, замена 84 блоков except Exception на конкретные типы, улучшенное логирование, исправлен antidebug.py, добавлены ключи локализации, 11 файлов исправлено, SQLCipher, DPAPI, Signed updates.</p>
+                <p><b>Рекомендуется.</b> Модульная архитектура, <strong>🔐 ДВУХФАКТОРНАЯ АУТЕНТИФИКАЦИЯ (2FA)</strong>, Argon2id хеширование + Rate Limiting, SQLite база паролей с полным шифрованием, SQLCipher, DPAPI, Signed updates, автосохранение, мастер-пароль, контроль целостности HMAC-SHA256, очистка памяти (ctypes.memset), Secure Clipboard, система логирования, защита от повторов, кнопка-глазок, горячие клавиши, <b>АНИМАЦИЯ КНОПОК</b>, <b>ЦВЕТОВАЯ ИНДИКАЦИЯ (зелёный/красный)</b>, <b>НЕОНОВЫЕ ЧЕКБОКСЫ</b>, <b>настраиваемая умная очистка буфера (10-120 сек)</b>, <b>RGB анимация ВСЕГО ОКНА с настройкой скорости и толщины</b>, <b>👤 ГЕНЕРАТОР ИМЁН (8 режимов)</b>, <b>🌙 PDF ТЁМНАЯ ТЕМА (уникальная функция!)</b>, Neon UI, поддержка PDF с кириллицей (DejaVuSans), кроссплатформенный звук, цветная пульсация пароля, полная локализация на 3 языка (RU/EN/UA), 50+ исправлений ошибок, полная защита от timing-атак и shell-инъекций, замена 84 блоков except Exception на конкретные типы, улучшенное логирование, исправлен antidebug.py, добавлены ключи локализации, 11 файлов исправлено, SQLCipher, DPAPI, Signed updates.</p>
                 <a href="https://github.com/Maximka1993271/Password-Generator-Python/releases/download/v4.0/SecurePassPro.exe" class="btn-primary full-width">⬇️ Скачать v4.0 (.EXE)</a>
                 <div style="margin-top: 15px;">
                     <a href="https://github.com/Maximka1993271/Password-Generator-Python/archive/refs/heads/main.zip" style="color: #888; font-size: 0.8rem;">📦 Исходный код (ZIP) →</a>
@@ -432,6 +462,7 @@
         <div class="footer-content">
             <p>© 2026 Максим Мельников • MIT License</p>
             <div class="footer-tags">
+                <span class="badge">🔐 Двухфакторная аутентификация</span>
                 <span class="badge">👤 Генератор имён</span>
                 <span class="badge">Python 3.9+</span>
                 <span class="badge">Модульная архитектура</span>
@@ -462,7 +493,7 @@
                 <span class="badge">11 Files Fixed</span>
                 <span class="badge">🌙 PDF Dark Theme</span>
             </div>
-            <p class="footer-description">Локализация: Русский, English, Українська. Программа гарантирует полную приватность данных. Генерация происходит локально. Кроссплатформенная поддержка Windows, macOS, Linux. Модульная архитектура, Argon2id хеширование с Rate Limiting, SQLite база паролей с полным шифрованием, SQLCipher, DPAPI, Signed updates, автосохранение, очистка памяти (ctypes.memset), Secure Clipboard, система логирования с фильтрацией sensitive данных, panic cleanup. Все критические баги исправлены (50+ исправлений, 15 критических безопасности), мёртвый код удалён, добавлена АНИМАЦИЯ КНОПОК, ЦВЕТОВАЯ ИНДИКАЦИЯ (зелёный/красный), НЕОНОВЫЕ ЧЕКБОКСЫ, RGB подсветка ВСЕГО ОКНА с настройкой скорости и толщины, умная очистка буфера, защита от timing-атак и shell-инъекций, защита от downgrade attack. PDF экспорт с полной поддержкой кириллицы и <strong>ТЁМНОЙ ТЕМОЙ (уникальная функция!)</strong>, без мусорных файлов. **18.05.2026: заменены 84 блока except Exception на конкретные типы, улучшено логирование, исправлен antidebug.py, добавлены ключи локализации, исправлено 11 файлов. 19.05.2026: добавлены SQLCipher, DPAPI, Signed updates. 21.05.2026: добавлен Генератор имён с 8 режимами и PDF тёмная тема.**</p>
+            <p class="footer-description">Локализация: Русский, English, Українська. Программа гарантирует полную приватность данных. Генерация происходит локально. Кроссплатформенная поддержка Windows, macOS, Linux. Модульная архитектура, <strong>🔐 ДВУХФАКТОРНАЯ АУТЕНТИФИКАЦИЯ (2FA)</strong>, Argon2id хеширование с Rate Limiting, SQLite база паролей с полным шифрованием, SQLCipher, DPAPI, Signed updates, автосохранение, очистка памяти (ctypes.memset), Secure Clipboard, система логирования с фильтрацией sensitive данных, panic cleanup. Все критические баги исправлены (50+ исправлений, 15 критических безопасности), мёртвый код удалён, добавлена АНИМАЦИЯ КНОПОК, ЦВЕТОВАЯ ИНДИКАЦИЯ (зелёный/красный), НЕОНОВЫЕ ЧЕКБОКСЫ, RGB подсветка ВСЕГО ОКНА с настройкой скорости и толщины, умная очистка буфера, защита от timing-атак и shell-инъекций, защита от downgrade attack. PDF экспорт с полной поддержкой кириллицы и <strong>ТЁМНОЙ ТЕМОЙ (уникальная функция!)</strong>, без мусорных файлов. <strong>🔐 2FA (двухфакторная аутентификация) с поддержкой Google Authenticator и резервными кодами!</strong> **18.05.2026: заменены 84 блока except Exception на конкретные типы, улучшено логирование, исправлен antidebug.py, добавлены ключи локализации, исправлено 11 файлов. 19.05.2026: добавлены SQLCipher, DPAPI, Signed updates. 21.05.2026: добавлен Генератор имён с 8 режимами, PDF тёмная тема и ДВУХФАКТОРНАЯ АУТЕНТИФИКАЦИЯ (2FA)!**</p>
         </div>
     </footer>
 
