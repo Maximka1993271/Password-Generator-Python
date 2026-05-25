@@ -26,7 +26,7 @@
 
 ## 📋 О программе
 
-**Secure Pass Pro v4.0** — это профессиональный генератор и менеджер паролей с открытым исходным кодом. Программа построена на Python и CustomTkinter, сочетает криптостойкую генерацию, многоязычный интерфейс, полное шифрование данных и современный дизайн с RGB-анимацией.
+**Secure Pass Pro v4.0** — это профессиональный генератор и менеджер паролей с открытым исходным кодом. Программа построена на Python и CustomTkinter, сочетает криптостойкую генерацию, многоязычный интерфейс, полное шифрование данных и современный дизайн с RGB-анимацию.
 
 | Параметр | Значение |
 |----------|----------|
@@ -121,6 +121,7 @@
 - ✅ Шифрование экспорта паролем (только JSON)
 - ✅ **Перевод фразы "Без метки" на язык экспорта**
 - ✅ Полная локализация HTML интерфейса
+- ✅ **Favicon иконка в HTML экспорте**
 
 ### 📥 **Импорт данных (6 форматов)**
 | Формат | Расширение | Источник |
@@ -138,6 +139,7 @@
 - ✅ Предпросмотр перед импортом
 - ✅ Автообновление базы после импорта
 - ✅ **Поддержка импорта на любом языке**
+- ✅ **Фильтрация дубликатов паролей**
 
 ### 🔍 **Поиск в базе паролей**
 - ✅ Поиск по **метке**, **паролю** и **дате**
@@ -151,6 +153,8 @@
 - ✅ Плавное переключение между категориями
 - ✅ Мгновенное применение настроек (без перезапуска)
 - ✅ **Полная локализация всех настроек**
+- ✅ **Строка поиска по настройкам**
+- ✅ **Профили настроек (сохранение/загрузка/сброс)**
 
 ### 🔘 **Настройки интерфейса**
 | Настройка | Описание |
@@ -172,11 +176,24 @@
 | 🎨 **Подсветка** | Найденные совпадения подсвечиваются |
 | 🌐 **Локализация** | Весь интерфейс на выбранном языке |
 | 📝 **Без метки** | Переводится на язык отчёта |
+| 🖼️ **Favicon** | Иконка на вкладке браузера |
 
-### 🔒 **Улучшения безопасности**
+---
+
+## 🔒 Улучшения безопасности в v4.0
+
 | Улучшение | Описание |
 |-----------|----------|
 | **Двухфакторная аутентификация (2FA)** | TOTP с поддержкой Google Authenticator, резервные коды, anti-replay защита |
+| **Anti-replay защита** | Кэш использованных кодов (100 записей, 5 минут) |
+| **Brute-force защита 2FA** | 5 попыток за 60 секунд |
+| **Узкие исключения** | Убраны все `except Exception`, заменены на конкретные типы |
+| **Panic Cleanup** | Аварийная очистка при краше, 11+ типов исключений |
+| **VM detection** | Обнаружение VirtualBox, VMware, Hyper-V через BIOS, MAC, CPU |
+| **Debugger heuristics** | IsDebuggerPresent, NtQueryInformationProcess, hardware breakpoints |
+| **Timing-based checks** | RDTSC, вариативность времени выполнения |
+| **Sandbox detection** | Проверка диска, памяти, CPU, процессов, окружения |
+| **Integrity self-checks** | SHA-256 проверка, фоновые самопроверки |
 | **Анти-отладка** | Проверка аппаратных точек останова (DR0-DR7) |
 | **Фоновые проверки** | Периодическая самопроверка целостности |
 | **Аудит мастер-пароля** | Логирование всех попыток входа |
@@ -184,15 +201,10 @@
 | **Атомарная запись** | Защита от повреждения файлов |
 | **Автобэкапы конфига** | Автоматическое создание резервных копий |
 | **Восстановление БД** | Автовосстановление из бэкапа при коррупции |
-
-### 🐧 **Поддержка Linux**
-| Функция | Описание |
-|---------|----------|
-| **Desktop Environment** | Gnome, KDE, XFCE |
-| **Wayland** | Полная поддержка Wayland |
-| **HiDPI** | Автоматическое масштабирование |
-| **Звук** | Поддержка paplay, mpg123, ffplay |
-| **Пути** | `~/.config/securepasspro`, `~/.cache/securepasspro` |
+| **Secure Clipboard** | 5-кратная перезапись, отслеживание владельца |
+| **Secure Memory** | ctypes.memset, MemoryGuard, Memory pressure handler |
+| **Фильтрация логов** | 30+ паттернов (пароли, ключи, токены, TOTP) |
+| **Экспорт с шифрованием** | AES-256-GCM |
 
 ---
 
@@ -214,7 +226,10 @@
 - 🌐 Язык: Русский / English
 - ✂️ Разделитель: ДА (_) / НЕТ
 - 🔢 Количество: от 1 до 10 имён за раз
-- **📝 Все интерфейсы генератора имён переведены на 3 языка**
+- 📝 Все интерфейсы генератора имён переведены на 3 языка
+- ✅ **Защита от дубликатов имён**
+- ✅ **Асинхронная генерация**
+- ✅ **Кнопка Отмена во время генерации**
 
 ---
 
@@ -222,7 +237,7 @@
 
 | Защита | Технология | Уровень |
 |--------|------------|---------|
-| **Двухфакторная аутентификация (2FA)** | TOTP (RFC 6238), Google Authenticator совместимость, резервные коды | 🔒 High |
+| **Двухфакторная аутентификация (2FA)** | TOTP (RFC 6238), Google Authenticator совместимость, резервные коды, anti-replay | 🔒 High |
 | Мастер-пароль | Argon2id + PBKDF2 fallback | 🔒 High |
 | Шифрование БД | AES-256-GCM + SQLCipher | 🔒 High |
 | Аппаратное шифрование | Windows DPAPI | 🔒 High |
@@ -230,11 +245,14 @@
 | Secure Clipboard | Windows API (5x overwrite) + отслеживание | 🔒 High |
 | Rate Limiting | 5 попыток → блокировка (персистентная) | 🔒 High |
 | Аудит | Логирование всех попыток входа | 🔒 High |
-| Подпись обновлений | SHA-256 верификация | 🔒 High |
+| Подпись обновлений | SHA-256 верификация, certificate pinning | 🔒 High |
 | Целостность файлов | HMAC-SHA256, fail-closed | 🔒 High |
-| Анти-отладка | IsDebuggerPresent + DR регистры | 🔒 Medium |
-| Фильтрация логов | 30+ паттернов (пароли, ключи, токены) | 🔒 High |
+| Анти-отладка | IsDebuggerPresent + DR регистры + VM detection | 🔒 Medium |
+| Фильтрация логов | 30+ паттернов (пароли, ключи, токены, TOTP) | 🔒 High |
 | Экспорт с шифрованием | AES-256-GCM | 🔒 High |
+| Panic Cleanup | Аварийная очистка при краше | 🔒 High |
+| Anti-replay (2FA) | Кэш использованных кодов | 🔒 High |
+| Trusted Devices | Отслеживание доверенных устройств | 🔒 Medium |
 
 ---
 
@@ -294,6 +312,42 @@
 1. Запустите файл — установка не требуется
 2. При первом запуске мастер-пароль не требуется (можно установить позже)
 3. Все данные сохраняются в папке `data/` рядом с EXE
+
+---
+
+## 🛠️ Исправления в версии 4.0
+
+### Критические исправления безопасности
+| Файл | Исправление |
+|------|-------------|
+| `security/antidebug.py` | 5 `except Exception` → узкие исключения, VM detection, debugger heuristics, integrity self-checks |
+| `security/panic.py` | 11 `except Exception` → fail-closed logic, guaranteed cleanup, panic logging isolation |
+| `security/clipboard.py` | 3 `except Exception` → clipboard ownership tracking, multi-clear strategy |
+| `security/encryption.py` | Узкие исключения, key rotation, crypto self-tests, tamper-evident metadata |
+| `security/master.py` | Auth audit logging, password history, session tracking, trusted devices, recovery workflow |
+| `security/totp.py` | Encrypted TOTP secrets, anti-replay protection, trusted devices, rate limiting |
+| `utils/secure_memory.py` | 5 `except Exception` → BufferError, OSError, RuntimeError; memory pressure handling |
+| `utils/updater.py` | SHA256 verification, signed updates, rollback protection, certificate pinning |
+| `utils/logger.py` | Полная фильтрация sensitive данных, JSON logs, structured logging |
+| `storage/database.py` | 7 `except Exception` → sqlite3.Error, OSError; corruption recovery, backup rotation |
+| `storage/config.py` | Schema validation, config versioning, migration handling, backup configs |
+
+### GUI исправления
+| Файл | Исправление |
+|------|-------------|
+| `gui/mixins/dialogs_mixin.py` | 9 `except Exception` → tk.TclError, RuntimeError, ValueError |
+| `gui/mixins/updater_mixin.py` | 2 `except Exception` → RuntimeError, requests.RequestException; threaded updater, cancel support |
+| `gui/mixins/name_generator_mixin.py` | Кнопка "Отмена" исправлена, duplicate filtering, async generation |
+| `gui/mixins/master_mixin.py` | Проверки hasattr, update_idletasks(), обновление окна настроек |
+| `gui/mixins/settings_mixin.py` | Мгновенное обновление окна настроек при смене языка |
+| `gui/mixins/ui_setup_mixin.py` | Выравнивание чекбоксов |
+
+### Исправления экспорта/импорта
+| Файл | Исправление |
+|------|-------------|
+| `utils/export.py` | Encrypted exports, sanitization, secure temp files, favicon, локализация "Без метки" |
+| `utils/import.py` | 2 `except Exception` → ValueError, OSError; extension validation, malformed detection |
+| `utils/import_passwords.py` | CSV sanitization, duplicate detection, encoding fallback |
 
 ---
 
