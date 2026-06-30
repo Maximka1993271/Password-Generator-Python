@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Secure Pass Pro — профессиональный генератор и менеджер паролей с открытым исходным кодом. AES-256-GCM, Argon2id, 2FA, бесплатно." />
+  <meta property="og:title" content="Secure Pass Pro v4.0" />
+  <meta property="og:description" content="Профессиональный генератор и менеджер паролей. Бесплатно. Без облаков. Открытый исходный код." />
+  <meta name="theme-color" content="#0a0c10" />
+  <title>Secure Pass Pro v4.0 — Менеджер паролей</title>
+
+  <!-- Favicons -->
+  <link rel="icon" type="image/x-icon" href="images/favicon.ico" />
+  <link rel="icon" type="image/png" sizes="32x32" href="images/favicon-32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="images/favicon-16.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="images/apple-touch-icon.png" />
+  <link rel="icon" type="image/png" sizes="192x192" href="images/icon-192.png" />
+  <link rel="icon" type="image/png" sizes="512x512" href="images/icon-512.png" />
+
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════════
+     NAV
+═══════════════════════════════════════════════════ -->
+<nav>
+  <div class="container nav-inner">
+    <a href="#" class="nav-logo">
+      <svg class="shield-mini" viewBox="0 0 28 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M14 1L2 6V15C2 22.2 7.4 28.9 14 31C20.6 28.9 26 22.2 26 15V6L14 1Z" fill="#00d4ff" fill-opacity="0.15" stroke="#00d4ff" stroke-width="1.5"/>
+        <path d="M9 16L12.5 19.5L19 13" stroke="#00d4ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      Secure Pass Pro
+    </a>
+
+    <ul class="nav-links" id="nav-links">
+      <li><a href="#features">Функции</a></li>
+      <li><a href="#security">Безопасность</a></li>
+      <li><a href="#formats">Форматы</a></li>
+      <li><a href="#install">Установка</a></li>
+      <li>
+        <a href="https://github.com/Maximka1993271/Password-Generator-Python/releases/download/v4.0/SecurePassPro.exe"
+           class="btn-nav" target="_blank" rel="noopener">
+          ↓ Скачать
+        </a>
+      </li>
+    </ul>
+
+    <button id="nav-toggle" style="display:none;background:none;border:none;color:var(--text);font-size:1.4rem;cursor:pointer;padding:4px;">☰</button>
+  </div>
+</nav>
+
+<!-- ══════════════════════════════════════════════════
+     HERO
+═══════════════════════════════════════════════════ -->
+<section id="hero">
+  <div class="hero-grid-bg"></div>
+  <div class="hero-glow"></div>
+
+  <div class="container hero-inner">
+    <!-- LEFT -->
+    <div>
+      <div class="hero-badge fade-up">v4.0 — Открытый исходный код</div>
+
+      <h1 class="hero-title fade-up fade-up-delay-1">
+        Пароли под
+        <span class="accent">полным контролем</span>
+      </h1>
+
+      <p class="hero-sub fade-up fade-up-delay-2">
+        Профессиональный генератор и менеджер паролей.
+        Шифрование AES-256-GCM, Argon2id, 2FA.
+        Всё локально — никаких облаков, никакой телеметрии.
+      </p>
+
+      <div class="hero-actions fade-up fade-up-delay-3">
+        <a href="https://github.com/Maximka1993271/Password-Generator-Python/releases/download/v4.0/SecurePassPro.exe"
+           class="btn-primary" target="_blank" rel="noopener">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+            <path d="M8 0a8 8 0 1 1 0 16A8 8 0 0 1 8 0zm-.5 4.5v5.086L4.707 6.793 3.293 8.207 8 12.914l4.707-4.707-1.414-1.414L8.5 9.586V4.5h-1z"/>
+          </svg>
+          Скачать EXE
+        </a>
+        <a href="https://github.com/Maximka1993271/Password-Generator-Python"
+           class="btn-secondary" target="_blank" rel="noopener">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+            <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z"/>
+          </svg>
+          GitHub
+        </a>
+      </div>
+    </div>
+
+    <!-- RIGHT: SCREENSHOTS SHOWCASE -->
+    <div class="hero-screenshots fade-up fade-up-delay-2">
+      <!-- Theme toggle pills -->
+      <div class="screenshot-toggle">
+        <button class="scr-btn active" data-scr="dark">🌙 Тёмная</button>
+        <button class="scr-btn" data-scr="light">☀️ Светлая</button>
+      </div>
+
+      <!-- Screenshot frame -->
+      <div class="screenshot-frame">
+        <div class="screenshot-titlebar">
+          <div class="scr-dots">
+            <span class="scr-dot red"></span>
+            <span class="scr-dot yellow"></span>
+            <span class="scr-dot green"></span>
+          </div>
+          <span class="scr-app-title">🔐 Secure Pass Pro v4.0</span>
+        </div>
+        <div class="screenshot-viewport">
+          <img id="scr-dark" class="scr-img active"
+               src="images/main-window.jpg"
+               alt="Secure Pass Pro — тёмная тема"
+               loading="lazy" />
+          <img id="scr-light" class="scr-img"
+               src="images/shield-strength.jpg"
+               alt="Secure Pass Pro — светлая тема"
+               loading="lazy" />
+        </div>
+      </div>
+
+      <!-- Caption -->
+      <p class="screenshot-caption" id="scr-caption">
+        🟢 Надёжный пароль · Стойкость: ~2.9e+39 · столетия на взлом
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════
+     STATS BAR
+═══════════════════════════════════════════════════ -->
+<div class="stats-bar">
+  <div class="container">
+    <div class="stats-inner">
+      <div class="stat-item reveal">
+        <span class="stat-num" data-count="256" data-suffix="-бит">0-бит</span>
+        <span class="stat-lbl">AES-GCM шифрование</span>
+      </div>
+      <div class="stat-item reveal">
+        <span class="stat-num" data-count="7" data-suffix=" форматов">0 форматов</span>
+        <span class="stat-lbl">Импорт паролей</span>
+      </div>
+      <div class="stat-item reveal">
+        <span class="stat-num" data-count="3" data-suffix=" языка">0 языка</span>
+        <span class="stat-lbl">Русский, English, Українська</span>
+      </div>
+      <div class="stat-item reveal">
+        <span class="stat-num" data-count="0" data-suffix="₽">0₽</span>
+        <span class="stat-lbl">Полностью бесплатно</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     FEATURES
+═══════════════════════════════════════════════════ -->
+<section id="features">
+  <div class="container">
+    <div class="section-header reveal">
+      <span class="section-eyebrow">// функции</span>
+      <h2>Всё что нужно<br>для безопасности паролей</h2>
+      <p>От генерации до хранения — полный инструментарий в одной программе</p>
+    </div>
+
+    <div class="features-grid">
+      <div class="feature-card reveal">
+        <div class="feature-icon">🔐</div>
+        <h3>Генератор паролей</h3>
+        <p>8 параметров настройки. CSPRNG — криптографически стойкий генератор на базе <span class="mono">secrets</span>. Визуальная индикация надёжности.</p>
+      </div>
+
+      <div class="feature-card reveal">
+        <div class="feature-icon">🎲</div>
+        <h3>Фразы-пароли Diceware</h3>
+        <p>EFF Diceware словарь — 7 776 слов. ~13 бит энтропии на слово. «верба лиман слон кофта» легче запомнить и труднее взломать.</p>
+      </div>
+
+      <div class="feature-card reveal">
+        <div class="feature-icon">🗄️</div>
+        <h3>База паролей</h3>
+        <p>Полное шифрование через SQLCipher. Каждое поле — AES-256-GCM с тегом аутентификации. Категории, теги, избранное, поиск.</p>
+      </div>
+
+      <div class="feature-card reveal">
+        <div class="feature-icon">🛡️</div>
+        <h3>2FA / TOTP</h3>
+        <p>Совместимость с Google Authenticator, Authy, 1Password. 10 одноразовых резервных кодов. Rate limiting на перебор.</p>
+      </div>
+
+      <div class="feature-card reveal">
+        <div class="feature-icon">☁️</div>
+        <h3>Облачная синхронизация</h3>
+        <p>WebDAV — Nextcloud, pCloud, Box и любой совместимый сервер. В облако уходит только зашифрованный файл. Ключ остаётся на устройстве.</p>
+      </div>
+
+      <div class="feature-card reveal">
+        <div class="feature-icon">⌨️</div>
+        <h3>Auto-Type</h3>
+        <p>Автоматический ввод пароля в активное поле без буфера обмена. Windows: <span class="mono">SendInput</span>. Linux: <span class="mono">xdotool</span>. macOS: <span class="mono">osascript</span>.</p>
+      </div>
+
+      <div class="feature-card reveal">
+        <div class="feature-icon">📋</div>
+        <h3>Secure Clipboard</h3>
+        <p>5-кратная перезапись буфера обмена случайными данными. Автоочистка по таймауту (по умолчанию 60 сек).</p>
+      </div>
+
+      <div class="feature-card reveal">
+        <div class="feature-icon">📄</div>
+        <h3>PDF экспорт</h3>
+        <p>Тёмная и светлая темы. Полная поддержка кириллицы через встроенный шрифт DejaVu Sans. Без зависимостей от ОС.</p>
+      </div>
+
+      <div class="feature-card reveal">
+        <div class="feature-icon">🔍</div>
+        <h3>Проверка утечек HIBP</h3>
+        <p>Have I Been Pwned через k-Anonymity: только первые 5 символов SHA-1 хэша отправляются на сервер. Пароль не передаётся.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════
+     SECURITY
+═══════════════════════════════════════════════════ -->
+<section id="security">
+  <div class="container">
+    <div class="security-grid">
+      <div>
+        <span class="section-eyebrow reveal">// безопасность</span>
+        <h2 class="reveal">Архитектура<br>без компромиссов</h2>
+        <p class="reveal" style="margin: 16px 0 40px;">Каждый уровень защиты выбран по конкретной причине — не для галочки.</p>
+
+        <table class="security-table reveal">
+          <tr>
+            <td>Шифрование БД</td>
+            <td>AES-256-GCM + SQLCipher</td>
+          </tr>
+          <tr>
+            <td>Мастер-пароль</td>
+            <td>Argon2id (64 MB, 3 iter)</td>
+          </tr>
+          <tr>
+            <td>KDF fallback</td>
+            <td>PBKDF2-HMAC-SHA256 × 600k</td>
+          </tr>
+          <tr>
+            <td>2FA стандарт</td>
+            <td>TOTP RFC 6238</td>
+          </tr>
+          <tr>
+            <td>Генерация</td>
+            <td>CSPRNG (secrets)</td>
+          </tr>
+          <tr>
+            <td>Очистка памяти</td>
+            <td>ctypes.memset</td>
+          </tr>
+          <tr>
+            <td>Анти-отладка</td>
+            <td>IsDebuggerPresent + ptrace</td>
+          </tr>
+          <tr>
+            <td>Обновления</td>
+            <td>SHA-256 подпись</td>
+          </tr>
+        </table>
+      </div>
+
+      <div class="security-visual reveal">
+        <div class="sec-layer" style="--layer-color: #22c55e;">
+          <span class="sec-layer-icon">🏰</span>
+          <div>
+            <div class="sec-layer-name">Мастер-пароль</div>
+            <div class="sec-layer-desc">Argon2id — единственный ключ. Никогда не сохраняется в открытом виде.</div>
+          </div>
+        </div>
+        <div class="sec-layer" style="--layer-color: #00d4ff;">
+          <span class="sec-layer-icon">🔒</span>
+          <div>
+            <div class="sec-layer-name">База данных</div>
+            <div class="sec-layer-desc">SQLCipher — весь .db файл зашифрован. AES-256-GCM на каждое поле.</div>
+          </div>
+        </div>
+        <div class="sec-layer" style="--layer-color: #a855f7;">
+          <span class="sec-layer-icon">📱</span>
+          <div>
+            <div class="sec-layer-name">Двухфакторная защита</div>
+            <div class="sec-layer-desc">TOTP + 10 резервных кодов. Блокировка после 5 неверных попыток.</div>
+          </div>
+        </div>
+        <div class="sec-layer" style="--layer-color: #f97316;">
+          <span class="sec-layer-icon">🧹</span>
+          <div>
+            <div class="sec-layer-name">Очистка данных</div>
+            <div class="sec-layer-desc">ctypes.memset для ключей в памяти. 5× перезапись буфера обмена.</div>
+          </div>
+        </div>
+        <div class="sec-layer" style="--layer-color: #eab308;">
+          <span class="sec-layer-icon">🕵️</span>
+          <div>
+            <div class="sec-layer-name">Анти-отладка</div>
+            <div class="sec-layer-desc">IsDebuggerPresent, ptrace detection, VM detection.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════
+     IMPORT / EXPORT
+═══════════════════════════════════════════════════ -->
+<section id="formats">
+  <div class="container">
+    <div class="section-header reveal">
+      <span class="section-eyebrow">// форматы</span>
+      <h2>Импорт и экспорт</h2>
+      <p>Переезжайте из любого менеджера паролей без потери данных</p>
+    </div>
+
+    <div class="formats-grid reveal">
+      <div class="format-group">
+        <h3>↓ Импорт из</h3>
+        <div class="format-list">
+          <div class="format-item">
+            <span class="format-ext">.kdbx</span>
+            KeePass 2 / KeePassXC
+          </div>
+          <div class="format-item">
+            <span class="format-ext">.xml</span>
+            KeePass XML
+          </div>
+          <div class="format-item">
+            <span class="format-ext">.json</span>
+            Bitwarden JSON
+          </div>
+          <div class="format-item">
+            <span class="format-ext">.1pux</span>
+            1Password 1PUX
+          </div>
+          <div class="format-item">
+            <span class="format-ext">.csv</span>
+            1Password CSV / Generic CSV
+          </div>
+          <div class="format-item">
+            <span class="format-ext">.json</span>
+            Generic JSON
+          </div>
+        </div>
+      </div>
+
+      <div class="format-group">
+        <h3>↑ Экспорт в</h3>
+        <div class="format-list">
+          <div class="format-item">
+            <span class="format-ext">.kdbx</span>
+            KeePass — зашифрованный
+          </div>
+          <div class="format-item">
+            <span class="format-ext">.pdf</span>
+            PDF — тёмная / светлая тема
+          </div>
+          <div class="format-item">
+            <span class="format-ext">.txt</span>
+            Текстовый файл UTF-8
+          </div>
+          <div class="format-item">
+            <span class="format-ext">.xml</span>
+            KeePass XML
+          </div>
+          <div class="format-item">
+            <span class="format-ext">.png</span>
+            QR-код для мобильных устройств
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════
+     PLATFORMS
+═══════════════════════════════════════════════════ -->
+<section id="platforms">
+  <div class="container">
+    <div class="section-header reveal">
+      <span class="section-eyebrow">// платформы</span>
+      <h2>Работает везде</h2>
+    </div>
+
+    <div class="platforms-row">
+      <div class="platform-card reveal">
+        <span class="platform-os">🪟</span>
+        <h3>Windows</h3>
+        <p>Готовый EXE. Запустить и работать — без установки Python или зависимостей.</p>
+        <span class="platform-status status-ready">✓ Готовый EXE</span>
+      </div>
+
+      <div class="platform-card reveal">
+        <span class="platform-os">🐧</span>
+        <h3>Linux</h3>
+        <p>Ubuntu, Debian, Fedora и другие дистрибутивы. Запуск через Python из исходников.</p>
+        <span class="platform-status status-src">Python 3.10+</span>
+      </div>
+
+      <div class="platform-card reveal">
+        <span class="platform-os">🍎</span>
+        <h3>macOS</h3>
+        <p>macOS 12+. Поддержка Apple Silicon (M1/M2) через PyInstaller universal2.</p>
+        <span class="platform-status status-src">Python 3.10+</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════
+     INSTALL
+═══════════════════════════════════════════════════ -->
+<section id="install">
+  <div class="container">
+    <div class="section-header reveal">
+      <span class="section-eyebrow">// установка</span>
+      <h2>Начать за 30 секунд</h2>
+    </div>
+
+    <div class="reveal">
+      <div class="install-tabs">
+        <button class="tab-btn active" data-tab="exe">Windows EXE</button>
+        <button class="tab-btn" data-tab="python">Python</button>
+        <button class="tab-btn" data-tab="build">Сборка EXE</button>
+      </div>
+
+      <!-- TAB: EXE -->
+      <div class="tab-panel active" id="tab-exe">
+        <div class="code-block">
+          <div class="code-block-header">
+            <span>Шаги установки</span>
+            <button class="code-copy">копировать</button>
+          </div>
+          <pre><code><span class="cm"># 1. Скачайте SecurePassPro.exe из Releases</span>
+<span class="cm"># 2. Запустите файл</span>
+<span class="cm"># 3. При первом запуске задайте мастер-пароль</span>
+<span class="cm">#</span>
+<span class="cm"># Если Windows SmartScreen показывает предупреждение:</span>
+<span class="cm"># Нажмите «Подробнее» → «Всё равно запустить»</span>
+<span class="cm">#</span>
+<span class="cm"># Проверка SHA-256 (рекомендуется):</span>
+<span class="fn">certutil</span> -hashfile SecurePassPro.exe <span class="st">SHA256</span></code></pre>
+        </div>
+      </div>
+
+      <!-- TAB: Python -->
+      <div class="tab-panel" id="tab-python">
+        <div class="code-block">
+          <div class="code-block-header">
+            <span>bash / PowerShell</span>
+            <button class="code-copy">копировать</button>
+          </div>
+          <pre><code><span class="cm"># Клонировать репозиторий</span>
+<span class="fn">git</span> clone https://github.com/Maximka1993271/Password-Generator-Python.git
+<span class="fn">cd</span> Password-Generator-Python
+
+<span class="cm"># Создать виртуальное окружение (рекомендуется)</span>
+<span class="fn">python</span> -m venv venv
+<span class="nm">venv\Scripts\activate</span>    <span class="cm"># Windows</span>
+<span class="nm">source venv/bin/activate</span>  <span class="cm"># Linux / macOS</span>
+
+<span class="cm"># Установить зависимости</span>
+<span class="fn">pip</span> install -r requirements.txt
+
+<span class="cm"># Запустить</span>
+<span class="fn">python</span> Secure_Pass_Pro.pyw</code></pre>
+        </div>
+      </div>
+
+      <!-- TAB: BUILD -->
+      <div class="tab-panel" id="tab-build">
+        <div class="code-block">
+          <div class="code-block-header">
+            <span>PowerShell</span>
+            <button class="code-copy">копировать</button>
+          </div>
+          <pre><code><span class="cm"># Установить PyInstaller</span>
+<span class="fn">pip</span> install pyinstaller>=6.0.0
+
+<span class="cm"># Запустить сборку</span>
+<span class="fn">python</span> build.py
+
+<span class="cm"># Готовый файл:</span>
+<span class="nm">dist\SecurePassPro.exe</span>  <span class="cm"># ~60 MB, всё включено</span></code></pre>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════
+     CTA
+═══════════════════════════════════════════════════ -->
+<section id="cta">
+  <div class="container">
+    <h2 class="reveal">Скачайте бесплатно</h2>
+    <p class="reveal">Открытый исходный код · MIT License · © 2025 Максим Мельников</p>
+    <div class="cta-actions reveal">
+      <a href="https://github.com/Maximka1993271/Password-Generator-Python/releases/download/v4.0/SecurePassPro.exe"
+         class="btn-primary" target="_blank" rel="noopener">
+        ↓ Скачать SecurePassPro.exe
+      </a>
+      <a href="https://github.com/Maximka1993271/Password-Generator-Python/wiki"
+         class="btn-secondary" target="_blank" rel="noopener">
+        📖 Документация
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════
+     FOOTER
+═══════════════════════════════════════════════════ -->
+<footer>
+  <div class="container footer-inner">
+    <a href="#" class="footer-logo">
+      <svg width="20" height="23" viewBox="0 0 28 32" fill="none">
+        <path d="M14 1L2 6V15C2 22.2 7.4 28.9 14 31C20.6 28.9 26 22.2 26 15V6L14 1Z"
+          fill="#00d4ff" fill-opacity="0.15" stroke="#00d4ff" stroke-width="1.5"/>
+        <path d="M9 16L12.5 19.5L19 13" stroke="#00d4ff" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      Secure Pass Pro
+    </a>
+
+    <ul class="footer-links">
+      <li><a href="https://github.com/Maximka1993271/Password-Generator-Python" target="_blank" rel="noopener">GitHub</a></li>
+      <li><a href="https://github.com/Maximka1993271/Password-Generator-Python/releases/download/v4.0/SecurePassPro.exe" target="_blank" rel="noopener">Releases</a></li>
+      <li><a href="https://github.com/Maximka1993271/Password-Generator-Python/wiki" target="_blank" rel="noopener">Wiki</a></li>
+      <li><a href="https://github.com/Maximka1993271/Password-Generator-Python/issues" target="_blank" rel="noopener">Issues</a></li>
+    </ul>
+
+    <span class="footer-copy">MIT License © 2025 Максим Мельников</span>
+  </div>
+</footer>
+
+<!-- Scroll to top button -->
+<button id="scroll-top" aria-label="Наверх" title="Наверх">
+  <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+    <path d="M9 14V4M9 4L4 9M9 4L14 9" stroke="currentColor" stroke-width="2"
+      stroke-linecap="round" stroke-linejoin="round"/>
+  </svg>
+</button>
+
+<script src="main.js"></script>
+</body>
+</html>
