@@ -1,0 +1,337 @@
+# ============================================================
+# Secure Pass Pro v4.0 - .gitignore
+# ============================================================
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.pyd
+*.pyc
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+*.whl
+
+# PyInstaller
+*.spec
+dist/
+build/
+
+# PyInstaller cache
+*.exe
+*.manifest
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+cover/
+*.log
+
+# Virtual environments
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+.venv/
+.python-version
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.ropeproject
+.project
+.pydevproject
+.settings/
+*.iml
+.DS_Store
+Thumbs.db
+*.bak
+*.tmp
+
+# Project-specific
+.securepass/
+data/
+logs/
+*.db
+*.db-shm
+*.db-wal
+*.key
+*.salt
+*.id
+config.json
+*.backup
+*.backup.*
+
+# Security / sensitive files
+*.pem
+*.crt
+*.key
+*.pfx
+*.p12
+*.secret
+*.token
+*.env
+.env.local
+.env.*.local
+
+# Temporary files
+*.tmp
+temp/
+*.temp
+*.swp
+*.swo
+*.~*
+
+# OS specific
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Logs
+*.log
+logs/
+*.log.*
+
+# Backup files
+*.bak
+*.backup
+*.backup.*
+backups/
+*.old
+*.orig
+
+# Crash reports
+crash_*.log
+*.crash
+
+# Exports
+*.enc.json
+*.enc.csv
+*.enc.html
+export_*
+*.export
+
+# Imports
+*.import
+*.imported
+*.1pux
+*.kdbx
+
+# Python profiling
+*.prof
+*.pstats
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# pyre type checker
+.pyre/
+
+# pytype static type analyzer
+.pytype/
+
+# Cython debug symbols
+cython_debug/
+
+# Ruff
+.ruff_cache/
+
+# Bandit
+bandit-report.json
+bandit-results.sarif
+
+# Safety
+safety-report.json
+
+# Test reports
+test_report.html
+coverage.xml
+*.xml
+*.html
+
+# Pipenv
+Pipfile.lock
+
+# Poetry
+poetry.lock
+
+# pipenv
+Pipfile
+
+# pdm
+.pdm.toml
+
+# Conda
+environment.yml
+environment.yaml
+
+# ============================================================
+# КОНФИГУРАЦИЯ ДЛЯ КОНКРЕТНЫХ ИНСТРУМЕНТОВ
+# ============================================================
+
+# pytest
+.pytest_cache/
+pytest.ini
+
+# coverage
+.coverage
+htmlcov/
+
+# Sphinx documentation
+docs/_build/
+
+# PyBuilder
+.pybuilder/
+target/
+
+# Jupyter Notebooks
+.ipynb_checkpoints
+
+# IPython
+profile_default/
+ipython_config.py
+
+# pyenv
+.python-version
+
+# pipenv
+Pipfile.lock
+
+# celery beat schedule
+celerybeat-schedule
+
+# SageMath parsed files
+*.sage.py
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Spyder project settings
+.spyderproject
+.spyproject
+
+# Rope project settings
+.ropeproject
+
+# mkdocs documentation
+/site
+
+# mypy
+.mypy_cache/
+
+# pyre
+.pyre/
+
+# pytype
+.pytype/
+
+# Cython debug
+cython_debug/
+
+# ============================================================
+# ПЕРСОНАЛЬНЫЕ НАСТРОЙКИ
+# ============================================================
+
+# Local development settings
+*.local
+*.user
+*.dev
+
+# IDE-specific
+.vscode/
+.idea/
+*.iml
+*.iws
+*.ipr
+.classpath
+.project
+.settings/
+.metadata
+*.swp
+*.swo
+*~
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# Visual Studio Code
+.vscode/
+*.code-workspace
+
+# ============================================================
+# ИСКЛЮЧЕНИЯ (ФАЙЛЫ, КОТОРЫЕ НУЖНО КОММИТИТЬ)
+# ============================================================
+
+# Но НЕ игнорируем example конфиги
+!config.example.json
+!*.example
+!*.example.*
+
+# Но НЕ игнорируем тестовые данные, если они нужны
+!tests/data/
+!tests/fixtures/
+!tests/mocks/
+
+# Но НЕ игнорируем документацию
+!*.md
+!*.rst
+!*.txt
+
+# Но НЕ игнорируем важные ресурсы
+!Resources/
+!Resources/*
+!Icons/
+!Icons/*
+!Sounds/
+!Sounds/*

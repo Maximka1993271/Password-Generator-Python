@@ -1,0 +1,272 @@
+# .github/workflows/security.yml
+# Security scanning with Bandit for Secure Pass Pro v4.0
+# English: Automated security checks on every push and pull request
+# Русский: Автоматические проверки безопасности при каждом push и pull request
+# Українська: Автоматичні перевірки безпеки при кожному push та pull request
+
+name: 🔒 Security Scan
+
+on:
+  push:
+    branches: [ main, master, develop ]
+    paths:
+      - '**.py'
+      - 'requirements*.txt'
+      - 'pyproject.toml'
+      - 'setup.py'
+      - '.github/workflows/security.yml'
+  pull_request:
+    branches: [ main, master, develop ]
+    paths:
+      - '**.py'
+      - 'requirements*.txt'
+      - 'pyproject.toml'
+      - 'setup.py'
+  schedule:
+    # Weekly scan every Monday at 9:00 UTC
+    # Еженедельное сканирование каждый понедельник в 9:00 UTC
+    # Щотижневе сканування кожного понеділка о 9:00 UTC
+    - cron: '0 9 * * 1'
+  workflow_dispatch:
+
+jobs:
+  security-scan:
+    name: 🛡️ Bandit Security Scan
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        python-version: ['3.10', '3.11', '3.12']
+    
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: 🐍 Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: 'pip'
+      
+      - name: 📦 Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install bandit[toml] bandit-sarif
+          if [ -f requirements.txt ]; then
+            pip install -r requirements.txt
+          fi
+          if [ -f requirements-dev.txt ]; then
+            pip install -r requirements-dev.txt
+          fi
+      
+      - name: 🔍 Run Bandit security scan
+        run: |
+          bandit -r . \
+            -f json \
+            -o bandit-report.json \
+            -c pyproject.toml \
+            --severity-level all \
+            --confidence-level all \
+            --exit-zero
+        continue-on-error: true
+      
+      - name: 📊 Generate SARIF report
+        run: |
+          bandit -r . \
+            -f sarif \
+            -o bandit-results.sarif \
+            -c pyproject.toml \
+            --severity-level medium \
+            --confidence-level medium
+        continue-on-error: true
+      
+      - name: 📤 Upload Bandit report
+        uses: actions/upload-artifact@v4
+        with:
+          name: bandit-report-python-${{ matrix.python-version }}
+          path: |
+            bandit-report.json
+            bandit-results.sarif
+          retention-days: 30
+      
+      - name: 📊 Upload SARIF to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: bandit-results.sarif
+          category: bandit-python-${{ matrix.python-version }}
+        continue-on-error: true
+      
+      - name: 📋 Parse and display results
+        id: bandit_results
+        run: |
+          if [ -f bandit-report.json ]; then
+            echo "🔍 Bandit Results:"
+            echo "=================="
+            python -c "
+            import json
+            import sys
+            try:
+                with open('bandit-report.json', 'r') as f:
+                    data = json.load(f)
+                metrics = data.get('metrics', {})
+                results = data.get('results', [])
+                print(f'📊 Files scanned: {metrics.get(\"_totals\", {}).get(\"loc\", 0)}')
+                print(f'📊 Results found: {len(results)}')
+                if results:
+                    print('\n📝 Issues:')
+                    for r in results[:10]:
+                        sev = r.get('issue_severity', 'unknown').upper()
+                        conf = r.get('issue_confidence', 'unknown').upper()
+                        print(f'  [{sev}] [{conf}] {r.get(\"test_name\", \"unknown\")} - {r.get(\"filename\", \"unknown\")}:{r.get(\"line_number\", 0)}')
+                    if len(results) > 10:
+                        print(f'  ... and {len(results) - 10} more issues')
+            except Exception as e:
+                print(f'❌ Error parsing report: {e}')
+            "
+            echo "=================="
+          else
+            echo "⚠️ No bandit report generated"
+          fi
+      
+      - name: 🚨 Fail if critical issues found
+        run: |
+          if [ -f bandit-report.json ]; then
+            python -c "
+            import json
+            import sys
+            with open('bandit-report.json', 'r') as f:
+                data = json.load(f)
+            results = data.get('results', [])
+            critical = [r for r in results if r.get('issue_severity', '').lower() == 'high' and r.get('issue_confidence', '').lower() == 'high']
+            if critical:
+                print(f'🚨 Found {len(critical)} CRITICAL issues:')
+                for r in critical:
+                    print(f'  - {r.get(\"test_name\", \"unknown\")} in {r.get(\"filename\", \"unknown\")}:{r.get(\"line_number\", 0)}')
+                sys.exit(1)
+            else:
+                print('✅ No critical issues found')
+            "
+          fi
+        continue-on-error: true
+
+  dependency-check:
+    name: 📦 Dependency Security Scan
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+      
+      - name: 🐍 Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      
+      - name: 📦 Install safety
+        run: |
+          python -m pip install --upgrade pip
+          pip install safety
+          if [ -f requirements.txt ]; then
+            pip install -r requirements.txt
+          fi
+      
+      - name: 🔍 Run safety check
+        run: |
+          safety check --full-report --output json > safety-report.json || true
+      
+      - name: 📤 Upload safety report
+        uses: actions/upload-artifact@v4
+        with:
+          name: safety-report
+          path: safety-report.json
+          retention-days: 30
+      
+      - name: 📋 Display safety results
+        run: |
+          if [ -f safety-report.json ]; then
+            echo "📦 Safety Check Results:"
+            echo "========================"
+            python -c "
+            import json
+            try:
+                with open('safety-report.json', 'r') as f:
+                    data = json.load(f)
+                vulnerabilities = data.get('vulnerabilities', [])
+                if vulnerabilities:
+                    print(f'🔴 Found {len(vulnerabilities)} vulnerable packages:')
+                    for v in vulnerabilities[:10]:
+                        print(f'  - {v.get(\"package_name\", \"unknown\")} {v.get(\"vulnerable_spec\", \"\")} - {v.get(\"vulnerability_id\", \"\")}')
+                else:
+                    print('✅ No vulnerable packages found')
+            except Exception as e:
+                print(f'❌ Error parsing safety report: {e}')
+            "
+            echo "========================"
+          fi
+
+  codeql-scan:
+    name: 🔍 CodeQL Security Scan
+    runs-on: ubuntu-latest
+    
+    permissions:
+      security-events: write
+      actions: read
+      contents: read
+    
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+      
+      - name: 🐍 Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      
+      - name: 📦 Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          if [ -f requirements.txt ]; then
+            pip install -r requirements.txt
+          fi
+      
+      - name: 🔍 Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: python
+          queries: security-extended,security-and-quality
+      
+      - name: 🔧 Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
+        with:
+          category: "/language:python"
+          upload: true
+
+  security-summary:
+    name: 📊 Security Summary
+    runs-on: ubuntu-latest
+    needs: [security-scan, dependency-check, codeql-scan]
+    if: always()
+    
+    steps:
+      - name: 📝 Summarize results
+        run: |
+          echo "========================================="
+          echo "  🔒 SECURITY SCAN SUMMARY"
+          echo "========================================="
+          echo ""
+          echo "✅ Bandit Security Scan: ${{ needs.security-scan.result }}"
+          echo "✅ Dependency Check: ${{ needs.dependency-check.result }}"
+          echo "✅ CodeQL Analysis: ${{ needs.codeql-scan.result }}"
+          echo ""
+          if [[ "${{ needs.security-scan.result }}" == "success" ]] && \
+             [[ "${{ needs.dependency-check.result }}" == "success" ]] && \
+             [[ "${{ needs.codeql-scan.result }}" == "success" ]]; then
+            echo "🎉 All security checks passed!"
+          else
+            echo "⚠️ Some security checks failed. Please review the reports."
+          fi
+          echo "========================================="

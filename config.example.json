@@ -1,0 +1,15 @@
+{
+    "_comment": "Пример конфигурации - скопируйте в data/config.json",
+    "THEME": "Dark",
+    "LANG": "RU",
+    "SOUND": true,
+    "RGB": true,
+    "RGB_SPEED": "normal",
+    "RGB_WIDTH": "normal",
+    "RADIUS": 25,
+    "font_size": 14,
+    "CLIP_TIMEOUT": 60,
+    "AUTO_LOCK": false,
+    "AUTO_LOCK_TIMEOUT": 5,
+    "auto_save": false
+}

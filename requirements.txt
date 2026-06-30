@@ -1,0 +1,56 @@
+# ============================================================
+# Secure Pass Pro v4.0 - Dependencies
+# Полный список зависимостей / Full dependency list
+# Повний список залежностей
+# ============================================================
+
+# ---------- Core UI ----------
+customtkinter>=5.2.0
+Pillow>=10.0.0
+
+# ---------- Security & Crypto ----------
+cryptography>=41.0.0
+argon2-cffi>=23.1.0
+
+# ---------- TOTP for 2FA ----------
+qrcode[pil]>=7.4.0
+
+# ---------- System info (VM detection, memory) ----------
+psutil>=5.9.0
+
+# ---------- Export/Import ----------
+defusedxml>=0.7.1
+xmltodict>=0.13.0
+
+# ---------- Cloud Sync (WebDAV) ----------
+requests>=2.31.0
+
+# ---------- Clipboard (autotype fallback) ----------
+pyperclip>=1.8.2
+
+# ---------- KeePass .kdbx export (optional, XML fallback if missing) ----------
+pykeepass>=4.0.5
+
+# ---------- PDF export ----------
+fpdf2>=2.7.0
+
+# ---------- Windows only ----------
+pywin32>=306; sys_platform == 'win32'
+
+# ---------- Global hotkey (optional, graceful fallback if missing) ----------
+keyboard>=0.13.5; sys_platform == 'win32'
+
+# ---------- System tray (optional) ----------
+pystray>=0.19.4
+
+# ---------- Networking ----------
+urllib3>=2.0.0
+certifi>=2023.0.0
+
+# ---------- Build ----------
+pyinstaller>=6.0.0
+
+# ---------- Testing (for development) ----------
+pytest>=7.4.0
+pytest-cov>=4.1.0
+pytest-mock>=3.11.0
