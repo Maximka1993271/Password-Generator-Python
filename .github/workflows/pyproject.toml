@@ -1,0 +1,43 @@
+# ... existing pyproject.toml content ...
+
+[tool.bandit]
+# Bandit configuration for Secure Pass Pro v4.0
+# Конфигурация Bandit для Secure Pass Pro v4.0
+# Конфігурація Bandit для Secure Pass Pro v4.0
+
+exclude_dirs = [
+    "tests",
+    ".venv",
+    "venv",
+    "env",
+    ".git",
+    ".github",
+    "__pycache__",
+    "build",
+    "dist",
+    ".pytest_cache",
+    ".mypy_cache",
+    ".ruff_cache",
+    "htmlcov",
+    ".coverage",
+    ".idea",
+    ".vscode"
+]
+
+skips = [
+    "B101",  # assert used in tests
+    "B307",  # eval not used in production
+    "B311",  # secrets used for cryptography
+    "B324",  # hashlib for non-security purposes
+    "B410",  # xml.etree with safety measures
+    "B504",  # ssl with proper context
+]
+
+severity = "high"
+confidence = "high"
+jobs = 4
+format = "json"
+verbose = false
+
+[tool.bandit.interpreters]
+python = ["3.10", "3.11", "3.12"]

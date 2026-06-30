@@ -1,0 +1,49 @@
+[MASTER]
+jobs=1
+suggestion-mode=yes
+
+[MESSAGES CONTROL]
+# E1101: generated-members — false positives for mixin attributes resolved via MRO
+# R0902: too-many-instance-attributes — acceptable for a main app window
+# R0915: too-many-statements — large UI setup functions are acceptable
+# C0301: line-too-long — some long lines are unavoidable in CTk/Tk calls
+disable=
+    R0902,
+    R0915,
+    C0301,
+    C0303
+
+[FORMAT]
+max-line-length=120
+indent-string='    '
+
+[DESIGN]
+max-attributes=25
+max-statements=80
+max-args=10
+
+[GENERATED-MEMBERS]
+# Mixin method/attr access is resolved at runtime via MRO
+generated-members=
+    self\.btn_gen,
+    self\.generator,
+    self\.upper_var,
+    self\.lower_var,
+    self\.digits_var,
+    self\.symb_var,
+    self\.ambig_var,
+    self\.unambig_var,
+    self\.at_least_var,
+    self\.no_repeat_var,
+    self\.slider_len,
+    self\.current_lang,
+    self\.current_theme,
+    self\.current_radius,
+    self\.clipboard_timeout,
+    self\.sound_enabled,
+    self\.hide_var,
+    self\.clipboard_clear,
+    self\.clipboard_append,
+    self\._stop_rgb,
+    self\.after_cancel,
+    self\.geometry

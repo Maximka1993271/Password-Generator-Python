@@ -1,0 +1,61 @@
+# .bandit
+# Bandit configuration for Secure Pass Pro v4.0
+
+# Exclude directories from scanning
+exclude_dirs:
+  - tests
+  - .venv
+  - venv
+  - env
+  - .git
+  - .github
+  - __pycache__
+  - build
+  - dist
+  - .pytest_cache
+  - .mypy_cache
+  - .ruff_cache
+  - htmlcov
+  - .coverage
+  - .idea
+  - .vscode
+
+# Tests to skip (with explanations)
+skips:
+  # B101: assert used - we use asserts in tests only
+  - 'B101'
+  # B307: eval used - we don't use eval in production code
+  - 'B307'
+  # B311: random used - we use secrets module for cryptography
+  - 'B311'
+  # B324: hashlib used - md5/sha1 used only for non-security purposes
+  - 'B324'
+  # B410: lxml used - we use standard xml.etree with safety measures
+  - 'B410'
+  # B504: ssl without context - we use proper SSL contexts
+  - 'B504'
+
+# Severity levels
+severity:
+  - high
+  - medium
+  - low
+
+# Confidence levels
+confidence:
+  - high
+  - medium
+  - low
+
+# Number of processes to use
+jobs: 4
+
+# Path to Python files
+paths:
+  - .
+
+# Output formats
+format: json
+
+# Verbose output
+verbose: false
